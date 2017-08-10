@@ -74,11 +74,14 @@ public class Value implements Action {
 
     public SetAction createSetAction(String name) {
         try {
+            if (name == null) {
+                throw new IllegalArgumentException("seter Funktionsname muss != null sein");
+            }
             return createSetAction(MethodHandles.lookup().unreflect(
                     this.getClazz().getDeclaredMethod("set" + name,
                             String.class)));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Die Klasse " + getClazz().getName() + " hat keine Methode set" + name + " oder sie ist privat",e);
         }
 
     }
