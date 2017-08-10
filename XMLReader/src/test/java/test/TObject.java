@@ -13,8 +13,8 @@ public class TObject {
     public int getNummer() {
         return nummer;
     }
-    public void setNummer(int nummer) {
-        this.nummer = nummer;
+    public void setNummer(String nummer) {
+        this.nummer = Integer.parseInt(nummer);
     }
     @Override
     public String toString() {

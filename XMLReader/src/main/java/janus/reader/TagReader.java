@@ -50,6 +50,7 @@ public class TagReader {
                 String pfad = s.getCurrentPath();
                 tags.put(pfad,pfad);
             }
+            bearbeiteAttribute(xmlr);
             break;
         case XMLStreamConstants.END_ELEMENT:
             if (xmlr.hasName()) {
@@ -76,13 +77,13 @@ public class TagReader {
       
     }
 
-    private void printAttributes(XMLStreamReader xmlr) {
+    private void bearbeiteAttribute(XMLStreamReader xmlr) {
         for (int i = 0; i < xmlr.getAttributeCount(); i++) {
-            printAttribute(xmlr, i);
+            bearbeiteAttribut(xmlr, i);
         }
     }
 
-    private void printAttribute(XMLStreamReader xmlr, int index) {
+    private void bearbeiteAttribut(XMLStreamReader xmlr, int index) {
         String prefix = xmlr.getAttributePrefix(index);
         String namespace = xmlr.getAttributeNamespace(index);
         String localName = xmlr.getAttributeLocalName(index);
@@ -101,9 +102,9 @@ public class TagReader {
         builder.append("public interface " + className +" {\n");
         for(String name : tags.keySet()) {
             String umgekehrt[] = name.substring(1).split("\\/");
-            builder.append("public final String ");
+            builder.append(" String ");
             for(int i=umgekehrt.length-1;i>=0;i--) {
-                builder.append(umgekehrt[i]);
+                builder.append(umgekehrt[i].replaceAll("\\@", "At"));
                 if (i>0) {
                     builder.append("_");
                 }

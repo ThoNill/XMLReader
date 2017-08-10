@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 
 import javax.xml.stream.XMLStreamException;
 
-import janus.reader.Const;
 import janus.reader.CurrentObject;
 import janus.reader.Reader;
 import janus.reader.SetAction;
@@ -117,6 +116,21 @@ public class SimpleTest {
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TObject);
         Assert.assertEquals("ICFSCTJJMMTT0000000DE00000000012346", ((TObject)o).getName());
+    }
+
+    
+    @Test
+    public void readerGesetztMitAttribut() throws FileNotFoundException, XMLStreamException {
+        Reader reader = new Reader();
+        
+        reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,TObject.class);
+        reader.addSetter(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,"Name");
+        
+        reader.read("resources/kontoauszug.xml");
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof TObject);
+        Assert.assertEquals("EUR", ((TObject)o).getName());
     }
 
 }
