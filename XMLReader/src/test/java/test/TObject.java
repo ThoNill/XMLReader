@@ -1,24 +1,55 @@
 package test;
 
-public class TObject {
+public class TObject extends TSuper {
     private String name;
-    private int nummer;
-    
+    private boolean bValue;
+    private float fValue;
+    private double dValue;
+    private long lValue;
+
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
-    public int getNummer() {
-        return nummer;
-    }
-    public void setNummer(String nummer) {
-        this.nummer = Integer.parseInt(nummer);
-    }
+
     @Override
     public String toString() {
-        return "TObject [name=" + name + ", nummer=" + nummer + "]";
+        return "TObject [name=" + name + ", nummer=" + getNummer() + "]";
     }
-    
+
+    public boolean isbValue() {
+        return bValue;
+    }
+
+    public void setbValue(boolean bValue) {
+        this.bValue = bValue;
+    }
+
+    public float getfValue() {
+        return fValue;
+    }
+
+    public void setfValue(float fValue) {
+        this.fValue = fValue;
+    }
+
+    public double getdValue() {
+        return dValue;
+    }
+
+    public void setdValue(double dValue) {
+        this.dValue = dValue;
+    }
+
+    public long getlValue() {
+        return lValue;
+    }
+
+    public void setlValue(long lValue) {
+        this.lValue = lValue;
+    }
+
 }
