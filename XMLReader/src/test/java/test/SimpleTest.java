@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import javax.xml.stream.XMLStreamException;
 
 import janus.reader.CurrentObject;
+import janus.reader.NamedActionMap;
 import janus.reader.Reader;
 import janus.reader.SetAction;
 import janus.reader.StringStack;
@@ -56,8 +57,9 @@ public class SimpleTest {
         
         CurrentObject current = new CurrentObject();
         Value value = new Value(TObject.class, current);
+        NamedActionMap map = new NamedActionMap();
         
-        StringStack stack = new StringStack(current);
+        StringStack stack = new StringStack(current,map);
         stack.addAction("/first/is", value);
         stack.addAction("/first/is/name", value.createSetAction("Name"));
         
@@ -177,6 +179,15 @@ public class SimpleTest {
         Assert.assertEquals("EUR", ((TObject)o).getVerwendungszweck());
     }
     
+    @Test
+    public void readAnnotierteKlasse() throws FileNotFoundException, XMLStreamException {
+        Reader reader = new Reader(TAnnotated.class);
+        reader.read("resources/kontoauszug.xml");
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof TAnnotated);
+        Assert.assertEquals("EUR",((TAnnotated)o).getName());
+    }
     
 
 }

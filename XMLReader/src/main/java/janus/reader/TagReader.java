@@ -11,6 +11,7 @@ import javax.xml.stream.XMLStreamReader;
 
 public class TagReader {
     private HashMap<String,String> tags;
+    private NamedActionMap map;
     private StringStack s;
     private CurrentObject current;
     private XMLStreamReader xmlr; 
@@ -19,7 +20,8 @@ public class TagReader {
         super();
         tags = new HashMap<>();
         current = new CurrentObject();
-        s = new StringStack(current);
+        map = new NamedActionMap();
+        s = new StringStack(current,map);
     }
     
     

@@ -4,12 +4,18 @@ import java.util.Enumeration;
 import java.util.Stack;
 
 public class StringStack extends Stack<String> {
-    NamedActionMap map = new NamedActionMap();
+    NamedActionMap map;
     CurrentObject current;
 
     public StringStack(CurrentObject current) {
+        this(current,new NamedActionMap());
+    }
+
+    
+    public StringStack(CurrentObject current,NamedActionMap map) {
         super();
         this.current = current;
+        this.map = map;
     }
 
     public void addValue(String name, Class clazz) {

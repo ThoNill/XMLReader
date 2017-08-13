@@ -1,5 +1,7 @@
 package janus.reader;
 
+import janus.reader.annotations.AnnotationProcessor;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
@@ -9,28 +11,36 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-public class Reader implements Iterator<Object>{
+public class Reader implements Iterator<Object> {
     private StringStack s;
     private CurrentObject current;
-    private XMLStreamReader xmlr; 
+    private XMLStreamReader xmlr;
+    private NamedActionMap map;
     
+
     public Reader() {
         super();
         current = new CurrentObject();
-        s = new StringStack(current);
+        map = new NamedActionMap();
+        s = new StringStack(current,map);
     }
-    
-    
-    
+
+    public Reader(Class<?>... classes) {
+        this();
+        readAnnotations(classes);
+    }
+
+    private void readAnnotations(Class<?>[] classes) {
+        AnnotationProcessor p = new AnnotationProcessor();
+        p.processClasses(s, classes);
+    }
 
     public void read(String filename) throws FileNotFoundException,
             XMLStreamException {
         XMLInputFactory xmlif = XMLInputFactory.newInstance();
-        xmlr = xmlif.createXMLStreamReader(filename,
-                new FileInputStream(filename));
-    }   
-
-
+        xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
+                filename));
+    }
 
     private void next(XMLStreamReader xmlr) {
         switch (xmlr.getEventType()) {
@@ -54,13 +64,12 @@ public class Reader implements Iterator<Object>{
         case XMLStreamConstants.PROCESSING_INSTRUCTION:
             break;
         case XMLStreamConstants.CDATA:
-   /*         System.out.print("<![CDATA[");
-            start = xmlr.getTextStart();
-            length = xmlr.getTextLength();
-            System.out
-                    .print(new String(xmlr.getTextCharacters(), start, length));
-            System.out.print("]]>");
-     */       break;
+            /*
+             * System.out.print("<![CDATA["); start = xmlr.getTextStart();
+             * length = xmlr.getTextLength(); System.out .print(new
+             * String(xmlr.getTextCharacters(), start, length));
+             * System.out.print("]]>");
+             */break;
         case XMLStreamConstants.COMMENT:
             break;
         case XMLStreamConstants.ENTITY_REFERENCE:
@@ -68,7 +77,7 @@ public class Reader implements Iterator<Object>{
         case XMLStreamConstants.START_DOCUMENT:
             break;
         }
-     }
+    }
 
     private void verarbeiteAttribute(XMLStreamReader xmlr) {
         for (int i = 0; i < xmlr.getAttributeCount(); i++) {
@@ -85,8 +94,6 @@ public class Reader implements Iterator<Object>{
 
     }
 
-
-
     public void addValue(String name, Class<?> clazz) {
         s.addValue(name, clazz);
     }
@@ -99,21 +106,16 @@ public class Reader implements Iterator<Object>{
         s.addRelativSetter(valueName, relPath, field);
     }
 
-
     public void addAction(String name, Action action) {
         s.addAction(name, action);
     }
-
-
 
     public void addAction(String name, SetAction action) {
         s.addAction(name, action);
     }
 
-
-    
     @Override
-    public Object next()  {
+    public Object next() {
         try {
             while ((!current.hasObject()) && xmlr.hasNext()) {
                 next(xmlr);
@@ -130,8 +132,7 @@ public class Reader implements Iterator<Object>{
         try {
             return xmlr.hasNext();
         } catch (XMLStreamException e) {
-           throw new RuntimeException(e);
+            throw new RuntimeException(e);
         }
     }
 }
-
