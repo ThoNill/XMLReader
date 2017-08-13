@@ -1,4 +1,4 @@
-package adapters;
+package janus.reader.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 

@@ -21,6 +21,7 @@ public class Reader implements Iterator<Object>{
     }
     
     
+    
 
     public void read(String filename) throws FileNotFoundException,
             XMLStreamException {

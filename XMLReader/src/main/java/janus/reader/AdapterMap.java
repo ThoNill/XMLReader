@@ -1,14 +1,14 @@
 package janus.reader;
 
+import janus.reader.adapters.BooleanAdapter;
+import janus.reader.adapters.DoubleAdapter;
+import janus.reader.adapters.FloatAdapter;
+import janus.reader.adapters.IntegerAdapter;
+import janus.reader.adapters.LongAdapter;
+
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
-
-import adapters.BooleanAdapter;
-import adapters.DoubleAdapter;
-import adapters.FloatAdapter;
-import adapters.IntegerAdapter;
-import adapters.LongAdapter;
 
 public class AdapterMap {
     private static HashMap<Class<?>, XmlAdapter<String, ?>> adapters = null;
