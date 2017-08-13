@@ -64,6 +64,7 @@ public class StringStack extends Stack<String> {
         map.setValue(path, value);
     }
 
+    @Override
     public String push(String item) {
         String erg = super.push(item);
         String path = getCurrentPath();
@@ -71,6 +72,7 @@ public class StringStack extends Stack<String> {
         return erg;
     }
 
+    @Override
     public String pop() {
         String path = getCurrentPath();
         String erg = super.pop();

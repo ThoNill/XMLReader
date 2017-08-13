@@ -3,26 +3,27 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>thomas.nill</groupId>
 	<artifactId>XMLReader</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.9.1-SNAPSHOT</version>
 
+ <!-- 
 	<parent>
 		<groupId>thomas.nill</groupId>
 		<artifactId>HauptPOM</artifactId>
 		<version>1.0</version>
 	</parent>
-
+-->
 
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>4.12</version>
-<!-- 			<scope>test</scope>-->
+			<scope>test</scope> 
 		</dependency>
 	</dependencies>
 
 	<build>
-		<testSourceDirectory>src/test/java</testSourceDirectory>
+ 
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>

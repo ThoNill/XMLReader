@@ -41,6 +41,7 @@ public class SimpleNamedAction implements NamedAction{
     }
 
     
+    @Override
     public Action getAction() {
         return action;
     }

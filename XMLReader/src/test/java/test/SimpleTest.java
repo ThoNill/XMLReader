@@ -1,9 +1,4 @@
 package test;
-import java.awt.image.TileObserver;
-import java.io.FileNotFoundException;
-
-import javax.xml.stream.XMLStreamException;
-
 import janus.reader.CurrentObject;
 import janus.reader.NamedActionMap;
 import janus.reader.Reader;
@@ -12,14 +7,19 @@ import janus.reader.StringStack;
 import janus.reader.TagReader;
 import janus.reader.Value;
 
+import java.io.FileNotFoundException;
+
+import javax.xml.stream.XMLStreamException;
+
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
 public class SimpleTest {
 
     
+    private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
+
     @Test
     public void testCurrent() {
         CurrentObject current = new CurrentObject();
@@ -110,7 +110,7 @@ public class SimpleTest {
     public void reader() throws FileNotFoundException, XMLStreamException {
         Reader reader = new Reader();
         
-        reader.read("resources/kontoauszug.xml");
+        reader.read(KONTOAUSZUG_XML);
         reader.next();
         
     }
@@ -119,7 +119,7 @@ public class SimpleTest {
     public void tagReader() throws FileNotFoundException, XMLStreamException {
         TagReader reader = new TagReader();
         
-        reader.read("resources/kontoauszug.xml");
+        reader.read(KONTOAUSZUG_XML);
         reader.next();
         System.out.print(reader.source("reader","Const"));
         
@@ -130,7 +130,7 @@ public class SimpleTest {
         Reader reader = new Reader();
         
         reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,TObject.class);
-        reader.read("resources/kontoauszug.xml");
+        reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TObject);
@@ -143,7 +143,7 @@ public class SimpleTest {
         reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,TObject.class);
         reader.addSetter(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,Const.TxId_Refs_TxDtls_NtryDtls_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,"Name");
         
-        reader.read("resources/kontoauszug.xml");
+        reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TObject);
@@ -158,7 +158,7 @@ public class SimpleTest {
         reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,TObject.class);
         reader.addSetter(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,"Name");
         
-        reader.read("resources/kontoauszug.xml");
+        reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TObject);
@@ -167,12 +167,13 @@ public class SimpleTest {
 
     @Test
     public void readerGesetztSuperKlasse() throws FileNotFoundException, XMLStreamException {
+       
         Reader reader = new Reader();
         
         reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,TObject.class);
         reader.addSetter(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,"Verwendungszweck");
         
-        reader.read("resources/kontoauszug.xml");
+        reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TObject);
@@ -182,7 +183,7 @@ public class SimpleTest {
     @Test
     public void readAnnotierteKlasse() throws FileNotFoundException, XMLStreamException {
         Reader reader = new Reader(TAnnotated.class);
-        reader.read("resources/kontoauszug.xml");
+        reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TAnnotated);
