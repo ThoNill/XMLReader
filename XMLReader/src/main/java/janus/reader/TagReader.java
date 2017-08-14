@@ -10,29 +10,27 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 public class TagReader {
-    private HashMap<String,String> tags;
+    private HashMap<String, String> tags;
     private NamedActionMap map;
     private StringStack s;
     private CurrentObject current;
-    private XMLStreamReader xmlr; 
-    
+    private XMLStreamReader xmlr;
+
     public TagReader() {
         super();
         tags = new HashMap<>();
         current = new CurrentObject();
         map = new NamedActionMap();
-        s = new StringStack(current,map);
+        s = new StringStack(current, map);
     }
-    
-    
 
     public void read(String filename) throws FileNotFoundException,
             XMLStreamException {
         XMLInputFactory xmlif = XMLInputFactory.newInstance();
-        xmlr = xmlif.createXMLStreamReader(filename,
-                new FileInputStream(filename));
-    }   
-    
+        xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
+                filename));
+    }
+
     public Object next() throws XMLStreamException {
         while ((!current.hasObject()) && xmlr.hasNext()) {
             next(xmlr);
@@ -40,9 +38,6 @@ public class TagReader {
         }
         return current.getCurrent();
     }
-    
-
-
 
     private void next(XMLStreamReader xmlr) {
         switch (xmlr.getEventType()) {
@@ -50,7 +45,7 @@ public class TagReader {
             if (xmlr.hasName()) {
                 s.push(xmlr.getLocalName());
                 String pfad = s.getCurrentPath();
-                tags.put(pfad,pfad);
+                tags.put(pfad, pfad);
             }
             bearbeiteAttribute(xmlr);
             break;
@@ -66,17 +61,14 @@ public class TagReader {
             s.setText(new String(xmlr.getTextCharacters(), start, length));
             break;
         case XMLStreamConstants.PROCESSING_INSTRUCTION:
-            break;
         case XMLStreamConstants.CDATA:
-            break;
         case XMLStreamConstants.COMMENT:
-            break;
         case XMLStreamConstants.ENTITY_REFERENCE:
-            break;
         case XMLStreamConstants.START_DOCUMENT:
+        default:
             break;
         }
-      
+
     }
 
     private void bearbeiteAttribute(XMLStreamReader xmlr) {
@@ -90,24 +82,23 @@ public class TagReader {
         String namespace = xmlr.getAttributeNamespace(index);
         String localName = xmlr.getAttributeLocalName(index);
         String value = xmlr.getAttributeValue(index);
-        s.push("@"+localName);
+        s.push("@" + localName);
         String pfad = s.getCurrentPath();
-        tags.put(pfad,pfad);
+        tags.put(pfad, pfad);
         s.pop();
 
     }
 
-
-    public String source(String packageName,String className) {
+    public String source(String packageName, String className) {
         StringBuilder builder = new StringBuilder();
-        builder.append("package " + packageName +";\n");
-        builder.append("public interface " + className +" {\n");
-        for(String name : tags.keySet()) {
+        builder.append("package " + packageName + ";\n");
+        builder.append("public interface " + className + " {\n");
+        for (String name : tags.keySet()) {
             String umgekehrt[] = name.substring(1).split("\\/");
             builder.append(" String ");
-            for(int i=umgekehrt.length-1;i>=0;i--) {
+            for (int i = umgekehrt.length - 1; i >= 0; i--) {
                 builder.append(umgekehrt[i].replaceAll("\\@", "At"));
-                if (i>0) {
+                if (i > 0) {
                     builder.append("_");
                 }
             }

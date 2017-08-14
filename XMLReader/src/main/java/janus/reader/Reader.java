@@ -16,13 +16,12 @@ public class Reader implements Iterator<Object> {
     private CurrentObject current;
     private XMLStreamReader xmlr;
     private NamedActionMap map;
-    
 
     public Reader() {
         super();
         current = new CurrentObject();
         map = new NamedActionMap();
-        s = new StringStack(current,map);
+        s = new StringStack(current, map);
     }
 
     public Reader(Class<?>... classes) {
@@ -62,19 +61,14 @@ public class Reader implements Iterator<Object> {
             s.setText(new String(xmlr.getTextCharacters(), start, length));
             break;
         case XMLStreamConstants.PROCESSING_INSTRUCTION:
-            break;
         case XMLStreamConstants.CDATA:
-            /*
-             * System.out.print("<![CDATA["); start = xmlr.getTextStart();
-             * length = xmlr.getTextLength(); System.out .print(new
-             * String(xmlr.getTextCharacters(), start, length));
-             * System.out.print("]]>");
-             */break;
         case XMLStreamConstants.COMMENT:
-            break;
         case XMLStreamConstants.ENTITY_REFERENCE:
-            break;
         case XMLStreamConstants.START_DOCUMENT:
+            break;
+        default:
+            new ReaderRuntimeException("Nicht behandelter EventType "
+                    + xmlr.getEventType());
             break;
         }
     }
@@ -86,8 +80,6 @@ public class Reader implements Iterator<Object> {
     }
 
     private void verarbeiteAttribut(XMLStreamReader xmlr, int index) {
-        String prefix = xmlr.getAttributePrefix(index);
-        String namespace = xmlr.getAttributeNamespace(index);
         String localName = xmlr.getAttributeLocalName(index);
         String value = xmlr.getAttributeValue(index);
         s.setAttribute(localName, value);
@@ -122,7 +114,7 @@ public class Reader implements Iterator<Object> {
                 xmlr.next();
             }
         } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
+            throw new ReaderRuntimeException(e);
         }
         return current.getCurrent();
     }
@@ -132,7 +124,7 @@ public class Reader implements Iterator<Object> {
         try {
             return xmlr.hasNext();
         } catch (XMLStreamException e) {
-            throw new RuntimeException(e);
+            throw new ReaderRuntimeException(e);
         }
     }
 }

@@ -1,24 +1,23 @@
 package janus.reader;
 
-import java.util.Enumeration;
-import java.util.Stack;
+import java.util.ArrayDeque;
 
-public class StringStack extends Stack<String> {
-    NamedActionMap map;
-    CurrentObject current;
+public class StringStack extends ArrayDeque<String> {
+    private static final long serialVersionUID = 773837341597279034L;
+    private NamedActionMap map;
+    private CurrentObject current;
 
     public StringStack(CurrentObject current) {
-        this(current,new NamedActionMap());
+        this(current, new NamedActionMap());
     }
 
-    
-    public StringStack(CurrentObject current,NamedActionMap map) {
+    public StringStack(CurrentObject current, NamedActionMap map) {
         super();
         this.current = current;
         this.map = map;
     }
 
-    public void addValue(String name, Class clazz) {
+    public void addValue(String name, Class<?> clazz) {
         Value value = new Value(clazz, current);
         addAction(name, value);
     }
@@ -28,18 +27,20 @@ public class StringStack extends Stack<String> {
     }
 
     public void addSetter(String valueName, String absPath, String field) {
-        Value value =checkArguments(valueName, absPath, field);
+        Value value = checkArguments(valueName, absPath, field);
         SetAction setter = value.createSetAction(field);
         addAction(absPath, setter);
     }
 
     public String getCurrentPath() {
         StringBuilder builder = new StringBuilder();
-        Enumeration<String> e = this.elements();
-        while (e.hasMoreElements()) {
-            String s = e.nextElement();
+        Object[] a = this.toArray();
+        int pos = a.length - 1;
+        while (pos >= 0) {
+            Object s = a[pos];
             builder.append("/");
-            builder.append(s);
+            builder.append(s.toString());
+            pos--;
         }
         return builder.toString();
     }
@@ -65,11 +66,10 @@ public class StringStack extends Stack<String> {
     }
 
     @Override
-    public String push(String item) {
-        String erg = super.push(item);
+    public void push(String item) {
+        super.push(item);
         String path = getCurrentPath();
         map.push(path);
-        return erg;
     }
 
     @Override
@@ -79,9 +79,8 @@ public class StringStack extends Stack<String> {
         map.pop(path);
         return erg;
     }
-    
-    private Value checkArguments(String valueName, String absPath,
-            String field) {
+
+    private Value checkArguments(String valueName, String absPath, String field) {
         if (valueName == null || absPath == null || field == null) {
             throw new IllegalArgumentException(
                     "Pfade oder Feldnamen müssen != null sein");
@@ -101,6 +100,6 @@ public class StringStack extends Stack<String> {
             throw new IllegalArgumentException("Object " + valueName
                     + " ist kein Value sondern " + o.getClass().getName());
         }
-        return (Value)o;
+        return (Value) o;
     }
 }

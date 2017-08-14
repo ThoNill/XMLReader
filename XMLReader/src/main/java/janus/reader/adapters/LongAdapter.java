@@ -2,9 +2,9 @@ package janus.reader.adapters;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class LongAdapter extends XmlAdapter<String,Long> {
- 
-   @Override
+public class LongAdapter extends XmlAdapter<String, Long> {
+
+    @Override
     public Long unmarshal(String v) throws Exception {
         return new Long(v.trim());
     }

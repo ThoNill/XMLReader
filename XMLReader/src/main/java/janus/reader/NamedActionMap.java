@@ -39,12 +39,11 @@ public class NamedActionMap extends HashMap<String, NamedAction> {
         }
     }
 
-
     public void pop(String name) {
         NamedAction action = get(name);
         if (action != null) {
             action.pop();
         }
     }
-    
+
 }

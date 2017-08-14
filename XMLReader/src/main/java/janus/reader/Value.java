@@ -1,15 +1,20 @@
 package janus.reader;
 
 import java.lang.reflect.Method;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class Value implements Action {
-    private Class clazz;
-    private Object value;
+    static Logger LOG = LogManager.getLogManager().getLogger(
+            Value.class.getName());
+
+    private Class<?> clazz;
+    private Object objectOfClass;
     private CurrentObject current;
 
-    public Value(Class clazz, CurrentObject current) {
+    public Value(Class<?> clazz, CurrentObject current) {
         super();
         this.clazz = clazz;
         this.current = current;
@@ -18,18 +23,16 @@ public class Value implements Action {
     @Override
     public void push() {
         try {
-            value = clazz.newInstance();
+            objectOfClass = clazz.newInstance();
         } catch (InstantiationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.severe(e.getMessage());
         } catch (IllegalAccessException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.severe(e.getMessage());
         }
     }
 
     public Object getValue() {
-        return value;
+        return objectOfClass;
     }
 
     public Class getClazz() {
@@ -38,8 +41,8 @@ public class Value implements Action {
 
     @Override
     public void pop() {
-        current.setCurrent(value);
-        value = null;
+        current.setCurrent(objectOfClass);
+        objectOfClass = null;
     }
 
     public SetAction createSetAction(ValueSetAction setAction) {
@@ -65,10 +68,11 @@ public class Value implements Action {
             public void setValue(String value) {
                 try {
                     m.invoke(v.getValue(), value);
-                } catch (Throwable e) {
-                    throw new RuntimeException(" Kann die Methode "
-                            + m.getName() + "("  + m.getParameterTypes()[0].getTypeName()+") nicht auf " + v.getValue()
-                            + " anwenden");
+                } catch (Exception e) {
+                    throw new ReaderRuntimeException(" Kann die Methode "
+                            + m.getName() + "("
+                            + m.getParameterTypes()[0].getTypeName()
+                            + ") nicht auf " + v.getValue() + " anwenden");
                 }
             }
         };
@@ -89,10 +93,12 @@ public class Value implements Action {
                 try {
                     o = a.unmarshal(value);
                     m.invoke(v.getValue(), o);
-                } catch (Throwable e) {
-                    throw new RuntimeException(" Kann die Methode "
-                            + m.getName()+ "("  + m.getParameterTypes()[0].getTypeName() + " mit dem Objecttyp " + o.getClass() + " nicht auf " + v.getValue()
-                            + " anwenden");
+                } catch (Exception e) {
+                    throw new ReaderRuntimeException(" Kann die Methode "
+                            + m.getName() + "("
+                            + m.getParameterTypes()[0].getTypeName()
+                            + " mit dem Objecttyp " + o.getClass()
+                            + " nicht auf " + v.getValue() + " anwenden");
                 }
             }
         };
@@ -110,13 +116,14 @@ public class Value implements Action {
                     String.class);
             Class<?> targetClass = method.getParameterTypes()[0];
             if (targetClass != String.class) {
-                return createSetAction(method, AdapterMap.getAdapter(targetClass));
+                return createSetAction(method,
+                        AdapterMap.getAdapter(targetClass));
             }
             return createSetAction(method);
         } catch (Exception e) {
-            throw new RuntimeException("Die Klasse " + getClazz().getName()
-                    + " hat keine Methode set" + name + " oder sie ist privat",
-                    e);
+            throw new ReaderRuntimeException("Die Klasse "
+                    + getClazz().getName() + " hat keine Methode set" + name
+                    + " oder sie ist privat", e);
         }
     }
 
@@ -132,9 +139,9 @@ public class Value implements Action {
                     sucheDieMethode(this.getClazz(), methodName, targetClass),
                     adapter);
         } catch (Exception e) {
-            throw new RuntimeException("Die Klasse " + getClazz().getName()
-                    + " hat keine Methode set" + name + " oder sie ist privat",
-                    e);
+            throw new ReaderRuntimeException("Die Klasse "
+                    + getClazz().getName() + " hat keine Methode set" + name
+                    + " oder sie ist privat", e);
         }
     }
 

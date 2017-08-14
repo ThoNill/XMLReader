@@ -6,12 +6,12 @@ import java.lang.reflect.Method;
 
 public class AnnotationProcessor {
 
-    public void processClasses(StringStack stack, Class<?> ... clazzes) {
-        for(Class<?> clazz: clazzes) {
+    public void processClasses(StringStack stack, Class<?>... clazzes) {
+        for (Class<?> clazz : clazzes) {
             processClass(stack, clazz);
         }
     }
-    
+
     public void processClass(StringStack stack, Class<?> clazz) {
         checkClass(clazz);
         processAllXmlPathAnnotations(stack, clazz);
@@ -41,17 +41,17 @@ public class AnnotationProcessor {
                     .substring(3));
         }
     }
-    
+
     private void checkClass(Class<?> clazz) {
         if (!clazz.isAnnotationPresent(XmlPath.class)) {
-            throw new RuntimeException("Die Klasse " + clazz.getName()
+            throw new IllegalArgumentException("Die Klasse " + clazz.getName()
                     + " muss mit XmlPath annotiert sein");
         }
     }
 
     private void checkMethod(Method m) {
         if (m.getParameterCount() != 1) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     "In der Kasse "
                             + m.getDeclaringClass().getName()
                             + " darf die Methode "
@@ -59,7 +59,7 @@ public class AnnotationProcessor {
                             + " nicht mit XmlPath annotiert sein, da die Parameterzahl != 1 ist ");
         }
         if (!m.getName().startsWith("set")) {
-            throw new RuntimeException(
+            throw new IllegalArgumentException(
                     "In der Kasse "
                             + m.getDeclaringClass().getName()
                             + " darf die Methode "

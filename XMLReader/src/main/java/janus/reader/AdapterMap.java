@@ -25,7 +25,11 @@ public class AdapterMap {
         addAdapter(float.class, new FloatAdapter());
         addAdapter(Boolean.class, new BooleanAdapter());
         addAdapter(boolean.class, new BooleanAdapter());
-        
+
+    }
+
+    public AdapterMap() {
+        super();
     }
 
     public static void addAdapter(Class<?> targetClass,

@@ -5,16 +5,16 @@ public class CurrentObject {
 
     public Object getCurrent() {
         Object o = current;
-        current=null;
+        current = null;
         return o;
     }
 
     public void setCurrent(Object current) {
         this.current = current;
     }
-    
+
     public boolean hasObject() {
-        return (current!=null);
+        return current != null;
     }
-    
+
 }
