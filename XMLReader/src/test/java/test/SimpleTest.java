@@ -1,4 +1,5 @@
 package test;
+import static org.junit.Assert.*;
 import janus.reader.CurrentObject;
 import janus.reader.NamedActionMap;
 import janus.reader.Reader;
@@ -189,6 +190,26 @@ public class SimpleTest {
         Assert.assertTrue(o instanceof TAnnotated);
         Assert.assertEquals("EUR",((TAnnotated)o).getName());
     }
+ 
+    @Test
+    public void falschAnnotierteKlasse() throws FileNotFoundException, XMLStreamException {
+        try {
+            Reader reader = new Reader(TObject.class);
+            fail("Keine Ausnahme");
+        } catch(Exception ex) {
+            
+        }
+    }
     
+    @Test
+    public void falschAnnotierteMethode() throws FileNotFoundException, XMLStreamException {
+        try {
+            Reader reader = new Reader(TFalschAnnotiert.class);
+            fail("Keine Ausnahme");
+        } catch(Exception ex) {
+            
+        }
+    }
+ 
 
 }

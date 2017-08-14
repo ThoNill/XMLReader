@@ -52,7 +52,7 @@ public class AnnotationProcessor {
     private void checkMethod(Method m) {
         if (m.getParameterCount() != 1) {
             throw new IllegalArgumentException(
-                    "In der Kasse "
+                    "In der Klasse "
                             + m.getDeclaringClass().getName()
                             + " darf die Methode "
                             + m.getName()
@@ -60,7 +60,7 @@ public class AnnotationProcessor {
         }
         if (!m.getName().startsWith("set")) {
             throw new IllegalArgumentException(
-                    "In der Kasse "
+                    "In der Klasse "
                             + m.getDeclaringClass().getName()
                             + " darf die Methode "
                             + m.getName()
