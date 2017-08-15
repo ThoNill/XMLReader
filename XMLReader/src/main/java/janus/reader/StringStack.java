@@ -83,7 +83,7 @@ public class StringStack extends ArrayDeque<String> {
     private Value checkArguments(String valueName, String absPath, String field) {
         if (valueName == null || absPath == null || field == null) {
             throw new IllegalArgumentException(
-                    "Pfade oder Feldnamen müssen != null sein");
+                    "Pfade oder Feldnamen muessen != null sein");
         }
         Object o = map.get(valueName);
         if (o == null) {
