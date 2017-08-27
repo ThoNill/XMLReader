@@ -1,5 +1,9 @@
 package janus.reader;
 
+import janus.reader.actions.CurrentObject;
+import janus.reader.actions.NamedActionMap;
+import janus.reader.core.StringStack;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.HashMap;
@@ -24,11 +28,16 @@ public class TagReader {
         s = new StringStack(current, map);
     }
 
-    public void read(String filename) throws FileNotFoundException,
-            XMLStreamException {
-        XMLInputFactory xmlif = XMLInputFactory.newInstance();
+    public void read(String filename)  {
+
+        try {
+            XMLInputFactory xmlif = XMLInputFactory.newInstance();
         xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
                 filename));
+    } catch (FileNotFoundException | XMLStreamException e) {
+        throw new ReaderRuntimeException("Failed to process file", e);
+    }
+
     }
 
     public Object next() throws XMLStreamException {
@@ -36,29 +45,20 @@ public class TagReader {
             next(xmlr);
             xmlr.next();
         }
-        return current.getCurrent();
+        return current.next();
     }
 
     private void next(XMLStreamReader xmlr) {
         switch (xmlr.getEventType()) {
         case XMLStreamConstants.START_ELEMENT:
-            if (xmlr.hasName()) {
-                s.push(xmlr.getLocalName());
-                String pfad = s.getCurrentPath();
-                tags.put(pfad, pfad);
-            }
-            bearbeiteAttribute(xmlr);
+            nextStartElement(xmlr);
             break;
         case XMLStreamConstants.END_ELEMENT:
-            if (xmlr.hasName()) {
-                s.pop();
-            }
+            nextEndElement(xmlr);
             break;
         case XMLStreamConstants.SPACE:
         case XMLStreamConstants.CHARACTERS:
-            int start = xmlr.getTextStart();
-            int length = xmlr.getTextLength();
-            s.setText(new String(xmlr.getTextCharacters(), start, length));
+            nextText(xmlr);
             break;
         case XMLStreamConstants.PROCESSING_INSTRUCTION:
         case XMLStreamConstants.CDATA:
@@ -71,6 +71,27 @@ public class TagReader {
 
     }
 
+    private void nextText(XMLStreamReader xmlr) {
+        int start = xmlr.getTextStart();
+        int length = xmlr.getTextLength();
+        s.setText(new String(xmlr.getTextCharacters(), start, length));
+    }
+
+    private void nextEndElement(XMLStreamReader xmlr) {
+        if (xmlr.hasName()) {
+            s.pop();
+        }
+    }
+
+    private void nextStartElement(XMLStreamReader xmlr) {
+        if (xmlr.hasName()) {
+            s.push(xmlr.getLocalName());
+            String pfad = s.getCurrentPath();
+            tags.put(pfad, pfad);
+        }
+        bearbeiteAttribute(xmlr);
+    }
+
     private void bearbeiteAttribute(XMLStreamReader xmlr) {
         for (int i = 0; i < xmlr.getAttributeCount(); i++) {
             bearbeiteAttribut(xmlr, i);
@@ -78,10 +99,7 @@ public class TagReader {
     }
 
     private void bearbeiteAttribut(XMLStreamReader xmlr, int index) {
-        String prefix = xmlr.getAttributePrefix(index);
-        String namespace = xmlr.getAttributeNamespace(index);
         String localName = xmlr.getAttributeLocalName(index);
-        String value = xmlr.getAttributeValue(index);
         s.push("@" + localName);
         String pfad = s.getCurrentPath();
         tags.put(pfad, pfad);
@@ -94,7 +112,7 @@ public class TagReader {
         builder.append("package " + packageName + ";\n");
         builder.append("public interface " + className + " {\n");
         for (String name : tags.keySet()) {
-            String umgekehrt[] = name.substring(1).split("\\/");
+            String[] umgekehrt = name.substring(1).split("\\/");
             builder.append(" String ");
             for (int i = umgekehrt.length - 1; i >= 0; i--) {
                 builder.append(umgekehrt[i].replaceAll("\\@", "At"));

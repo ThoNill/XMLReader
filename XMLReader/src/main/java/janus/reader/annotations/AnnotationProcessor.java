@@ -1,7 +1,6 @@
 package janus.reader.annotations;
 
-import janus.reader.StringStack;
-
+import janus.reader.core.StringStack;
 import java.lang.reflect.Method;
 
 public class AnnotationProcessor {

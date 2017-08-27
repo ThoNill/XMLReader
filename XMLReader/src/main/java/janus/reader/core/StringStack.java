@@ -1,4 +1,12 @@
-package janus.reader;
+package janus.reader.core;
+
+import janus.reader.actions.Action;
+import janus.reader.actions.CurrentObject;
+import janus.reader.actions.NamedAction;
+import janus.reader.actions.NamedActionMap;
+import janus.reader.actions.SetAction;
+import janus.reader.actions.SimpleNamedAction;
+import janus.reader.actions.Value;
 
 import java.util.ArrayDeque;
 
@@ -85,21 +93,35 @@ public class StringStack extends ArrayDeque<String> {
             throw new IllegalArgumentException(
                     "Pfade oder Feldnamen muessen != null sein");
         }
+        Object o =checkName(valueName);
+        checkNamedAction(valueName, o);
+        return checkValue(valueName, o);
+    }
+
+
+    private Object checkName(String valueName) {
         Object o = map.get(valueName);
         if (o == null) {
             throw new IllegalArgumentException("Value " + valueName
                     + " ist nicht vorhanden");
         }
+        return o;
+    }
+
+    private void checkNamedAction(String valueName, Object o) {
         if (!(o instanceof NamedAction)) {
             throw new IllegalArgumentException("Object " + valueName
                     + " ist keine NamedAction sondern "
                     + o.getClass().getName());
         }
-        o = ((NamedAction) o).getAction();
-        if (!(o instanceof Value)) {
+    }
+
+    private Value checkValue(String valueName, Object o) {
+        Action a = ((NamedAction) o).getAction();
+        if (!(a instanceof Value)) {
             throw new IllegalArgumentException("Object " + valueName
-                    + " ist kein Value sondern " + o.getClass().getName());
+                    + " ist kein Value sondern " + a.getClass().getName());
         }
-        return (Value) o;
+        return (Value)a;
     }
 }

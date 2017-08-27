@@ -1,4 +1,4 @@
-package janus.reader;
+package janus.reader.actions;
 
 public interface Action {
     void push();

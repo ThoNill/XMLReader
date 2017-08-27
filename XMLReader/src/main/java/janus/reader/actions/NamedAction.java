@@ -1,4 +1,4 @@
-package janus.reader;
+package janus.reader.actions;
 
 public interface NamedAction extends Action, SetAction {
     String getName();

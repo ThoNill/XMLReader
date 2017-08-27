@@ -1,9 +1,9 @@
-package janus.reader;
+package janus.reader.actions;
 
 public class CurrentObject {
     private Object current;
 
-    public Object getCurrent() {
+    public Object next() {
         Object o = current;
         current = null;
         return o;

@@ -1,4 +1,4 @@
-package janus.reader;
+package janus.reader.actions;
 
 public class SimpleNamedAction implements NamedAction {
     private String name;

@@ -1,10 +1,4 @@
-package janus.reader;
-
-import janus.reader.adapters.BooleanAdapter;
-import janus.reader.adapters.DoubleAdapter;
-import janus.reader.adapters.FloatAdapter;
-import janus.reader.adapters.IntegerAdapter;
-import janus.reader.adapters.LongAdapter;
+package janus.reader.adapters;
 
 import java.util.HashMap;
 
@@ -27,29 +21,32 @@ public class AdapterMap {
         addAdapter(boolean.class, new BooleanAdapter());
 
     }
-
-    public AdapterMap() {
-        super();
+    
+    private AdapterMap() {
     }
+     
 
     public static void addAdapter(Class<?> targetClass,
             XmlAdapter<String, ?> adapter) {
         adapters.put(targetClass, adapter);
     }
 
-    public static XmlAdapter<String, ?> getAdapter(Class<?> targetClass) {
-        XmlAdapter<String, ?> adapter = adapters.get(targetClass);
-        return adapter;
+    public static XmlAdapter<String,?> getAdapter(Class<?> targetClass) {
+        return adapters.get(targetClass);
     }
 
     public static boolean hasAdapterForClass(Class<?> targetClass) {
         return adapters.containsKey(targetClass);
     }
 
-    public static Object unmashal(Class<?> targetClass, String text)
-            throws Exception {
-        XmlAdapter<String, ?> adapter = getAdapter(targetClass);
-        return adapter.unmarshal(text);
+    public static Object unmashal(Class<?> targetClass, String text) {
+        try {
+            XmlAdapter<String, ?> adapter = getAdapter(targetClass);
+            return adapter.unmarshal(text);
+        } catch (Exception ex) {
+            throw new AdapterException(
+                    "Error within Adapter or Adapter not found for " + targetClass.getName(), ex);
+        }
     }
 
 }

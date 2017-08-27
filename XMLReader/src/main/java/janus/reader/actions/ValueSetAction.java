@@ -1,4 +1,4 @@
-package janus.reader;
+package janus.reader.actions;
 
 @FunctionalInterface
 public interface ValueSetAction {

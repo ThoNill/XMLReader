@@ -1,10 +1,16 @@
 package janus.reader;
 
+import janus.reader.actions.Action;
+import janus.reader.actions.CurrentObject;
+import janus.reader.actions.NamedActionMap;
+import janus.reader.actions.SetAction;
 import janus.reader.annotations.AnnotationProcessor;
+import janus.reader.core.StringStack;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
@@ -34,43 +40,54 @@ public class Reader implements Iterator<Object> {
         p.processClasses(s, classes);
     }
 
-    public void read(String filename) throws FileNotFoundException,
-            XMLStreamException {
+    public void read(String filename) {
         XMLInputFactory xmlif = XMLInputFactory.newInstance();
-        xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
-                filename));
+        try {
+            xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
+                    filename));
+        } catch (FileNotFoundException | XMLStreamException e) {
+            throw new ReaderRuntimeException("Failed to process file", e);
+        }
     }
 
     private void next(XMLStreamReader xmlr) {
         switch (xmlr.getEventType()) {
         case XMLStreamConstants.START_ELEMENT:
-            if (xmlr.hasName()) {
-                s.push(xmlr.getLocalName());
-            }
-            verarbeiteAttribute(xmlr);
+            nextStartElement(xmlr);
             break;
         case XMLStreamConstants.END_ELEMENT:
-            if (xmlr.hasName()) {
-                s.pop();
-            }
+            nextEndElement(xmlr);
             break;
         case XMLStreamConstants.SPACE:
         case XMLStreamConstants.CHARACTERS:
-            int start = xmlr.getTextStart();
-            int length = xmlr.getTextLength();
-            s.setText(new String(xmlr.getTextCharacters(), start, length));
+            nextText(xmlr);
             break;
         case XMLStreamConstants.PROCESSING_INSTRUCTION:
         case XMLStreamConstants.CDATA:
         case XMLStreamConstants.COMMENT:
         case XMLStreamConstants.ENTITY_REFERENCE:
         case XMLStreamConstants.START_DOCUMENT:
-            break;
-        default:
-            new ReaderRuntimeException("Nicht behandelter EventType "
-                    + xmlr.getEventType());
-            break;
+        default: break;    
         }
+    }
+
+    private void nextText(XMLStreamReader xmlr) {
+        int start = xmlr.getTextStart();
+        int length = xmlr.getTextLength();
+        s.setText(new String(xmlr.getTextCharacters(), start, length));
+    }
+
+    private void nextEndElement(XMLStreamReader xmlr) {
+        if (xmlr.hasName()) {
+            s.pop();
+        }
+    }
+
+    private void nextStartElement(XMLStreamReader xmlr) {
+        if (xmlr.hasName()) {
+            s.push(xmlr.getLocalName());
+        }
+        verarbeiteAttribute(xmlr);
     }
 
     private void verarbeiteAttribute(XMLStreamReader xmlr) {
@@ -116,13 +133,16 @@ public class Reader implements Iterator<Object> {
         } catch (XMLStreamException e) {
             throw new ReaderRuntimeException(e);
         }
-        return current.getCurrent();
+        if (!current.hasObject()) {
+            throw new NoSuchElementException();
+        }
+        return current.next();
     }
 
     @Override
     public boolean hasNext() {
         try {
-            return xmlr.hasNext();
+            return xmlr.hasNext() || current.hasObject();
         } catch (XMLStreamException e) {
             throw new ReaderRuntimeException(e);
         }

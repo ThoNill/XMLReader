@@ -1,4 +1,4 @@
-package janus.reader;
+package janus.reader.actions;
 
 import java.util.HashMap;
 import java.util.Map;

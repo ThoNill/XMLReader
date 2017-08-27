@@ -1,12 +1,12 @@
 package test;
-import static org.junit.Assert.*;
-import janus.reader.CurrentObject;
-import janus.reader.NamedActionMap;
+import static org.junit.Assert.fail;
 import janus.reader.Reader;
-import janus.reader.SetAction;
-import janus.reader.StringStack;
 import janus.reader.TagReader;
-import janus.reader.Value;
+import janus.reader.actions.CurrentObject;
+import janus.reader.actions.NamedActionMap;
+import janus.reader.actions.SetAction;
+import janus.reader.actions.Value;
+import janus.reader.core.StringStack;
 
 import java.io.FileNotFoundException;
 
@@ -14,9 +14,13 @@ import javax.xml.stream.XMLStreamException;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class SimpleTest {
+    static Logger LOG = LoggerFactory.getLogger(Value.class);
+
 
     
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
@@ -30,7 +34,7 @@ public class SimpleTest {
         action.setValue("Test");
         
         value.pop();
-        TObject testObject = (TObject)current.getCurrent();
+        TObject testObject = (TObject)current.next();
         
         Assert.assertEquals("Test", testObject.getName());
         
@@ -46,7 +50,7 @@ public class SimpleTest {
         action.setValue("Test");
         
         value.pop();
-        TObject testObject = (TObject)current.getCurrent();
+        TObject testObject = (TObject)current.next();
         
         Assert.assertEquals("Test", testObject.getName());
         
@@ -71,7 +75,7 @@ public class SimpleTest {
         stack.pop();
         stack.pop();
         
-        TObject testObject = (TObject)current.getCurrent();
+        TObject testObject = (TObject)current.next();
         
         Assert.assertEquals("Test", testObject.getName());
         
@@ -96,7 +100,7 @@ public class SimpleTest {
         bSetter.setValue("true");
         
         value.pop();
-        TObject testObject = (TObject)current.getCurrent();
+        TObject testObject = (TObject)current.next();
         Assert.assertEquals(66, testObject.getNummer());
         Assert.assertEquals(888l, testObject.getlValue());
         Assert.assertEquals(6.6d, testObject.getdValue(),0.01);
@@ -112,7 +116,6 @@ public class SimpleTest {
         Reader reader = new Reader();
         
         reader.read(KONTOAUSZUG_XML);
-        reader.next();
         
     }
 
@@ -197,7 +200,7 @@ public class SimpleTest {
             Reader reader = new Reader(TObject.class);
             fail("Keine Ausnahme");
         } catch(Exception ex) {
-            
+            LOG.info("Expected exception",ex);
         }
     }
     
@@ -207,7 +210,7 @@ public class SimpleTest {
             Reader reader = new Reader(TFalschAnnotiert.class);
             fail("Keine Ausnahme");
         } catch(Exception ex) {
-            
+            LOG.info("Expected exception",ex);
         }
     }
  

@@ -1,14 +1,17 @@
-package janus.reader;
+package janus.reader.actions;
+
+import janus.reader.ReaderRuntimeException;
+import janus.reader.adapters.AdapterMap;
 
 import java.lang.reflect.Method;
-import java.util.logging.LogManager;
-import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Value implements Action {
-    static Logger LOG = LogManager.getLogManager().getLogger(
-            Value.class.getName());
+    static Logger LOG = LoggerFactory.getLogger(Value.class);
 
     private Class<?> clazz;
     private Object objectOfClass;
@@ -25,9 +28,9 @@ public class Value implements Action {
         try {
             objectOfClass = clazz.newInstance();
         } catch (InstantiationException e) {
-            LOG.severe(e.getMessage());
+            LOG.error("The Object could not be instantiated",e);
         } catch (IllegalAccessException e) {
-            LOG.severe(e.getMessage());
+            LOG.error("Illegal Access",e);
         }
     }
 
@@ -72,7 +75,7 @@ public class Value implements Action {
                     throw new ReaderRuntimeException(" Kann die Methode "
                             + m.getName() + "("
                             + m.getParameterTypes()[0].getTypeName()
-                            + ") nicht auf " + v.getValue() + " anwenden");
+                            + ") nicht auf " + v.getValue() + " anwenden",e);
                 }
             }
         };
@@ -98,7 +101,7 @@ public class Value implements Action {
                             + m.getName() + "("
                             + m.getParameterTypes()[0].getTypeName()
                             + " mit dem Objecttyp " + o.getClass()
-                            + " nicht auf " + v.getValue() + " anwenden");
+                            + " nicht auf " + v.getValue() + " anwenden",e);
                 }
             }
         };
