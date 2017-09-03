@@ -1,5 +1,11 @@
 package janus.reader;
 
+/**
+ * class for runtime exception of the reader
+ * 
+ * @author Thomas Nill
+ *
+ */
 public class ReaderRuntimeException extends RuntimeException {
 
     public ReaderRuntimeException() {

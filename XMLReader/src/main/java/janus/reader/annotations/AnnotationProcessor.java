@@ -1,22 +1,22 @@
 package janus.reader.annotations;
 
-import janus.reader.core.StringStack;
+import janus.reader.core.ElementNameStack;
 import java.lang.reflect.Method;
 
 public class AnnotationProcessor {
 
-    public void processClasses(StringStack stack, Class<?>... clazzes) {
+    public void processClasses(ElementNameStack stack, Class<?>... clazzes) {
         for (Class<?> clazz : clazzes) {
             processClass(stack, clazz);
         }
     }
 
-    public void processClass(StringStack stack, Class<?> clazz) {
+    public void processClass(ElementNameStack stack, Class<?> clazz) {
         checkClass(clazz);
         processAllXmlPathAnnotations(stack, clazz);
     }
 
-    protected void processAllXmlPathAnnotations(StringStack stack,
+    protected void processAllXmlPathAnnotations(ElementNameStack stack,
             Class<?> clazz) {
         for (XmlPath cPath : clazz.getAnnotationsByType(XmlPath.class)) {
             stack.addValue(cPath.path(), clazz);
@@ -26,14 +26,14 @@ public class AnnotationProcessor {
         }
     }
 
-    private void processMethod(StringStack stack, XmlPath cPath, Method m) {
+    private void processMethod(ElementNameStack stack, XmlPath cPath, Method m) {
         if (m.isAnnotationPresent(XmlPath.class)) {
             checkMethod(m);
             processAllXmlPathAnnotations(stack, cPath, m);
         }
     }
 
-    protected void processAllXmlPathAnnotations(StringStack stack,
+    protected void processAllXmlPathAnnotations(ElementNameStack stack,
             XmlPath cPath, Method m) {
         for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
             stack.addSetter(cPath.path(), mPath.path(), m.getName()

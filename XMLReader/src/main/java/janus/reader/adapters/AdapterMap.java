@@ -4,6 +4,13 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
+
+/**
+ * a bundle of different adapters, you can add other adapters to this bundle
+ * 
+ * @author Thomas Nill
+ *
+ */
 public class AdapterMap {
     private static HashMap<Class<?>, XmlAdapter<String, ?>> adapters = null;
 
@@ -25,20 +32,45 @@ public class AdapterMap {
     private AdapterMap() {
     }
      
-
+    /**
+     * add an adapter for a class targetClass
+     * 
+     * @param targetClass
+     * @param adapter
+     */
     public static void addAdapter(Class<?> targetClass,
             XmlAdapter<String, ?> adapter) {
         adapters.put(targetClass, adapter);
     }
 
+    /**
+     * get the adapter for the targetClass
+     * @param targetClass
+     * 
+     * @return
+     */
     public static XmlAdapter<String,?> getAdapter(Class<?> targetClass) {
         return adapters.get(targetClass);
     }
 
+    /**
+     * chak if an adapter for a class targetClass exists
+     * 
+     * @param targetClass
+     * @return
+     */
     public static boolean hasAdapterForClass(Class<?> targetClass) {
         return adapters.containsKey(targetClass);
     }
 
+    /**
+     * get the adapter for a specific class targetClass
+     * und unmashal the string value
+     * 
+     * @param targetClass
+     * @param text
+     * @return
+     */
     public static Object unmashal(Class<?> targetClass, String text) {
         try {
             XmlAdapter<String, ?> adapter = getAdapter(targetClass);

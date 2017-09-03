@@ -5,7 +5,7 @@ import janus.reader.actions.CurrentObject;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
 import janus.reader.annotations.AnnotationProcessor;
-import janus.reader.core.StringStack;
+import janus.reader.core.ElementNameStack;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,28 +17,49 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+/**
+ * The Reader emit the Objects of the configured Classes. If a end -tag ist
+ * reached the next method, emits a instance of the Class of this element
+ * 
+ * The reader must be configured before it is used.
+ * 
+ * @author Thomas Nill
+ *
+ */
+
 public class Reader implements Iterator<Object> {
-    private StringStack s;
+    private ElementNameStack elementNameStack;
     private CurrentObject current;
     private XMLStreamReader xmlr;
     private NamedActionMap map;
 
+    /**
+     * Constructor of an uninitialized Reader
+     * 
+     */
     public Reader() {
         super();
         current = new CurrentObject();
         map = new NamedActionMap();
-        s = new StringStack(current, map);
+        elementNameStack = new ElementNameStack(current, map);
     }
 
+    /**
+     * Constructor with the initialization in annotated classes
+     * 
+     * @param classes
+     */
     public Reader(Class<?>... classes) {
         this();
         readAnnotations(classes);
     }
 
-    private void readAnnotations(Class<?>[] classes) {
-        AnnotationProcessor p = new AnnotationProcessor();
-        p.processClasses(s, classes);
-    }
+    /**
+     * start to read a file
+     * 
+     * @param filename
+     *            (name of the file)
+     */
 
     public void read(String filename) {
         XMLInputFactory xmlif = XMLInputFactory.newInstance();
@@ -48,6 +69,111 @@ public class Reader implements Iterator<Object> {
         } catch (FileNotFoundException | XMLStreamException e) {
             throw new ReaderRuntimeException("Failed to process file", e);
         }
+    }
+
+    /**
+     * read the next Object from the Stax-Stream
+     * 
+     */
+    @Override
+    public Object next() {
+        try {
+            while ((!current.hasObject()) && xmlr.hasNext()) {
+                next(xmlr);
+                xmlr.next();
+            }
+        } catch (XMLStreamException e) {
+            throw new ReaderRuntimeException(e);
+        }
+        if (!current.hasObject()) {
+            throw new NoSuchElementException();
+        }
+        return current.next();
+    }
+
+    /**
+     * check if there is a next object that can be read
+     * 
+     */
+    @Override
+    public boolean hasNext() {
+        try {
+            return xmlr.hasNext() || current.hasObject();
+        } catch (XMLStreamException e) {
+            throw new ReaderRuntimeException(e);
+        }
+    }
+
+    /**
+     * Add the creation of a class instance to a path of XML Elements
+     * 
+     * @param name
+     *            (path of XML Elements)
+     * @param clazz
+     *            (class of the generated instance)
+     */
+    public void addValue(String name, Class<?> clazz) {
+        elementNameStack.addValue(name, clazz);
+    }
+
+    /**
+     * Add the setXXXX setter to a path of XML Elements
+     * 
+     * @param valueName
+     *            (the path of XML elements to the object instance, that will be
+     *            set)
+     * @param absPath
+     *            (the absolute path of XML elements to a text-value, for the
+     *            value attribute of the setter)
+     * @param field
+     *            (the name of the setter Method)
+     */
+    public void addSetter(String valueName, String absPath, String field) {
+        elementNameStack.addSetter(valueName, absPath, field);
+    }
+
+    /**
+     * Add the setXXXX setter to a path of XML Elements
+     * 
+     * @param valueName
+     *            (the path of XML elements to the object instance, that will be
+     *            set)
+     * @param relPath
+     *            (the relative path of XML elements to a text-value, for the
+     *            value attribute of the setter)
+     * @param field
+     *            (the name of the setter Method)
+     */
+    public void addRelativSetter(String valueName, String relPath, String field) {
+        elementNameStack.addRelativSetter(valueName, relPath, field);
+    }
+
+    /**
+     * Add a @{Action} to a path of XML Elements
+     * 
+     * @param name
+     *            (the path of XML elements to the object instance, that will be
+     *            set)
+     * @param action
+     *            (the action, that will be executed at the start and end-tag of
+     *            the path)
+     */
+    public void addAction(String name, Action action) {
+        elementNameStack.addAction(name, action);
+    }
+
+    /**
+     * Add a @{SetAction} to a path of XML Elements
+     * 
+     * @param name
+     *            (the path of XML elements to the object instance, that will be
+     *            set)
+     * @param action
+     *            (the action, that will be executed at the start and end-tag of
+     *            the path)
+     */
+    public void addAction(String name, SetAction action) {
+        elementNameStack.addAction(name, action);
     }
 
     private void next(XMLStreamReader xmlr) {
@@ -67,84 +193,47 @@ public class Reader implements Iterator<Object> {
         case XMLStreamConstants.COMMENT:
         case XMLStreamConstants.ENTITY_REFERENCE:
         case XMLStreamConstants.START_DOCUMENT:
-        default: break;    
+        default:
+            break;
         }
     }
 
     private void nextText(XMLStreamReader xmlr) {
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
-        s.setText(new String(xmlr.getTextCharacters(), start, length));
+        elementNameStack.setText(new String(xmlr.getTextCharacters(), start,
+                length));
     }
 
     private void nextEndElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
-            s.pop();
+            elementNameStack.pop();
         }
     }
 
     private void nextStartElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
-            s.push(xmlr.getLocalName());
+            elementNameStack.push(xmlr.getLocalName());
         }
-        verarbeiteAttribute(xmlr);
+        traverseAttributes(xmlr);
     }
 
-    private void verarbeiteAttribute(XMLStreamReader xmlr) {
+    private void traverseAttributes(XMLStreamReader xmlr) {
         for (int i = 0; i < xmlr.getAttributeCount(); i++) {
-            verarbeiteAttribut(xmlr, i);
+            handleAttribut(xmlr, i);
         }
     }
 
-    private void verarbeiteAttribut(XMLStreamReader xmlr, int index) {
+    private void handleAttribut(XMLStreamReader xmlr, int index) {
         String localName = xmlr.getAttributeLocalName(index);
         String value = xmlr.getAttributeValue(index);
-        s.setAttribute(localName, value);
+        elementNameStack.setAttribute(localName, value);
 
     }
 
-    public void addValue(String name, Class<?> clazz) {
-        s.addValue(name, clazz);
+    private void readAnnotations(Class<?>[] classes) {
+        AnnotationProcessor p = new AnnotationProcessor();
+        p.processClasses(elementNameStack, classes);
     }
 
-    public void addSetter(String valueName, String relPath, String field) {
-        s.addSetter(valueName, relPath, field);
-    }
-
-    public void addRelativSetter(String valueName, String relPath, String field) {
-        s.addRelativSetter(valueName, relPath, field);
-    }
-
-    public void addAction(String name, Action action) {
-        s.addAction(name, action);
-    }
-
-    public void addAction(String name, SetAction action) {
-        s.addAction(name, action);
-    }
-
-    @Override
-    public Object next() {
-        try {
-            while ((!current.hasObject()) && xmlr.hasNext()) {
-                next(xmlr);
-                xmlr.next();
-            }
-        } catch (XMLStreamException e) {
-            throw new ReaderRuntimeException(e);
-        }
-        if (!current.hasObject()) {
-            throw new NoSuchElementException();
-        }
-        return current.next();
-    }
-
-    @Override
-    public boolean hasNext() {
-        try {
-            return xmlr.hasNext() || current.hasObject();
-        } catch (XMLStreamException e) {
-            throw new ReaderRuntimeException(e);
-        }
-    }
 }

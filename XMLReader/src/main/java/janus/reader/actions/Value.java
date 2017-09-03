@@ -10,6 +10,16 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * A value holds a instance of a class {@value clazz}.
+ * in the push action, this instance ist generated
+ * in the pop action this object is transfered to the current Object
+ * 
+ * there ar different methods to create {@link SetAction} 
+ * 
+ * @author Thomas Nill
+ *
+ */
 public class Value implements Action {
     static Logger LOG = LoggerFactory.getLogger(Value.class);
 
@@ -23,6 +33,10 @@ public class Value implements Action {
         this.current = current;
     }
 
+    /**
+     * push action create a instance of class clazz
+     * 
+     */
     @Override
     public void push() {
         try {
@@ -34,34 +48,59 @@ public class Value implements Action {
         }
     }
 
-    public Object getValue() {
-        return objectOfClass;
-    }
-
-    public Class getClazz() {
-        return clazz;
-    }
-
+    /**
+     * pop action transfers object to current
+     * 
+     */
     @Override
     public void pop() {
         current.setCurrent(objectOfClass);
         objectOfClass = null;
     }
-
-    public SetAction createSetAction(ValueSetAction setAction) {
-        Value v = this;
-
-        return new SetAction() {
-            ValueSetAction s = setAction;
-
-            @Override
-            public void setValue(String value) {
-                s.setValue(v.getValue(), value);
-            }
-        };
+    
+    public Object getValue() {
+        return objectOfClass;
+    }
+    
+    public Class<?> getClazz() {
+        return clazz;
     }
 
-    public SetAction createSetAction(Method handle) {
+    /**
+     * create form a method name
+     * 
+     * @param name
+     * @return
+     */
+    public SetAction createSetAction(String name) {
+        try {
+            if (name == null) {
+                throw new IllegalArgumentException(
+                        "seter Funktionsname muss != null sein");
+            }
+            String methodName = "set" + name;
+            Method method = searchTheMethod(this.getClazz(), methodName,
+                    String.class);
+            Class<?> targetClass = method.getParameterTypes()[0];
+            if (targetClass != String.class) {
+                return createSetAction(method,
+                        AdapterMap.getAdapter(targetClass));
+            }
+            return createSetAction(method);
+        } catch (Exception e) {
+            throw new ReaderRuntimeException("Die Klasse "
+                    + getClazz().getName() + " hat keine Methode set" + name
+                    + " oder sie ist privat", e);
+        }
+    }
+    
+    /**
+     * create SetAction from a {@link Method}
+     * 
+     * @param handle
+     * @return
+     */
+    private SetAction createSetAction(Method handle) {
         Value v = this;
 
         return new SetAction() {
@@ -82,7 +121,14 @@ public class Value implements Action {
 
     }
 
-    public SetAction createSetAction(Method handle,
+    /**
+     * create SetAction from a {@link Method}
+     * 
+     * @param handle
+     * @param adapter
+     * @return
+     */
+    private SetAction createSetAction(Method handle,
             XmlAdapter<String, ?> adapter) {
         Value v = this;
 
@@ -107,48 +153,17 @@ public class Value implements Action {
         };
 
     }
-
-    public SetAction createSetAction(String name) {
-        try {
-            if (name == null) {
-                throw new IllegalArgumentException(
-                        "seter Funktionsname muss != null sein");
-            }
-            String methodName = "set" + name;
-            Method method = sucheDieMethode(this.getClazz(), methodName,
-                    String.class);
-            Class<?> targetClass = method.getParameterTypes()[0];
-            if (targetClass != String.class) {
-                return createSetAction(method,
-                        AdapterMap.getAdapter(targetClass));
-            }
-            return createSetAction(method);
-        } catch (Exception e) {
-            throw new ReaderRuntimeException("Die Klasse "
-                    + getClazz().getName() + " hat keine Methode set" + name
-                    + " oder sie ist privat", e);
-        }
-    }
-
-    public SetAction createSetAction(String name,
-            XmlAdapter<String, ?> adapter, Class targetClass) {
-        try {
-            if (name == null) {
-                throw new IllegalArgumentException(
-                        "seter Funktionsname muss != null sein");
-            }
-            String methodName = "set" + name;
-            return createSetAction(
-                    sucheDieMethode(this.getClazz(), methodName, targetClass),
-                    adapter);
-        } catch (Exception e) {
-            throw new ReaderRuntimeException("Die Klasse "
-                    + getClazz().getName() + " hat keine Methode set" + name
-                    + " oder sie ist privat", e);
-        }
-    }
-
-    public Method sucheDieMethode(Class<?> clazz, String name,
+ 
+    /**
+     * search a method
+     * 
+     * @param clazz
+     * @param name
+     * @param targetClass
+     * @return
+     * @throws Exception
+     */
+    private Method searchTheMethod(Class<?> clazz, String name,
             Class<?> targetClass) throws Exception {
         Method bestMethod = null;
         Method usableMethod = null;

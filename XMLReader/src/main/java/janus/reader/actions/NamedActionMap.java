@@ -3,28 +3,58 @@ package janus.reader.actions;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The NamedActionMap calls the {@link Action} and {@link SetAction} actions,
+ * for a path. It connects the path, with the actions.
+ * 
+ * @author Thomas Nill
+ *
+ */
 public class NamedActionMap extends HashMap<String, NamedAction> {
 
+    /**
+     * constructor of parent class
+     */
     public NamedActionMap() {
         super();
     }
 
+    /**
+     * constructor of parent class
+     */
     public NamedActionMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
+    /**
+     * constructor of parent class
+     */
     public NamedActionMap(int initialCapacity) {
         super(initialCapacity);
     }
 
+    /**
+     * constructor of parent class
+     */
     public NamedActionMap(Map<? extends String, ? extends NamedAction> m) {
         super(m);
     }
 
+    /**
+     * put a {@link NamedAction} in the Map
+     * 
+     * @param action
+     */
     public void put(NamedAction action) {
         put(action.getName(), action);
     }
 
+    /**
+     * call a {@link NamedAction} setValue action 
+     * 
+     * @param name
+     * @param value
+     */
     public void setValue(String name, String value) {
         NamedAction action = get(name);
         if (action != null) {
@@ -32,6 +62,12 @@ public class NamedActionMap extends HashMap<String, NamedAction> {
         }
     }
 
+    /**
+     * call a {@link NamedAction} push action 
+     * 
+     * @param name
+     * @param value
+     */
     public void push(String name) {
         NamedAction action = get(name);
         if (action != null) {
@@ -39,6 +75,12 @@ public class NamedActionMap extends HashMap<String, NamedAction> {
         }
     }
 
+    /**
+     * call a {@link NamedAction} pop action 
+     * 
+     * @param name
+     * @param value
+     */
     public void pop(String name) {
         NamedAction action = get(name);
         if (action != null) {

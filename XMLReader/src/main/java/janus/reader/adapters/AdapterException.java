@@ -1,5 +1,11 @@
 package janus.reader.adapters;
 
+/**
+ * Exeption for the unmashal of values
+ * 
+ * @author javaman
+ *
+ */
 public class AdapterException extends RuntimeException {
 
     public AdapterException() {

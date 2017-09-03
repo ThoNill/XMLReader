@@ -2,7 +2,7 @@ package janus.reader;
 
 import janus.reader.actions.CurrentObject;
 import janus.reader.actions.NamedActionMap;
-import janus.reader.core.StringStack;
+import janus.reader.core.ElementNameStack;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,10 +13,17 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+/**
+ * Helper to generate a interface with string constants of the different paths in a
+ * xml file.
+ * 
+ * @author Thomas Nill
+ *
+ */
 public class TagReader {
     private HashMap<String, String> tags;
     private NamedActionMap map;
-    private StringStack s;
+    private ElementNameStack s;
     private CurrentObject current;
     private XMLStreamReader xmlr;
 
@@ -25,15 +32,21 @@ public class TagReader {
         tags = new HashMap<>();
         current = new CurrentObject();
         map = new NamedActionMap();
-        s = new StringStack(current, map);
+        s = new ElementNameStack(current, map);
     }
 
+    /**
+     * read a xml file
+     * 
+     * @param filename
+     */
     public void read(String filename)  {
 
         try {
             XMLInputFactory xmlif = XMLInputFactory.newInstance();
         xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
                 filename));
+        
     } catch (FileNotFoundException | XMLStreamException e) {
         throw new ReaderRuntimeException("Failed to process file", e);
     }
@@ -47,6 +60,32 @@ public class TagReader {
         }
         return current.next();
     }
+    /**
+     * create the source text for a class in a package und classname
+     * 
+     * @param packageName
+     * @param className
+     * @return
+     */
+    public String source(String packageName, String className) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("package " + packageName + ";\n");
+        builder.append("public interface " + className + " {\n");
+        for (String name : tags.keySet()) {
+            String[] umgekehrt = name.substring(1).split("\\/");
+            builder.append(" String ");
+            for (int i = umgekehrt.length - 1; i >= 0; i--) {
+                builder.append(umgekehrt[i].replaceAll("\\@", "At"));
+                if (i > 0) {
+                    builder.append("_");
+                }
+            }
+            builder.append(" = \"" + name + "\";\n");
+        }
+        builder.append("}\n\n");
+        return builder.toString();
+    }
+
 
     private void next(XMLStreamReader xmlr) {
         switch (xmlr.getEventType()) {
@@ -70,6 +109,7 @@ public class TagReader {
         }
 
     }
+
 
     private void nextText(XMLStreamReader xmlr) {
         int start = xmlr.getTextStart();
@@ -107,22 +147,5 @@ public class TagReader {
 
     }
 
-    public String source(String packageName, String className) {
-        StringBuilder builder = new StringBuilder();
-        builder.append("package " + packageName + ";\n");
-        builder.append("public interface " + className + " {\n");
-        for (String name : tags.keySet()) {
-            String[] umgekehrt = name.substring(1).split("\\/");
-            builder.append(" String ");
-            for (int i = umgekehrt.length - 1; i >= 0; i--) {
-                builder.append(umgekehrt[i].replaceAll("\\@", "At"));
-                if (i > 0) {
-                    builder.append("_");
-                }
-            }
-            builder.append(" = \"" + name + "\";\n");
-        }
-        builder.append("}\n\n");
-        return builder.toString();
-    }
+
 }

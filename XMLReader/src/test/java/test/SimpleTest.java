@@ -6,7 +6,7 @@ import janus.reader.actions.CurrentObject;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
 import janus.reader.actions.Value;
-import janus.reader.core.StringStack;
+import janus.reader.core.ElementNameStack;
 
 import java.io.FileNotFoundException;
 
@@ -25,22 +25,6 @@ public class SimpleTest {
     
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
 
-    @Test
-    public void testCurrent() {
-        CurrentObject current = new CurrentObject();
-        Value value = new Value(TObject.class, current);
-        value.push();
-        SetAction action = value.createSetAction((s,v) -> ((TObject) s).setName(v));
-        action.setValue("Test");
-        
-        value.pop();
-        TObject testObject = (TObject)current.next();
-        
-        Assert.assertEquals("Test", testObject.getName());
-        
-        
-    }
-    
     @Test
     public void methodHandle() {
         CurrentObject current = new CurrentObject();
@@ -64,7 +48,7 @@ public class SimpleTest {
         Value value = new Value(TObject.class, current);
         NamedActionMap map = new NamedActionMap();
         
-        StringStack stack = new StringStack(current,map);
+        ElementNameStack stack = new ElementNameStack(current,map);
         stack.addAction("/first/is", value);
         stack.addAction("/first/is/name", value.createSetAction("Name"));
         
