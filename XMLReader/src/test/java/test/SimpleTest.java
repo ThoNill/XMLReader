@@ -1,5 +1,6 @@
 package test;
 import static org.junit.Assert.fail;
+import janus.reader.Formater;
 import janus.reader.Reader;
 import janus.reader.TagReader;
 import janus.reader.actions.CurrentObject;
@@ -198,5 +199,10 @@ public class SimpleTest {
         }
     }
  
-
+    @Test
+    public void format() throws FileNotFoundException, XMLStreamException {
+       Formater reader = new Formater("   ");
+       reader.read(KONTOAUSZUG_XML);
+    }
+ 
 }
