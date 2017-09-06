@@ -236,4 +236,25 @@ public class Reader implements Iterator<Object> {
         p.processClasses(elementNameStack, classes);
     }
 
+    /**
+     * Created Object for a Class, perhaps it is not fully instantiated
+     *
+     * @param name
+     * @return
+     */
+    public Object getValueObject(String name) {
+        return elementNameStack.getValueObject(name);
+    }
+
+    /**
+     * Created Object for a Class, perhaps it is not fully instantiated
+     * with a Exception if the value or Object does not exist
+     * 
+     * @param name
+     * @return
+     */
+    public Object getValueObjectWithException(String name) {
+        return elementNameStack.getValueObjectWithException(name);
+    }
+
 }

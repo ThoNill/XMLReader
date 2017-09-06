@@ -6,6 +6,13 @@ import janus.reader.core.ElementNameStack;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 
 import javax.xml.stream.XMLInputFactory;
@@ -26,6 +33,7 @@ public class Formater {
     private int depth = 0;
     private boolean leaf = false;
     private String tab;
+    private Writer writer;
 
     public Formater(String tab) {
         super();
@@ -43,36 +51,66 @@ public class Formater {
         
     }
 
-    private void printTabs(int depth) {
-        System.out.print("\n");
+    private void writeTabs(int depth)  throws IOException{
+        writer.write("\n");
         for (int i = 0; i < depth; i++) {
-            System.out.print(tab);
+            writer.write(tab);
         }
     }
 
+    
+    
+    public void write(String inFilename)  throws IOException{
+        InputStream in = new FileInputStream(inFilename);
+        Writer out = new OutputStreamWriter(System.out,"UTF8");
+        write(in,out);
+        in.close();
+        out.close();
+    }
+    
+    
+/**
+ * Format a XML File
+ * 
+ * @param inFilename
+ * @param outFilename
+ * @param charset
+ * @throws IOException
+ */
+    public void write(String inFilename,String outFilename,String charset)  throws IOException{
+        InputStream in = new FileInputStream(inFilename);
+        Writer out = new OutputStreamWriter(new FileOutputStream(outFilename),charset);
+        write(in,out);
+        in.close();
+        out.close();
+    }
+    
     /**
-     * read a xml file
+     * Format a INputStream
      * 
-     * @param filename
+     * @param input
+     * @param writer
+     * @throws IOException
      */
-    public void read(String filename) {
-
+    public void write(InputStream input,Writer writer)  throws IOException{
         try {
+            this.writer = writer;
             XMLInputFactory xmlif = XMLInputFactory.newInstance();
-            xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
-                    filename));
+            xmlr = xmlif.createXMLStreamReader("filename", input);
             while (xmlr.hasNext()) {
                 next(xmlr);
                 xmlr.next();
             }
-
+            writer.flush();
         } catch (FileNotFoundException | XMLStreamException e) {
             throw new ReaderRuntimeException("Failed to process file", e);
         }
 
     }
 
-    private void next(XMLStreamReader xmlr) {
+    
+    
+    private void next(XMLStreamReader xmlr)  throws IOException{
         switch (xmlr.getEventType()) {
         case XMLStreamConstants.START_ELEMENT:
             nextStartElement(xmlr);
@@ -95,39 +133,39 @@ public class Formater {
 
     }
 
-    private void nextText(XMLStreamReader xmlr) {
+    private void nextText(XMLStreamReader xmlr)  throws IOException{
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
-        System.out.print(new String(xmlr.getTextCharacters(), start, length).replaceAll("\\n",""));
+        writer.write(new String(xmlr.getTextCharacters(), start, length).replaceAll("\\n",""));
     }
 
-    private void nextEndElement(XMLStreamReader xmlr) {
+    private void nextEndElement(XMLStreamReader xmlr) throws IOException {
         if (xmlr.hasName()) {
             decDepth();
             if (!leaf) {
-                printTabs(depth+1);
+                writeTabs(depth+1);
             }
-            System.out.print("</"+ xmlr.getLocalName() + ">");
+            writer.write("</"+ xmlr.getLocalName() + ">");
         }
     }
 
-    private void nextStartElement(XMLStreamReader xmlr) {
+    private void nextStartElement(XMLStreamReader xmlr)  throws IOException{
         incDepth();
-        printTabs(depth);
-        System.out.print("<"+ xmlr.getLocalName());
+        writeTabs(depth);
+        writer.write("<"+ xmlr.getLocalName());
         bearbeiteAttribute(xmlr);
-        System.out.print(">");
+        writer.write(">");
     }
 
-    private void bearbeiteAttribute(XMLStreamReader xmlr) {
+    private void bearbeiteAttribute(XMLStreamReader xmlr)  throws IOException{
         for (int i = 0; i < xmlr.getAttributeCount(); i++) {
             bearbeiteAttribut(xmlr, i);
         }
     }
 
-    private void bearbeiteAttribut(XMLStreamReader xmlr, int index) {
+    private void bearbeiteAttribut(XMLStreamReader xmlr, int index)  throws IOException{
         String localName = xmlr.getAttributeLocalName(index);
-        System.out.print(" " + localName + "=\"" + xmlr.getAttributeValue(index)+ "\" ");
+        writer.write(" " + localName + "=\"" + xmlr.getAttributeValue(index)+ "\" ");
     }
 
 }

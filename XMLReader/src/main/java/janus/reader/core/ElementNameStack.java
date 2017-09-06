@@ -9,6 +9,7 @@ import janus.reader.actions.SimpleNamedAction;
 import janus.reader.actions.Value;
 
 import java.util.ArrayDeque;
+import java.util.HashMap;
 
 /**
  * A stack of the Element Names in a XML document
@@ -37,6 +38,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     private static final long serialVersionUID = 773837341597279034L;
     private NamedActionMap map;
     private CurrentObject current;
+    private HashMap<String,Value> valueHash = new HashMap<>();
 
     /**
      * constructor with a empty configuration
@@ -78,6 +80,36 @@ public class ElementNameStack extends ArrayDeque<String> {
         return builder.toString();
     }
 
+    /**
+     * Created Object for a Class, perhaps it is not fully instantiated
+     *
+     * @param name
+     * @return
+     */
+    public Object getValueObject(String name) {
+        Value value = valueHash.get(name);
+        if (value != null) {
+            return value.getValue();
+        }
+        return null;
+    }
+ 
+    /**
+     * Created Object for a Class, perhaps it is not fully instantiated
+     * with a Exception if the value or Object does not exist
+     * 
+     * @param name
+     * @return
+     */
+    public Object getValueObjectWithException(String name) {
+        Object obj = getValueObject(name);
+        if (obj == null) {
+            throw new IllegalArgumentException("Aa value for " + name + " does not exist ");
+        }
+        return obj;
+    }
+  
+    
     /**
      * push a element name on the stack, calls a push method of a {@link Action}
      * if it exists
@@ -136,6 +168,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     public void addValue(String name, Class<?> clazz) {
         Value value = new Value(clazz, current);
         addAction(name, value);
+        valueHash.put(name, value);
     }
 
     /**
