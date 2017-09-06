@@ -1,5 +1,11 @@
 package janus.reader.actions;
 
+/**
+ * An {@link Action} or {@link SetAction} with a name
+ * 
+ * @author javaman
+ *
+ */
 public class SimpleNamedAction implements NamedAction {
     private String name;
     private Action action;
