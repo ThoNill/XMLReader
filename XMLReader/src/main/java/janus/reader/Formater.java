@@ -1,19 +1,12 @@
 package janus.reader;
 
-import janus.reader.actions.CurrentObject;
-import janus.reader.actions.NamedActionMap;
-import janus.reader.core.ElementNameStack;
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.charset.Charset;
-import java.util.HashMap;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;

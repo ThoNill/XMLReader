@@ -164,7 +164,7 @@ public class Value implements Action {
      * @throws Exception
      */
     private Method searchTheMethod(Class<?> clazz, String name,
-            Class<?> targetClass) throws Exception {
+            Class<?> targetClass) {
         Method bestMethod = null;
         Method usableMethod = null;
         for (Method method : clazz.getMethods()) {

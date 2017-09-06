@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.thonill</groupId>
 	<artifactId>XMLReader</artifactId>
-	<version>0.9.1</version>
+	<version>0.9.2</version>
 	<name>Stax XML Reader</name>
 	<description>Read a XML File with StaX</description>
 	<url>http://github.com/ThoNill/XMLReader</url>
@@ -106,6 +106,10 @@
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-javadoc-plugin</artifactId>
 						<version>2.9.1</version>
+                                                <configuration>
+                                                    <failOnError>false</failOnError>
+                                                    <additionalparam>-Xdoclint:none</additionalparam>
+                                                </configuration>
 						<executions>
 							<execution>
 								<id>attach-javadocs</id>

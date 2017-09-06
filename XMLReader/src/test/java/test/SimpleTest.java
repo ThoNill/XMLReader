@@ -16,7 +16,6 @@ import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -228,7 +227,7 @@ public class SimpleTest {
     public void falschAnnotierteKlasse() throws FileNotFoundException,
             XMLStreamException {
         try {
-            Reader reader = new Reader(TObject.class);
+            new Reader(TObject.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
             LOG.info("Expected exception", ex);
@@ -240,7 +239,7 @@ public class SimpleTest {
     public void falschAnnotierteMethode() throws FileNotFoundException,
             XMLStreamException {
         try {
-            Reader reader = new Reader(TFalschAnnotiert.class);
+            new Reader(TFalschAnnotiert.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
             LOG.info("Expected exception", ex);
@@ -253,7 +252,8 @@ public class SimpleTest {
         Formater reader = new Formater("   ");
         try {
             reader.write(KONTOAUSZUG_XML);
-        } catch (IOException e) {
+        } catch (IOException ex) {
+            LOG.info("unexpected Exception",ex);
             fail("unexpected Exception");
         }
     }
