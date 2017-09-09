@@ -1,9 +1,12 @@
 package janus.reader.actions;
 
-import janus.reader.ReaderRuntimeException;
 import janus.reader.adapters.AdapterMap;
+import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.helper.ClassHelper;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -24,13 +27,38 @@ public class Value implements Action {
     static Logger LOG = LoggerFactory.getLogger(Value.class);
 
     private Class<?> clazz;
+    private Method staticCreationMethod;
     private Object objectOfClass;
     private CurrentObject current;
 
     public Value(Class<?> clazz, CurrentObject current) {
+        this(clazz,current,null);
+    }
+
+    public Value(Class<?> clazz, CurrentObject current,String staticMethodName) {
         super();
         this.clazz = clazz;
         this.current = current;
+        if (staticMethodName != null) {
+            try {
+                staticCreationMethod = clazz.getMethod(staticMethodName);
+            } catch (NoSuchMethodException | SecurityException e) {
+                throw new IllegalArgumentException(
+                        "the method " + staticMethodName + " does not exist or is privat/protected");
+            }
+            if (!ClassHelper.isThisClassOrASuperClass(staticCreationMethod.getReturnType(),clazz)) {
+                throw new IllegalArgumentException(
+                        "the method " + staticMethodName + " create a Object that is not of type " + clazz.getCanonicalName());
+            }
+            if (!Modifier.isStatic(staticCreationMethod.getModifiers())) {
+                throw new IllegalArgumentException(
+                        "the method " + staticMethodName + " is not static ");
+            }
+            if (staticCreationMethod.getParameterCount()> 0) {
+                throw new IllegalArgumentException(
+                        "the method " + staticMethodName + " has parameters ");
+            }
+        }
     }
 
     /**
@@ -40,11 +68,19 @@ public class Value implements Action {
     @Override
     public void push() {
         try {
-            objectOfClass = clazz.newInstance();
+            if (staticCreationMethod == null) {
+               objectOfClass = clazz.newInstance();
+            } else {
+                objectOfClass = staticCreationMethod.invoke(null); 
+            }
         } catch (InstantiationException e) {
             LOG.error("The Object could not be instantiated",e);
         } catch (IllegalAccessException e) {
             LOG.error("Illegal Access",e);
+        } catch (IllegalArgumentException e) {
+            LOG.error("The method " + staticCreationMethod.getName() + " is called with wrong arguments",e);
+        } catch (InvocationTargetException e) {
+            LOG.error("The method " + staticCreationMethod.getName() + " can not been invoced",e);
         }
     }
 

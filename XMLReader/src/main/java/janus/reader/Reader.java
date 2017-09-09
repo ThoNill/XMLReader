@@ -2,10 +2,11 @@ package janus.reader;
 
 import janus.reader.actions.Action;
 import janus.reader.actions.CurrentObject;
+import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
 import janus.reader.annotations.AnnotationProcessor;
-import janus.reader.core.ElementNameStack;
+import janus.reader.exceptions.ReaderRuntimeException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

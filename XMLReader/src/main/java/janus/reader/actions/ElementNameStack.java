@@ -1,12 +1,4 @@
-package janus.reader.core;
-
-import janus.reader.actions.Action;
-import janus.reader.actions.CurrentObject;
-import janus.reader.actions.NamedAction;
-import janus.reader.actions.NamedActionMap;
-import janus.reader.actions.SetAction;
-import janus.reader.actions.SimpleNamedAction;
-import janus.reader.actions.Value;
+package janus.reader.actions;
 
 import java.util.ArrayDeque;
 import java.util.HashMap;
@@ -171,6 +163,22 @@ public class ElementNameStack extends ArrayDeque<String> {
         valueHash.put(name, value);
     }
 
+    /**
+     * Add the creation of a class instance to a path of XML Elements
+     * 
+     * @param name
+     *            (path of XML Elements)
+     * @param clazz
+     *            (class of the generated instance)
+     */
+
+    public void addValue(String name, Class<?> clazz,String methodName) {
+        Value value = new Value(clazz, current,methodName);
+        addAction(name, value);
+        valueHash.put(name, value);
+    }
+
+    
     /**
      * Add the setXXXX setter to a path of XML Elements
      * 

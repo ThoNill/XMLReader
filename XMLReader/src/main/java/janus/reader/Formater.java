@@ -1,5 +1,7 @@
 package janus.reader;
 
+import janus.reader.exceptions.ReaderRuntimeException;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;

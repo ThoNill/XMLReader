@@ -1,8 +1,9 @@
 package janus.reader;
 
 import janus.reader.actions.CurrentObject;
+import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
-import janus.reader.core.ElementNameStack;
+import janus.reader.exceptions.ReaderRuntimeException;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

@@ -5,10 +5,10 @@ import janus.reader.Formater;
 import janus.reader.Reader;
 import janus.reader.TagReader;
 import janus.reader.actions.CurrentObject;
+import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
 import janus.reader.actions.Value;
-import janus.reader.core.ElementNameStack;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -223,6 +223,19 @@ public class SimpleTest {
         Assert.assertEquals("EUR", ((TAnnotated) o).getName());
     }
 
+    @Test
+    public void readStatischAnnotierteKlasse() throws FileNotFoundException,
+            XMLStreamException {
+        Reader reader = new Reader(TStaticAnnotated.class);
+        reader.read(KONTOAUSZUG_XML);
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof TStaticAnnotated);
+        Assert.assertEquals("EUR", ((TStaticAnnotated) o).getName());
+        Assert.assertEquals("Thomas", ((TStaticAnnotated) o).getVorName());
+    }
+
+    
     @Test
     public void falschAnnotierteKlasse() throws FileNotFoundException,
             XMLStreamException {

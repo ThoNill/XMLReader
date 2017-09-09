@@ -1,8 +1,10 @@
 package janus.reader.annotations;
 
-import janus.reader.core.ElementNameStack;
+import janus.reader.actions.ElementNameStack;
+import janus.reader.helper.ClassHelper;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 public class AnnotationProcessor {
 
@@ -21,14 +23,58 @@ public class AnnotationProcessor {
             Class<?> clazz) {
         for (XmlPath cPath : clazz.getAnnotationsByType(XmlPath.class)) {
             stack.addValue(cPath.path(), clazz);
-            for (Method m : clazz.getMethods()) {
-                processMethod(stack, cPath, m);
+            processNonStaticMethods(stack, clazz, cPath);
+        }
+        processStaticMethods(stack, clazz);
+    }
+
+    private void processStaticMethods(ElementNameStack stack, Class<?> clazz) {
+        for (Method m : clazz.getMethods()) {
+            processOneStaticMethod(stack, clazz, m);
+        }
+    }
+
+    private void processOneStaticMethod(ElementNameStack stack, Class<?> clazz,
+            Method m) {
+        if (Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class))) {
+            for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
+               checkStaticMethod(clazz,m); 
+               stack.addValue(mPath.path(), clazz,m.getName());
+               processNonStaticMethods(stack, clazz, mPath);
             }
         }
     }
 
-    private void processMethod(ElementNameStack stack, XmlPath cPath, Method m) {
-        if (m.isAnnotationPresent(XmlPath.class)) {
+    private void checkStaticMethod(Class<?> clazz,Method m) {
+        if (m.getParameterCount() != 0) {
+            throw new IllegalArgumentException(
+                    "In der Klasse "
+                            + m.getDeclaringClass().getName()
+                            + " darf die Methode "
+                            + m.getName()
+                            + " keine Paramter haben ");
+        }
+        if (!ClassHelper.isThisClassOrASuperClass(m.getReturnType(), clazz)) {
+            throw new IllegalArgumentException(
+                    "In der Klasse "
+                            + m.getDeclaringClass().getName()
+                            + " muss die Methode "
+                            + m.getName()
+                            + " ein Object dieser Klasse " + clazz.getCanonicalName() + " zurueckgeben");
+        }
+       
+        
+    }
+
+    private void processNonStaticMethods(ElementNameStack stack,
+            Class<?> clazz, XmlPath cPath) {
+        for (Method m : clazz.getMethods()) {
+            processOneNonStaticMethod(stack, cPath, m);
+        }
+    }
+
+    private void processOneNonStaticMethod(ElementNameStack stack, XmlPath cPath, Method m) {
+        if (!Modifier.isStatic(m.getModifiers()) && m.isAnnotationPresent(XmlPath.class)) {
             checkMethod(m);
             processAllXmlPathAnnotations(stack, cPath, m);
         }
@@ -43,6 +89,13 @@ public class AnnotationProcessor {
     }
 
     private void checkClass(Class<?> clazz) {
+        // Wenn es statische Methoden gibt, die nnotiert sind, ist die Kalsse auch erlaubt
+        for (Method m : clazz.getMethods()) {
+            if(Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class))) {
+                return;
+            }
+        }
+        
         if (!clazz.isAnnotationPresent(XmlPath.class)) {
             throw new IllegalArgumentException("Die Klasse " + clazz.getName()
                     + " muss mit XmlPath annotiert sein");

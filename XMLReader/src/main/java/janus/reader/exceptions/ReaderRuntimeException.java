@@ -1,4 +1,4 @@
-package janus.reader;
+package janus.reader.exceptions;
 
 /**
  * class for runtime exception of the reader
