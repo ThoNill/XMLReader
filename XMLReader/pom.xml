@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.thonill</groupId>
 	<artifactId>XMLReader</artifactId>
-	<version>0.9.3</version>
+	<version>0.9.4</version>
 	<name>Stax XML Reader</name>
 	<description>Read a XML File with StaX</description>
 	<url>http://github.com/ThoNill/XMLReader</url>
