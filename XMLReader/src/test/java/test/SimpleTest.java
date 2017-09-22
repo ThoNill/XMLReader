@@ -21,10 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SimpleTest {
-    static Logger LOG = LoggerFactory.getLogger(Value.class);
+    static private Logger log = LoggerFactory.getLogger(Value.class);
 
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
-
+    private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
+    
     @Test
     public void methodHandle() {
         CurrentObject current = new CurrentObject();
@@ -93,7 +94,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void reader() throws FileNotFoundException, XMLStreamException {
+    public void reader()  {
         Reader reader = new Reader();
 
         reader.read(KONTOAUSZUG_XML);
@@ -101,18 +102,22 @@ public class SimpleTest {
     }
 
     @Test
-    public void tagReader() throws FileNotFoundException, XMLStreamException {
-        TagReader reader = new TagReader();
-
-        reader.read(KONTOAUSZUG_XML);
-        reader.next();
-        System.out.print(reader.source("reader", "Const"));
+    public void tagReader()  {
+        try {
+            TagReader reader = new TagReader();
+            
+            reader.read(KONTOAUSZUG_XML);
+            reader.next();
+            System.out.print(reader.source("reader", "Const"));
+        } catch (XMLStreamException e) {
+            log.error("Unerwartete Ausnahem,",e);
+            fail("Unerwartete Ausnahme");
+        }
 
     }
 
     @Test
-    public void readerGesetzt() throws FileNotFoundException,
-            XMLStreamException {
+    public void readerGesetzt()  {
         Reader reader = new Reader();
 
         reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
@@ -124,8 +129,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztMitName() throws FileNotFoundException,
-            XMLStreamException {
+    public void readerGesetztMitName() {
         Reader reader = new Reader();
 
         reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
@@ -144,8 +148,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztMitAttribut() throws FileNotFoundException,
-            XMLStreamException {
+    public void readerGesetztMitAttribut()  {
         Reader reader = new Reader();
 
         reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
@@ -162,8 +165,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztSuperKlasse() throws FileNotFoundException,
-            XMLStreamException {
+    public void readerGesetztSuperKlasse()  {
 
         Reader reader = new Reader();
 
@@ -184,8 +186,7 @@ public class SimpleTest {
 
     
     @Test
-    public void readerParent() throws FileNotFoundException,
-            XMLStreamException {
+    public void readerParent() {
 
         Reader reader = new Reader();
 
@@ -213,8 +214,7 @@ public class SimpleTest {
 
     
     @Test
-    public void readAnnotierteKlasse() throws FileNotFoundException,
-            XMLStreamException {
+    public void readAnnotierteKlasse() {
         Reader reader = new Reader(TAnnotated.class);
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -224,8 +224,18 @@ public class SimpleTest {
     }
 
     @Test
-    public void readStatischAnnotierteKlasse() throws FileNotFoundException,
-            XMLStreamException {
+    public void readAnnotierteKlasse2() {
+        Reader reader = new Reader(TAnnotated.class);
+        reader.read(KONTOAUSZUG_XML2);
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof TAnnotated);
+        Assert.assertEquals("Thomas", ((TAnnotated) o).getName());
+    }
+
+    
+    @Test
+    public void readStatischAnnotierteKlasse()  {
         Reader reader = new Reader(TStaticAnnotated.class);
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -237,36 +247,34 @@ public class SimpleTest {
 
     
     @Test
-    public void falschAnnotierteKlasse() throws FileNotFoundException,
-            XMLStreamException {
+    public void falschAnnotierteKlasse()  {
         try {
             new Reader(TObject.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            LOG.info("Expected exception", ex);
+            log.info("Expected exception", ex);
         }
     }
 
     
     @Test
-    public void falschAnnotierteMethode() throws FileNotFoundException,
-            XMLStreamException {
+    public void falschAnnotierteMethode()  {
         try {
             new Reader(TFalschAnnotiert.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            LOG.info("Expected exception", ex);
+            log.info("Expected exception", ex);
         }
     }
 
     
     @Test
-    public void format() throws FileNotFoundException, XMLStreamException {
+    public void format()  {
         Formater reader = new Formater("   ");
         try {
             reader.write(KONTOAUSZUG_XML);
         } catch (IOException ex) {
-            LOG.info("unexpected Exception",ex);
+            log.info("unexpected Exception",ex);
             fail("unexpected Exception");
         }
     }

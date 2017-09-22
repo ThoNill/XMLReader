@@ -36,7 +36,7 @@ public class AnnotationProcessor {
 
     private void processOneStaticMethod(ElementNameStack stack, Class<?> clazz,
             Method m) {
-        if (Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class))) {
+        if (Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class) || m.isAnnotationPresent(XmlPaths.class))) {
             for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
                checkStaticMethod(clazz,m); 
                stack.addValue(mPath.path(), clazz,m.getName());
@@ -74,7 +74,7 @@ public class AnnotationProcessor {
     }
 
     private void processOneNonStaticMethod(ElementNameStack stack, XmlPath cPath, Method m) {
-        if (!Modifier.isStatic(m.getModifiers()) && m.isAnnotationPresent(XmlPath.class)) {
+        if (!Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class) || m.isAnnotationPresent(XmlPaths.class))) {
             checkMethod(m);
             processAllXmlPathAnnotations(stack, cPath, m);
         }
@@ -83,20 +83,25 @@ public class AnnotationProcessor {
     protected void processAllXmlPathAnnotations(ElementNameStack stack,
             XmlPath cPath, Method m) {
         for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
-            stack.addSetter(cPath.path(), mPath.path(), m.getName()
-                    .substring(3));
+            String path = mPath.path();
+            String methodName = m.getName().substring(3);
+            if(path.charAt(0) == '/') {
+               stack.addSetter(cPath.path(), path,methodName);
+            } else {
+                stack.addRelativSetter(cPath.path(), path,methodName);
+            }
         }
     }
 
     private void checkClass(Class<?> clazz) {
         // Wenn es statische Methoden gibt, die nnotiert sind, ist die Kalsse auch erlaubt
         for (Method m : clazz.getMethods()) {
-            if(Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class))) {
+            if(Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class) || m.isAnnotationPresent(XmlPaths.class))) {
                 return;
             }
         }
         
-        if (!clazz.isAnnotationPresent(XmlPath.class)) {
+        if (!(clazz.isAnnotationPresent(XmlPath.class) || clazz.isAnnotationPresent(XmlPaths.class))) {
             throw new IllegalArgumentException("Die Klasse " + clazz.getName()
                     + " muss mit XmlPath annotiert sein");
         }

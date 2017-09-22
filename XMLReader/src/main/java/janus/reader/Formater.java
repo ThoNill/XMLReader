@@ -30,6 +30,11 @@ public class Formater {
     private String tab;
     private Writer writer;
 
+/**
+* Formater with tab as tabulator String
+*
+* @param tab 
+*/
     public Formater(String tab) {
         super();
         this.tab = tab;
@@ -42,7 +47,7 @@ public class Formater {
 
     private void decDepth() {
         depth--;
-        leaf = (lastDepth == depth);
+        leaf = lastDepth == depth;
         
     }
 
@@ -55,6 +60,10 @@ public class Formater {
 
     
     
+    /**
+    * Write to System.out 
+    * @Param inFilename
+    */
     public void write(String inFilename)  throws IOException{
         InputStream in = new FileInputStream(inFilename);
         Writer out = new OutputStreamWriter(System.out,"UTF8");

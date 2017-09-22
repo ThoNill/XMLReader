@@ -44,7 +44,7 @@ public class Value implements Action {
                 staticCreationMethod = clazz.getMethod(staticMethodName);
             } catch (NoSuchMethodException | SecurityException e) {
                 throw new IllegalArgumentException(
-                        "the method " + staticMethodName + " does not exist or is privat/protected");
+                        "the method " + staticMethodName + " does not exist or is privat/protected",e);
             }
             if (!ClassHelper.isThisClassOrASuperClass(staticCreationMethod.getReturnType(),clazz)) {
                 throw new IllegalArgumentException(
@@ -78,9 +78,9 @@ public class Value implements Action {
         } catch (IllegalAccessException e) {
             LOG.error("Illegal Access",e);
         } catch (IllegalArgumentException e) {
-            LOG.error("The method " + staticCreationMethod.getName() + " is called with wrong arguments",e);
+            LOG.error("The method " + ((staticCreationMethod==null) ? "NN" : staticCreationMethod.getName()) + " is called with wrong arguments",e);
         } catch (InvocationTargetException e) {
-            LOG.error("The method " + staticCreationMethod.getName() + " can not been invoced",e);
+            LOG.error("The method " + ((staticCreationMethod==null) ? "NN" :  staticCreationMethod.getName()) + " can not been invoced",e);
         }
     }
 
@@ -164,14 +164,14 @@ public class Value implements Action {
      * @param adapter
      * @return
      */
-    private SetAction createSetAction(Method handle,
-            XmlAdapter<String, ?> adapter) {
-        Value v = this;
 
+  private SetAction createSetAction(Method handle, XmlAdapter<String, ?> adapter) {
+        Value v = this;
+ 
         return new SetAction() {
             Method m = handle;
             XmlAdapter<String, ?> a = adapter;
-
+ 
             @Override
             public void setValue(String value) {
                 Object o = "";
@@ -187,11 +187,10 @@ public class Value implements Action {
                 }
             }
         };
-
-    }
  
-    /**
-     * search a method
+    }
+
+     /** search a method
      * 
      * @param clazz
      * @param name
