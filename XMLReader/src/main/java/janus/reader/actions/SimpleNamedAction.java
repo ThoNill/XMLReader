@@ -7,11 +7,11 @@ package janus.reader.actions;
  *
  */
 public class SimpleNamedAction implements NamedAction {
-    private String name;
+    private TagPath name;
     private Action action;
     private SetAction setter;
 
-    public SimpleNamedAction(String name, Action action, SetAction setter) {
+    public SimpleNamedAction(TagPath name, Action action, SetAction setter) {
         super();
         this.name = name;
         this.action = action;
@@ -41,7 +41,7 @@ public class SimpleNamedAction implements NamedAction {
     }
 
     @Override
-    public String getName() {
+    public TagPath getName() {
         return name;
     }
 

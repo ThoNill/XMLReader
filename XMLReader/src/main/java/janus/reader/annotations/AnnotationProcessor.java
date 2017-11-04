@@ -1,6 +1,7 @@
 package janus.reader.annotations;
 
 import janus.reader.actions.ElementNameStack;
+import janus.reader.actions.TagPath;
 import janus.reader.helper.ClassHelper;
 
 import java.lang.reflect.Method;
@@ -22,7 +23,7 @@ public class AnnotationProcessor {
     protected void processAllXmlPathAnnotations(ElementNameStack stack,
             Class<?> clazz) {
         for (XmlPath cPath : clazz.getAnnotationsByType(XmlPath.class)) {
-            stack.addValue(cPath.path(), clazz);
+            stack.addValue(new TagPath(cPath.path()), clazz);
             processNonStaticMethods(stack, clazz, cPath);
         }
         processStaticMethods(stack, clazz);
@@ -39,7 +40,7 @@ public class AnnotationProcessor {
         if (Modifier.isStatic(m.getModifiers()) && (m.isAnnotationPresent(XmlPath.class) || m.isAnnotationPresent(XmlPaths.class))) {
             for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
                checkStaticMethod(clazz,m); 
-               stack.addValue(mPath.path(), clazz,m.getName());
+               stack.addValue(new TagPath(mPath.path()), clazz,m.getName());
                processNonStaticMethods(stack, clazz, mPath);
             }
         }
@@ -86,9 +87,9 @@ public class AnnotationProcessor {
             String path = mPath.path();
             String methodName = m.getName().substring(3);
             if(path.charAt(0) == '/') {
-               stack.addSetter(cPath.path(), path,methodName);
+               stack.addSetter(new TagPath(cPath.path()), new TagPath(path),methodName);
             } else {
-                stack.addRelativSetter(cPath.path(), path,methodName);
+                stack.addRelativSetter(new TagPath(cPath.path()), new TagPath(path),methodName);
             }
         }
     }

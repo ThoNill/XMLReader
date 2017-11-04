@@ -8,6 +8,7 @@ import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
+import janus.reader.actions.TagPath;
 import janus.reader.actions.Value;
 
 import java.io.FileNotFoundException;
@@ -49,8 +50,8 @@ public class SimpleTest {
         NamedActionMap map = new NamedActionMap();
 
         ElementNameStack stack = new ElementNameStack(current, map);
-        stack.addAction("/first/is", value);
-        stack.addAction("/first/is/name", value.createSetAction("Name"));
+        stack.addAction(new TagPath("/first/is"), value);
+        stack.addAction(new TagPath("/first/is/name"), value.createSetAction("Name"));
 
         stack.push("first");
         stack.push("is");
@@ -120,7 +121,7 @@ public class SimpleTest {
     public void readerGesetzt()  {
         Reader reader = new Reader();
 
-        reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -132,11 +133,11 @@ public class SimpleTest {
     public void readerGesetztMitName() {
         Reader reader = new Reader();
 
-        reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
         reader.addSetter(
-                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
-                Const.TxId_Refs_TxDtls_NtryDtls_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+                new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+                new TagPath(Const.TxId_Refs_TxDtls_NtryDtls_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Name");
 
         reader.read(KONTOAUSZUG_XML);
@@ -151,10 +152,10 @@ public class SimpleTest {
     public void readerGesetztMitAttribut()  {
         Reader reader = new Reader();
 
-        reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
-                Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addSetter(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Name");
 
         reader.read(KONTOAUSZUG_XML);
@@ -169,10 +170,10 @@ public class SimpleTest {
 
         Reader reader = new Reader();
 
-        reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
-                Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addSetter(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+                new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
         reader.read(KONTOAUSZUG_XML);
@@ -190,22 +191,22 @@ public class SimpleTest {
 
         Reader reader = new Reader();
 
-        reader.addValue(Const.BkToCstmrDbtCdtNtfctn_Document,
+        reader.addValue(new TagPath(Const.BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(Const.BkToCstmrDbtCdtNtfctn_Document,
-                Const.MsgId_GrpHdr_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addSetter(new TagPath(Const.BkToCstmrDbtCdtNtfctn_Document),
+                new TagPath(Const.MsgId_GrpHdr_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
-        reader.addValue(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
-                Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document,
+        reader.addSetter(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+                new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
         reader.read(KONTOAUSZUG_XML);
         reader.next();
         
-        Object ov = reader.getValueObject(Const.BkToCstmrDbtCdtNtfctn_Document);
+        Object ov = reader.getValueObject(new TagPath(Const.BkToCstmrDbtCdtNtfctn_Document));
         Assert.assertNotNull(ov);
         Assert.assertTrue(ov instanceof TObject);
         Assert.assertEquals("MSG1", ((TObject) ov).getVerwendungszweck());

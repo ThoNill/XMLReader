@@ -5,6 +5,7 @@ import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
+import janus.reader.actions.TagPath;
 import janus.reader.annotations.AnnotationProcessor;
 import janus.reader.exceptions.ReaderRuntimeException;
 
@@ -113,7 +114,7 @@ public class Reader implements Iterator<Object> {
      * @param clazz
      *            (class of the generated instance)
      */
-    public void addValue(String name, Class<?> clazz) {
+    public void addValue(TagPath name, Class<?> clazz) {
         elementNameStack.addValue(name, clazz);
     }
 
@@ -129,7 +130,7 @@ public class Reader implements Iterator<Object> {
      * @param field
      *            (the name of the setter Method)
      */
-    public void addSetter(String valueName, String absPath, String field) {
+    public void addSetter(TagPath valueName, TagPath absPath, String field) {
         elementNameStack.addSetter(valueName, absPath, field);
     }
 
@@ -145,7 +146,7 @@ public class Reader implements Iterator<Object> {
      * @param field
      *            (the name of the setter Method)
      */
-    public void addRelativSetter(String valueName, String relPath, String field) {
+    public void addRelativSetter(TagPath valueName, TagPath relPath, String field) {
         elementNameStack.addRelativSetter(valueName, relPath, field);
     }
 
@@ -159,7 +160,7 @@ public class Reader implements Iterator<Object> {
      *            (the action, that will be executed at the start and end-tag of
      *            the path)
      */
-    public void addAction(String name, Action action) {
+    public void addAction(TagPath name, Action action) {
         elementNameStack.addAction(name, action);
     }
 
@@ -173,7 +174,7 @@ public class Reader implements Iterator<Object> {
      *            (the action, that will be executed at the start and end-tag of
      *            the path)
      */
-    public void addAction(String name, SetAction action) {
+    public void addAction(TagPath name, SetAction action) {
         elementNameStack.addAction(name, action);
     }
 
@@ -243,7 +244,7 @@ public class Reader implements Iterator<Object> {
      * @param name
      * @return
      */
-    public Object getValueObject(String name) {
+    public Object getValueObject(TagPath name) {
         return elementNameStack.getValueObject(name);
     }
 
@@ -254,7 +255,7 @@ public class Reader implements Iterator<Object> {
      * @param name
      * @return
      */
-    public Object getValueObjectWithException(String name) {
+    public Object getValueObjectWithException(TagPath name) {
         return elementNameStack.getValueObjectWithException(name);
     }
 

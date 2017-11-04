@@ -10,7 +10,7 @@ import java.util.Map;
  * @author Thomas Nill
  *
  */
-public class NamedActionMap extends HashMap<String, NamedAction> {
+public class NamedActionMap extends HashMap<TagPath, NamedAction> {
 
     /**
      * constructor of parent class
@@ -36,7 +36,7 @@ public class NamedActionMap extends HashMap<String, NamedAction> {
     /**
      * constructor of parent class
      */
-    public NamedActionMap(Map<? extends String, ? extends NamedAction> m) {
+    public NamedActionMap(Map<? extends TagPath, ? extends NamedAction> m) {
         super(m);
     }
 
@@ -55,7 +55,7 @@ public class NamedActionMap extends HashMap<String, NamedAction> {
      * @param name
      * @param value
      */
-    public void setValue(String name, String value) {
+    public void setValue(TagPath name, String value) {
         NamedAction action = get(name);
         if (action != null) {
             action.setValue(value);
@@ -68,7 +68,7 @@ public class NamedActionMap extends HashMap<String, NamedAction> {
      * @param name
      * @param value
      */
-    public void push(String name) {
+    public void push(TagPath name) {
         NamedAction action = get(name);
         if (action != null) {
             action.push();
@@ -81,7 +81,7 @@ public class NamedActionMap extends HashMap<String, NamedAction> {
      * @param name
      * @param value
      */
-    public void pop(String name) {
+    public void pop(TagPath name) {
         NamedAction action = get(name);
         if (action != null) {
             action.pop();

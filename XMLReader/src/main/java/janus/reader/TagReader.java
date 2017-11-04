@@ -3,6 +3,7 @@ package janus.reader;
 import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
+import janus.reader.actions.TagPath;
 import janus.reader.exceptions.ReaderRuntimeException;
 
 import java.io.FileInputStream;
@@ -22,7 +23,7 @@ import javax.xml.stream.XMLStreamReader;
  *
  */
 public class TagReader {
-    private HashMap<String, String> tags;
+    private HashMap<TagPath, TagPath> tags;
     private NamedActionMap map;
     private ElementNameStack s;
     private CurrentObject current;
@@ -72,8 +73,8 @@ public class TagReader {
         StringBuilder builder = new StringBuilder();
         builder.append("package " + packageName + ";\n");
         builder.append("public interface " + className + " {\n");
-        for (String name : tags.keySet()) {
-            String[] umgekehrt = name.substring(1).split("\\/");
+        for (TagPath name : tags.keySet()) {
+            String[] umgekehrt = name.toString().substring(1).split("\\/");
             builder.append(" String ");
             for (int i = umgekehrt.length - 1; i >= 0; i--) {
                 builder.append(umgekehrt[i].replaceAll("\\@", "At"));
@@ -127,7 +128,7 @@ public class TagReader {
     private void nextStartElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             s.push(xmlr.getLocalName());
-            String pfad = s.getCurrentPath();
+            TagPath pfad = s.getCurrentPath();
             tags.put(pfad, pfad);
         }
         bearbeiteAttribute(xmlr);
@@ -142,7 +143,7 @@ public class TagReader {
     private void bearbeiteAttribut(XMLStreamReader xmlr, int index) {
         String localName = xmlr.getAttributeLocalName(index);
         s.push("@" + localName);
-        String pfad = s.getCurrentPath();
+        TagPath pfad = s.getCurrentPath();
         tags.put(pfad, pfad);
         s.pop();
 

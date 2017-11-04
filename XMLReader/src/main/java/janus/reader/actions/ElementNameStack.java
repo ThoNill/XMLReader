@@ -30,7 +30,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     private static final long serialVersionUID = 773837341597279034L;
     private NamedActionMap map;
     private CurrentObject current;
-    private HashMap<String,Value> valueHash = new HashMap<>();
+    private HashMap<TagPath,Value> valueHash = new HashMap<>();
 
     /**
      * constructor with a empty configuration
@@ -59,7 +59,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * 
      * @return
      */
-    public String getCurrentPath() {
+    public TagPath getCurrentPath() {
         StringBuilder builder = new StringBuilder();
         Object[] a = this.toArray();
         int pos = a.length - 1;
@@ -69,7 +69,7 @@ public class ElementNameStack extends ArrayDeque<String> {
             builder.append(s.toString());
             pos--;
         }
-        return builder.toString();
+        return new TagPath(builder.toString());
     }
 
     /**
@@ -78,7 +78,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param name
      * @return
      */
-    public Object getValueObject(String name) {
+    public Object getValueObject(TagPath name) {
         Value value = valueHash.get(name);
         if (value != null) {
             return value.getValue();
@@ -93,7 +93,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param name
      * @return
      */
-    public Object getValueObjectWithException(String name) {
+    public Object getValueObjectWithException(TagPath name) {
         Object obj = getValueObject(name);
         if (obj == null) {
             throw new IllegalArgumentException("Aa value for " + name + " does not exist ");
@@ -110,7 +110,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     @Override
     public void push(String item) {
         super.push(item);
-        String path = getCurrentPath();
+        TagPath path = getCurrentPath();
         map.push(path);
     }
 
@@ -121,7 +121,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
     @Override
     public String pop() {
-        String path = getCurrentPath();
+        TagPath path = getCurrentPath();
         String erg = super.pop();
         map.pop(path);
         return erg;
@@ -133,7 +133,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
     public void setAttribute(String item, String value) {
         super.push("@" + item);
-        String path = getCurrentPath();
+        TagPath path = getCurrentPath();
         map.setValue(path, value);
         super.pop();
     }
@@ -144,7 +144,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param value
      */
     public void setText(String value) {
-        String path = getCurrentPath();
+        TagPath path = getCurrentPath();
         map.setValue(path, value);
     }
 
@@ -157,7 +157,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (class of the generated instance)
      */
 
-    public void addValue(String name, Class<?> clazz) {
+    public void addValue(TagPath name, Class<?> clazz) {
         Value value = new Value(clazz, current);
         addAction(name, value);
         valueHash.put(name, value);
@@ -172,7 +172,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (class of the generated instance)
      */
 
-    public void addValue(String name, Class<?> clazz,String methodName) {
+    public void addValue(TagPath name, Class<?> clazz,String methodName) {
         Value value = new Value(clazz, current,methodName);
         addAction(name, value);
         valueHash.put(name, value);
@@ -192,7 +192,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (the name of the setter Method)
      */
 
-    public void addSetter(String valueName, String absPath, String field) {
+    public void addSetter(TagPath valueName, TagPath absPath, String field) {
         Value value = checkArguments(valueName, absPath, field);
         SetAction setter = value.createSetAction(field);
         addAction(absPath, setter);
@@ -211,8 +211,8 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (the name of the setter Method)
      */
 
-    public void addRelativSetter(String valueName, String relPath, String field) {
-        addSetter(valueName, valueName + "/" + relPath, field);
+    public void addRelativSetter(TagPath valueName, TagPath relPath, String field) {
+        addSetter(valueName, new TagPath(valueName.toString() + "/" + relPath.toString()), field);
     }
 
     /**
@@ -226,7 +226,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            the path)
      */
 
-    public void addAction(String name, Action action) {
+    public void addAction(TagPath name, Action action) {
         map.put(new SimpleNamedAction(name, action, null));
     }
 
@@ -241,11 +241,11 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            the path)
      */
 
-    public void addAction(String name, SetAction action) {
+    public void addAction(TagPath name, SetAction action) {
         map.put(new SimpleNamedAction(name, null, action));
     }
 
-    private Value checkArguments(String valueName, String absPath, String field) {
+    private Value checkArguments(TagPath valueName, TagPath absPath, String field) {
         if (valueName == null || absPath == null || field == null) {
             throw new IllegalArgumentException(
                     "Pfade oder Feldnamen muessen != null sein");
@@ -255,7 +255,7 @@ public class ElementNameStack extends ArrayDeque<String> {
         return checkValue(valueName, o);
     }
 
-    private Object checkName(String valueName) {
+    private Object checkName(TagPath valueName) {
         Object o = map.get(valueName);
         if (o == null) {
             throw new IllegalArgumentException("Value " + valueName
@@ -264,7 +264,7 @@ public class ElementNameStack extends ArrayDeque<String> {
         return o;
     }
 
-    private void checkNamedAction(String valueName, Object o) {
+    private void checkNamedAction(TagPath valueName, Object o) {
         if (!(o instanceof NamedAction)) {
             throw new IllegalArgumentException("Object " + valueName
                     + " ist keine NamedAction sondern "
@@ -272,7 +272,7 @@ public class ElementNameStack extends ArrayDeque<String> {
         }
     }
 
-    private Value checkValue(String valueName, Object o) {
+    private Value checkValue(TagPath valueName, Object o) {
         Action a = ((NamedAction) o).getAction();
         if (!(a instanceof Value)) {
             throw new IllegalArgumentException("Object " + valueName
