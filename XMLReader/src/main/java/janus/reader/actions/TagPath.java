@@ -40,5 +40,16 @@ public class TagPath {
     public String toString() {
         return path;
     }
-    
+
+    public boolean isAbsolut() {
+        return path.charAt(0) == '/';
+    }
+
+    public boolean compare(TagPath path) {
+        if (path.isAbsolut()) {
+            return this.path.equals(path.path);
+        }
+        return this.path.endsWith(path.path);
+    }
+
 }

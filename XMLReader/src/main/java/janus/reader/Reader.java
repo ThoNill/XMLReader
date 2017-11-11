@@ -5,6 +5,7 @@ import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
+import janus.reader.actions.SimpleCurrentObject;
 import janus.reader.actions.TagPath;
 import janus.reader.annotations.AnnotationProcessor;
 import janus.reader.exceptions.ReaderRuntimeException;
@@ -41,7 +42,7 @@ public class Reader implements Iterator<Object> {
      */
     public Reader() {
         super();
-        current = new CurrentObject();
+        current = new SimpleCurrentObject();
         map = new NamedActionMap();
         elementNameStack = new ElementNameStack(current, map);
     }

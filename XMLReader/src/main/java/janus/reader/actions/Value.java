@@ -28,17 +28,18 @@ public class Value implements Action {
 
     private Class<?> clazz;
     private Method staticCreationMethod;
-    private Object objectOfClass;
+    private CurrentObject objectOfClass;
     private CurrentObject current;
 
-    public Value(Class<?> clazz, CurrentObject current) {
-        this(clazz,current,null);
+    public Value(Class<?> clazz, CurrentObject current,CurrentObject objectOfClass) {
+        this(clazz,current,null,objectOfClass);
     }
 
-    public Value(Class<?> clazz, CurrentObject current,String staticMethodName) {
+    public Value(Class<?> clazz, CurrentObject current,String staticMethodName,CurrentObject objectOfClass) {
         super();
         this.clazz = clazz;
         this.current = current;
+        this.objectOfClass = objectOfClass;
         if (staticMethodName != null) {
             try {
                 staticCreationMethod = clazz.getMethod(staticMethodName);
@@ -69,9 +70,9 @@ public class Value implements Action {
     public void push() {
         try {
             if (staticCreationMethod == null) {
-               objectOfClass = clazz.newInstance();
+               objectOfClass.setCurrent(clazz.newInstance());
             } else {
-                objectOfClass = staticCreationMethod.invoke(null); 
+                objectOfClass.setCurrent(staticCreationMethod.invoke(null)); 
             }
         } catch (InstantiationException e) {
             LOG.error("The Object could not be instantiated",e);
@@ -90,12 +91,11 @@ public class Value implements Action {
      */
     @Override
     public void pop() {
-        current.setCurrent(objectOfClass);
-        objectOfClass = null;
+        current.setCurrent(objectOfClass.next());
     }
     
     public Object getValue() {
-        return objectOfClass;
+        return objectOfClass.getCurrent();
     }
     
     public Class<?> getClazz() {

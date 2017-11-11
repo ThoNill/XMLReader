@@ -8,6 +8,8 @@ import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SetAction;
+import janus.reader.actions.SimpleCurrentObject;
+import janus.reader.actions.StackCurrentObject;
 import janus.reader.actions.TagPath;
 import janus.reader.actions.Value;
 
@@ -27,10 +29,25 @@ public class SimpleTest {
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
     
+    @Test 
+    public void copareTest() {
+        TagPath absolut = new TagPath("/a/b/c");
+        TagPath relativ = new TagPath("b/c");
+        
+        Assert.assertTrue(absolut.isAbsolut());
+        Assert.assertFalse(relativ.isAbsolut());
+        
+        Assert.assertTrue(absolut.compare(relativ));
+        Assert.assertFalse(absolut.compare(new TagPath("a")));
+        Assert.assertTrue(absolut.compare(absolut));
+        Assert.assertFalse(absolut.compare(new TagPath("/a")));
+        
+    }
+    
     @Test
     public void methodHandle() {
-        CurrentObject current = new CurrentObject();
-        Value value = new Value(TObject.class, current);
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new Value(TObject.class, current,new SimpleCurrentObject());
         value.push();
         SetAction action = value.createSetAction("Name");
         action.setValue("Test");
@@ -43,10 +60,26 @@ public class SimpleTest {
     }
 
     @Test
+    public void methodHandleWithStack() {
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new Value(TObject.class, current,new StackCurrentObject());
+        value.push();
+        SetAction action = value.createSetAction("Name");
+        action.setValue("Test");
+
+        value.pop();
+        TObject testObject = (TObject) current.next();
+
+        Assert.assertEquals("Test", testObject.getName());
+
+    }
+
+    
+    @Test
     public void stringStack() {
 
-        CurrentObject current = new CurrentObject();
-        Value value = new Value(TObject.class, current);
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new Value(TObject.class, current,new SimpleCurrentObject());
         NamedActionMap map = new NamedActionMap();
 
         ElementNameStack stack = new ElementNameStack(current, map);
@@ -69,8 +102,8 @@ public class SimpleTest {
     @Test
     public void adapter() {
 
-        CurrentObject current = new CurrentObject();
-        Value value = new Value(TObject.class, current);
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new Value(TObject.class, current,new SimpleCurrentObject());
         SetAction iSetter = value.createSetAction("Nummer");
         SetAction bSetter = value.createSetAction("bValue");
         SetAction fSetter = value.createSetAction("fValue");

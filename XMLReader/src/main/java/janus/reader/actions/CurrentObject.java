@@ -6,25 +6,14 @@ package janus.reader.actions;
  * @author javaman
  *
  */
-public class CurrentObject {
-    private Object current;
-
+public interface CurrentObject {
+  
     /**
      * emit the next value
      * @return
      */
-    public Object next() {
-        Object o = current;
-        current = null;
-        return o;
-    }
-
-    public void setCurrent(Object current) {
-        this.current = current;
-    }
-
-    public boolean hasObject() {
-        return current != null;
-    }
-
+    Object next();
+    void setCurrent(Object current);
+    boolean hasObject();
+    Object getCurrent();
 }

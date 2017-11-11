@@ -158,9 +158,14 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
 
     public void addValue(TagPath name, Class<?> clazz) {
-        Value value = new Value(clazz, current);
+        Value value = new Value(clazz, current, 
+                createCurrentObject(name));
         addAction(name, value);
         valueHash.put(name, value);
+    }
+
+    private CurrentObject createCurrentObject(TagPath name) {
+        return (name.isAbsolut()) ? new SimpleCurrentObject() : new StackCurrentObject();
     }
 
     /**
@@ -173,7 +178,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
 
     public void addValue(TagPath name, Class<?> clazz,String methodName) {
-        Value value = new Value(clazz, current,methodName);
+        Value value = new Value(clazz, current,methodName,createCurrentObject(name));
         addAction(name, value);
         valueHash.put(name, value);
     }

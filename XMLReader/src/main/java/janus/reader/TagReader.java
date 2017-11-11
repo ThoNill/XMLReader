@@ -3,6 +3,7 @@ package janus.reader;
 import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.NamedActionMap;
+import janus.reader.actions.SimpleCurrentObject;
 import janus.reader.actions.TagPath;
 import janus.reader.exceptions.ReaderRuntimeException;
 
@@ -32,7 +33,7 @@ public class TagReader {
     public TagReader() {
         super();
         tags = new HashMap<>();
-        current = new CurrentObject();
+        current = new SimpleCurrentObject();
         map = new NamedActionMap();
         s = new ElementNameStack(current, map);
     }
