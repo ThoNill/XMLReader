@@ -2,6 +2,10 @@ package janus.reader.actions;
 
 import java.util.ArrayDeque;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
 /**
  * holds the current object that will be emitted
  * 
@@ -9,6 +13,8 @@ import java.util.ArrayDeque;
  *
  */
 public class StackCurrentObject implements CurrentObject {
+    static private Logger log = LoggerFactory.getLogger(StackCurrentObject.class);
+
     private ArrayDeque<Object> current = new ArrayDeque<>();
 
     /**
@@ -22,8 +28,9 @@ public class StackCurrentObject implements CurrentObject {
         return current.pop();
     }
 
-    public void setCurrent(Object current) {
-        this.current.push(current);
+    public void setCurrent(Object obj) {
+        log.debug("-------------push " +obj);
+        this.current.push(obj);
     }
 
     public boolean hasObject() {
@@ -31,6 +38,7 @@ public class StackCurrentObject implements CurrentObject {
     }
     
     public Object getCurrent() {
+        log.debug("peek " + current.peek());
         return current.peek();
     }
 

@@ -51,5 +51,13 @@ public class TagPath {
         }
         return this.path.endsWith(path.path);
     }
+    
+    public TagPath parent() {
+        int lastIndex = this.path.lastIndexOf('/');
+        if (lastIndex >= 0) {
+            return new TagPath(this.path.substring(0, lastIndex));
+        }
+        return null;
+    }
 
 }

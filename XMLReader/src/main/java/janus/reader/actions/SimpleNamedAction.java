@@ -1,5 +1,8 @@
 package janus.reader.actions;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * An {@link Action} or {@link SetAction} with a name
  * 
@@ -7,6 +10,8 @@ package janus.reader.actions;
  *
  */
 public class SimpleNamedAction implements NamedAction {
+    static private Logger log = LoggerFactory.getLogger(SimpleNamedAction.class);
+
     private TagPath name;
     private Action action;
     private SetAction setter;
@@ -19,10 +24,11 @@ public class SimpleNamedAction implements NamedAction {
     }
 
     @Override
-    public void setValue(String value) {
+    public void setValue(Object value) {
+        log.debug("setze mit " + setter);
         if (setter != null) {
             setter.setValue(value);
-        }
+        } 
 
     }
 
@@ -49,4 +55,11 @@ public class SimpleNamedAction implements NamedAction {
     public Action getAction() {
         return action;
     }
+    
+
+    @Override
+    public SetAction getSetter() {
+        return setter;
+    }
+
 }

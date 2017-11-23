@@ -3,6 +3,9 @@ package janus.reader.actions;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * A stack of the Element Names in a XML document
  * 
@@ -27,6 +30,9 @@ import java.util.HashMap;
  *
  */
 public class ElementNameStack extends ArrayDeque<String> {
+    static private Logger log = LoggerFactory.getLogger(ElementNameStack.class);
+
+    
     private static final long serialVersionUID = 773837341597279034L;
     private NamedActionMap map;
     private CurrentObject current;
@@ -82,7 +88,7 @@ public class ElementNameStack extends ArrayDeque<String> {
         Value value = valueHash.get(name);
         if (value != null) {
             return value.getValue();
-        }
+        } 
         return null;
     }
  
@@ -109,6 +115,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
     @Override
     public void push(String item) {
+        log.debug("Push a Tag " + item);
         super.push(item);
         TagPath path = getCurrentPath();
         map.push(path);
@@ -122,9 +129,17 @@ public class ElementNameStack extends ArrayDeque<String> {
     @Override
     public String pop() {
         TagPath path = getCurrentPath();
+        
+        setParentValue(path);
+        
         String erg = super.pop();
         map.pop(path);
         return erg;
+    }
+    
+    
+    public void setParentValue(TagPath path) {
+        map.setValue(path.parent(), path);
     }
 
     /**

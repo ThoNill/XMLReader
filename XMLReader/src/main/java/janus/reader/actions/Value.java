@@ -1,6 +1,8 @@
 package janus.reader.actions;
 
 import janus.reader.adapters.AdapterMap;
+import janus.reader.annotations.XmlPath;
+import janus.reader.annotations.XmlPaths;
 import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
 
@@ -118,11 +120,13 @@ public class Value implements Action {
             Method method = searchTheMethod(this.getClazz(), methodName,
                     String.class);
             Class<?> targetClass = method.getParameterTypes()[0];
-            if (targetClass != String.class) {
+            if(targetClass.equals(String.class) || targetClass.isAnnotationPresent(XmlPath.class) || targetClass.isAnnotationPresent(XmlPaths.class)) {
+                return createSetAction(method);     
+            } else {
                 return createSetAction(method,
                         AdapterMap.getAdapter(targetClass));
             }
-            return createSetAction(method);
+           
         } catch (Exception e) {
             throw new ReaderRuntimeException("Die Klasse "
                     + getClazz().getName() + " hat keine Methode set" + name
@@ -136,6 +140,7 @@ public class Value implements Action {
      * @param handle
      * @return
      */
+    
     private SetAction createSetAction(Method handle) {
         Value v = this;
 
@@ -143,20 +148,24 @@ public class Value implements Action {
             Method m = handle;
 
             @Override
-            public void setValue(String value) {
+            public void setValue(Object value) {
                 try {
-                    m.invoke(v.getValue(), value);
+                    LOG.debug("setValue 1");
+                    if (m.getParameters()[0].getType().isAssignableFrom(value.getClass())) {
+                        m.invoke(v.getValue(), value);
+                    }
                 } catch (Exception e) {
                     throw new ReaderRuntimeException(" Kann die Methode "
                             + m.getName() + "("
                             + m.getParameterTypes()[0].getTypeName()
-                            + ") nicht auf " + v.getValue() + " anwenden",e);
+                            + "  " + value + ") nicht auf " + v.getValue() + " anwenden",e);
                 }
             }
         };
 
     }
 
+    
     /**
      * create SetAction from a {@link Method}
      * 
@@ -173,10 +182,11 @@ public class Value implements Action {
             XmlAdapter<String, ?> a = adapter;
  
             @Override
-            public void setValue(String value) {
+            public void setValue(Object value) {
+                LOG.debug("setValue 2");
                 Object o = "";
                 try {
-                    o = a.unmarshal(value);
+                    o = a.unmarshal(value.toString());
                     m.invoke(v.getValue(), o);
                 } catch (Exception e) {
                     throw new ReaderRuntimeException(" Kann die Methode "
@@ -205,11 +215,15 @@ public class Value implements Action {
         for (Method method : clazz.getMethods()) {
             if (name.equals(method.getName())
                     && method.getParameterCount() == 1) {
-                if (method.getParameterTypes()[0] == targetClass) {
+                Class<?> parameterType = method.getParameterTypes()[0];
+                if (parameterType == targetClass) {
                     bestMethod = method;
                 }
                 if (AdapterMap
-                        .hasAdapterForClass(method.getParameterTypes()[0])) {
+                        .hasAdapterForClass(parameterType)) {
+                    usableMethod = method;
+                }
+                if (parameterType.isAnnotationPresent(XmlPath.class) || parameterType.isAnnotationPresent(XmlPaths.class)) {
                     usableMethod = method;
                 }
             }
@@ -218,6 +232,10 @@ public class Value implements Action {
             return bestMethod;
         }
         return usableMethod;
+    }
+
+    public CurrentObject getCurrent() {
+        return objectOfClass;
     }
 
 }

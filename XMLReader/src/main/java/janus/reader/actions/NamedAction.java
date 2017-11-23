@@ -9,4 +9,5 @@ package janus.reader.actions;
 public interface NamedAction extends Action, SetAction {
     TagPath getName();
     Action getAction();
+    SetAction getSetter();
 }

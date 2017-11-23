@@ -19,6 +19,7 @@ import java.io.IOException;
 import javax.xml.stream.XMLStreamException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,9 +29,13 @@ public class SimpleTest {
 
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
+    private static final String CHILDS_XML = "src/test/resources/childs.xml";
+    private static final String LINKCHILDS_XML = "src/test/resources/linkChilds.xml";
+    
+    
     
     @Test 
-    public void copareTest() {
+    public void compareTest() {
         TagPath absolut = new TagPath("/a/b/c");
         TagPath relativ = new TagPath("b/c");
         
@@ -43,6 +48,16 @@ public class SimpleTest {
         Assert.assertFalse(absolut.compare(new TagPath("/a")));
         
     }
+    
+    @Test 
+    public void parentPathTest() {
+        TagPath child = new TagPath("/a/b/cc");
+        TagPath parent = new TagPath("/a/b");
+        
+        Assert.assertEquals(parent,child.parent());
+        
+    }
+    
     
     @Test
     public void methodHandle() {
@@ -127,6 +142,7 @@ public class SimpleTest {
 
     }
 
+  
     @Test
     public void reader()  {
         Reader reader = new Reader();
@@ -135,6 +151,7 @@ public class SimpleTest {
 
     }
 
+    @Ignore
     @Test
     public void tagReader()  {
         try {
@@ -301,7 +318,7 @@ public class SimpleTest {
         }
     }
 
-    
+    @Ignore
     @Test
     public void format()  {
         Formater reader = new Formater("   ");
@@ -311,6 +328,52 @@ public class SimpleTest {
             log.info("unexpected Exception",ex);
             fail("unexpected Exception");
         }
+    }
+    
+    @Test
+    public void readChilds()  {
+        Reader reader = new Reader(Child.class);
+        reader.read(CHILDS_XML);
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof Child);
+        Assert.assertEquals("Vera", ((Child) o).getName());
+
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof Child);
+        Assert.assertEquals("Thomas", ((Child) o).getName());
+
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof Child);
+        Assert.assertEquals("Hans", ((Child) o).getName());
+
+    }
+
+    @Test
+    public void readLinkChilds()  {
+        Reader reader = new Reader(LinkChild.class);
+        reader.read(CHILDS_XML);
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof LinkChild);
+        Assert.assertEquals("Vera", ((LinkChild) o).getName());
+        
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof LinkChild);
+        Assert.assertEquals("Thomas", ((LinkChild) o).getName());
+        Assert.assertEquals("Vera", ((LinkChild) o).getChild().getName());
+        
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof LinkChild);
+        Assert.assertEquals("Hans", ((LinkChild) o).getName());
+        
+        System.out.println(o);
+        Assert.assertEquals("Thomas", ((LinkChild) o).getChild().getName());
+        Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild().getName());
     }
 
 }
