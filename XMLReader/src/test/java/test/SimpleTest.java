@@ -30,7 +30,8 @@ public class SimpleTest {
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
     private static final String CHILDS_XML = "src/test/resources/childs.xml";
-    private static final String LINKCHILDS_XML = "src/test/resources/linkChilds.xml";
+    private static final String CHILDSANDCITY_XML = "src/test/resources/childsAndCity.xml";
+    
     
     
     
@@ -64,7 +65,7 @@ public class SimpleTest {
         CurrentObject current = new SimpleCurrentObject();
         Value value = new Value(TObject.class, current,new SimpleCurrentObject());
         value.push();
-        SetAction action = value.createSetAction("Name");
+        SetAction action = value.createSetAction(new TagPath("/first"),"Name");
         action.setValue("Test");
 
         value.pop();
@@ -79,7 +80,7 @@ public class SimpleTest {
         CurrentObject current = new SimpleCurrentObject();
         Value value = new Value(TObject.class, current,new StackCurrentObject());
         value.push();
-        SetAction action = value.createSetAction("Name");
+        SetAction action = value.createSetAction(new TagPath("/first/is"),"Name");
         action.setValue("Test");
 
         value.pop();
@@ -99,7 +100,7 @@ public class SimpleTest {
 
         ElementNameStack stack = new ElementNameStack(current, map);
         stack.addAction(new TagPath("/first/is"), value);
-        stack.addAction(new TagPath("/first/is/name"), value.createSetAction("Name"));
+        stack.addAction(new TagPath("/first/is/name"), value.createSetAction(new TagPath("/first/is"),"Name"));
 
         stack.push("first");
         stack.push("is");
@@ -119,11 +120,11 @@ public class SimpleTest {
 
         CurrentObject current = new SimpleCurrentObject();
         Value value = new Value(TObject.class, current,new SimpleCurrentObject());
-        SetAction iSetter = value.createSetAction("Nummer");
-        SetAction bSetter = value.createSetAction("bValue");
-        SetAction fSetter = value.createSetAction("fValue");
-        SetAction dSetter = value.createSetAction("dValue");
-        SetAction lSetter = value.createSetAction("lValue");
+        SetAction iSetter = value.createSetAction(new TagPath("/first"),"Nummer");
+        SetAction bSetter = value.createSetAction(new TagPath("/first"),"bValue");
+        SetAction fSetter = value.createSetAction(new TagPath("/first"),"fValue");
+        SetAction dSetter = value.createSetAction(new TagPath("/first"),"dValue");
+        SetAction lSetter = value.createSetAction(new TagPath("/first"),"lValue");
 
         value.push();
         iSetter.setValue("66");
@@ -364,15 +365,48 @@ public class SimpleTest {
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Thomas", ((LinkChild) o).getName());
-        Assert.assertEquals("Vera", ((LinkChild) o).getChild().getName());
-        
+
         o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Hans", ((LinkChild) o).getName());
         
         System.out.println(o);
-        Assert.assertEquals("Thomas", ((LinkChild) o).getChild().getName());
+        Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild().getName());
+    }
+
+    @Test
+    public void readLinkChildsAndCity()  {
+        Reader reader = new Reader(LinkChild.class,City.class);
+        reader.read(CHILDSANDCITY_XML);
+    
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof City);
+        Assert.assertEquals("A", ((City) o).getName());
+    
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof City);
+        Assert.assertEquals("C", ((City) o).getName());
+    
+        o = reader.next();
+        Assert.assertTrue(o instanceof LinkChild);
+        Assert.assertEquals("Vera", ((LinkChild) o).getName());
+        Assert.assertEquals("C", ((LinkChild) o).getCity().getName());
+        
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof LinkChild);
+        Assert.assertEquals("Thomas", ((LinkChild) o).getName());
+
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof LinkChild);
+        Assert.assertEquals("Hans", ((LinkChild) o).getName());
+        Assert.assertEquals("A", ((LinkChild) o).getCity().getName());
+        
+        System.out.println(o);
         Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild().getName());
     }
 

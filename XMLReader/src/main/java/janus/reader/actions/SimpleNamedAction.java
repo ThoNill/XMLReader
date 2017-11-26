@@ -15,6 +15,7 @@ public class SimpleNamedAction implements NamedAction {
     private TagPath name;
     private Action action;
     private SetAction setter;
+    
 
     public SimpleNamedAction(TagPath name, Action action, SetAction setter) {
         super();
@@ -25,8 +26,8 @@ public class SimpleNamedAction implements NamedAction {
 
     @Override
     public void setValue(Object value) {
-        log.debug("setze mit " + setter);
-        if (setter != null) {
+        if (setter != null && value != null) {
+            log.debug("simpleNamedAction setze mit {} auf {}",setter,value);
             setter.setValue(value);
         } 
 
@@ -61,5 +62,15 @@ public class SimpleNamedAction implements NamedAction {
     public SetAction getSetter() {
         return setter;
     }
+
+   @Override
+   public boolean isSetableFromString() {
+       return setter != null && setter.isSetableFromString();
+   }
+
+   @Override
+   public TagPath getValuePath() {
+       return (setter != null ) ? setter.getValuePath() : null;
+   }
 
 }

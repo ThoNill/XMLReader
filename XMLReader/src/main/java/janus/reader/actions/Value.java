@@ -6,6 +6,7 @@ import janus.reader.annotations.XmlPaths;
 import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -110,7 +111,7 @@ public class Value implements Action {
      * @param name
      * @return
      */
-    public SetAction createSetAction(String name) {
+    public SetAction createSetAction(TagPath valuePath,String name) {
         try {
             if (name == null) {
                 throw new IllegalArgumentException(
@@ -120,10 +121,14 @@ public class Value implements Action {
             Method method = searchTheMethod(this.getClazz(), methodName,
                     String.class);
             Class<?> targetClass = method.getParameterTypes()[0];
-            if(targetClass.equals(String.class) || targetClass.isAnnotationPresent(XmlPath.class) || targetClass.isAnnotationPresent(XmlPaths.class)) {
-                return createSetAction(method);     
+            if(targetClass.isAnnotationPresent(XmlPath.class)) {
+                XmlPath xpath = targetClass.getAnnotation(XmlPath.class);
+                return createSetAction(new TagPath(xpath.path()),method);     
+            }
+            if(targetClass.equals(String.class) ) {
+                return createSetAction(valuePath,method);     
             } else {
-                return createSetAction(method,
+                return createSetAction(valuePath,method,
                         AdapterMap.getAdapter(targetClass));
             }
            
@@ -141,18 +146,21 @@ public class Value implements Action {
      * @return
      */
     
-    private SetAction createSetAction(Method handle) {
+    private SetAction createSetAction(TagPath rValuePath,Method handle) {
         Value v = this;
 
         return new SetAction() {
             Method m = handle;
+            TagPath valuePath = rValuePath;
 
             @Override
             public void setValue(Object value) {
                 try {
-                    LOG.debug("setValue 1");
+                    LOG.debug("setMethod {} to Value {} ",m,value );
                     if (m.getParameters()[0].getType().isAssignableFrom(value.getClass())) {
                         m.invoke(v.getValue(), value);
+                    } else {
+                        LOG.debug("The Method {} is not asignable from {} ",m,value.getClass() );
                     }
                 } catch (Exception e) {
                     throw new ReaderRuntimeException(" Kann die Methode "
@@ -160,6 +168,14 @@ public class Value implements Action {
                             + m.getParameterTypes()[0].getTypeName()
                             + "  " + value + ") nicht auf " + v.getValue() + " anwenden",e);
                 }
+            }
+            
+            public boolean isSetableFromString() {
+                return m.getParameterTypes()[0].equals(String.class);
+            }
+            
+            public TagPath getValuePath() {
+                return valuePath;
             }
         };
 
@@ -174,11 +190,13 @@ public class Value implements Action {
      * @return
      */
 
-  private SetAction createSetAction(Method handle, XmlAdapter<String, ?> adapter) {
+  private SetAction createSetAction(TagPath rValuePath,Method handle, XmlAdapter<String, ?> adapter) {
         Value v = this;
  
         return new SetAction() {
             Method m = handle;
+            TagPath valuePath = rValuePath;
+
             XmlAdapter<String, ?> a = adapter;
  
             @Override
@@ -195,6 +213,14 @@ public class Value implements Action {
                             + " mit dem Objecttyp " + o.getClass()
                             + " nicht auf " + v.getValue() + " anwenden",e);
                 }
+            }
+            
+            public boolean isSetableFromString() {
+                return true;
+            }
+
+            public TagPath getValuePath() {
+                return valuePath;
             }
         };
  

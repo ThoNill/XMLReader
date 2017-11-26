@@ -5,10 +5,24 @@ package janus.reader.actions;
  */
 public class TagPath {
     private String path;
-
+    private int depth= 0;
+    
+    
     public TagPath(String path) {
         super();
         this.path = path;
+        this.depth = calculateDpth(path);
+    }
+
+    private int calculateDpth(String pathString) {
+ 
+        int count=0;
+        for(int i=pathString.length()-1;i>=0;i--) {
+            if (pathString.charAt(i)=='/') {
+                count++;
+            }
+        }
+        return count+1;
     }
 
     @Override
@@ -58,6 +72,10 @@ public class TagPath {
             return new TagPath(this.path.substring(0, lastIndex));
         }
         return null;
+    }
+
+    public int getDepth() {
+        return depth;
     }
 
 }

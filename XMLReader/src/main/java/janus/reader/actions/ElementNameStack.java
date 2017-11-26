@@ -139,7 +139,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     
     
     public void setParentValue(TagPath path) {
-        map.setValue(path.parent(), path);
+        map.setValue(path);
     }
 
     /**
@@ -214,7 +214,7 @@ public class ElementNameStack extends ArrayDeque<String> {
 
     public void addSetter(TagPath valueName, TagPath absPath, String field) {
         Value value = checkArguments(valueName, absPath, field);
-        SetAction setter = value.createSetAction(field);
+        SetAction setter = value.createSetAction(valueName,field);
         addAction(absPath, setter);
     }
 

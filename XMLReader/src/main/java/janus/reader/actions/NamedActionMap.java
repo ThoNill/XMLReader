@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 public class NamedActionMap extends HashMap<TagPath, NamedAction> {
     static private Logger log = LoggerFactory.getLogger(NamedActionMap.class);
 
-
     /**
      * constructor of parent class
      */
@@ -56,20 +55,22 @@ public class NamedActionMap extends HashMap<TagPath, NamedAction> {
     }
 
     /**
-     * call a {@link NamedAction} setValue action 
+     * call a {@link NamedAction} setValue action
      * 
      * @param name
      * @param value
      */
     public void setValue(TagPath name, String value) {
+        log.debug(" setValue auf String {} {} ", name, value);
         NamedAction action = get(name);
-        if (action != null) {
+        if (action != null && action.isSetableFromString()) {
+            log.debug(" find {} ", action.getName());
             action.setValue(value);
         }
     }
 
     /**
-     * call a {@link NamedAction} push action 
+     * call a {@link NamedAction} push action
      * 
      * @param name
      * @param value
@@ -82,7 +83,7 @@ public class NamedActionMap extends HashMap<TagPath, NamedAction> {
     }
 
     /**
-     * call a {@link NamedAction} pop action 
+     * call a {@link NamedAction} pop action
      * 
      * @param name
      * @param value
@@ -95,73 +96,97 @@ public class NamedActionMap extends HashMap<TagPath, NamedAction> {
     }
 
     public NamedAction get(TagPath path) {
-        for (TagPath p : keySet()) {
-            if (path.compare(p)) {
-                return super.get(p);
-            }
+        log.debug("get {} ", path);
+        TagPath bestPath = searchTheBestMatchingPath(path);
+        if (bestPath != null) {
+            return super.get(bestPath);
         }
         return null;
     }
 
-
-    public NamedAction getValueAction(TagPath path) {
+    private TagPath searchTheBestMatchingPath(TagPath path) {
+        log.debug("searchTheBestMatchingPath {} ", path);
+        int bestDepth = 0;
+        TagPath bestPath = null;
         for (TagPath p : keySet()) {
-            if (path.compare(p)) {
-                NamedAction valueAction = super.get(p);
-                if (valueAction.getAction() != null && valueAction.getAction() instanceof Value) {
-                    return valueAction;
+            if (path.compare(p) && p.getDepth() > bestDepth) {
+                log.debug("better path {} ", p);
+                bestPath = p;
+                bestDepth = p.getDepth();
+            }
+        }
+        return bestPath;
+    }
+
+    private TagPath searchTheBestMatchingValue(TagPath path) {
+        log.debug("searchTheBestMatchingPath {} ", path);
+        int bestDepth = 0;
+        TagPath bestPath = null;
+        for (TagPath p : keySet()) {
+            if (path.compare(p) && p.getDepth() > bestDepth) {
+                NamedAction a = super.get(p);
+                if (a.getAction() != null && a.getAction() instanceof Value) {
+                    log.debug("better path {} ", p);
+                    bestPath = p;
+                    bestDepth = p.getDepth();
                 }
             }
+        }
+        return bestPath;
+    }
+
+    public NamedAction getValueAction(TagPath path) {
+        log.debug("get {} ", path);
+        TagPath bestPath = searchTheBestMatchingValue(path);
+        if (bestPath != null) {
+            return super.get(bestPath);
         }
         return null;
     }
 
     public NamedAction getSetterAction(TagPath path) {
-        for (TagPath p : keySet()) {
-            if (path.compare(p)) {
-                NamedAction valueAction = super.get(p);
-                if (valueAction.getSetter() != null && valueAction.getSetter() instanceof SetAction) {
-                    return valueAction;
-                }
-            }
-        }
-        return null;
+        return get(path);
     }
 
-    
+    /*
+     * public NamedAction getSetterAction(TagPath path) { for (TagPath p :
+     * keySet()) { if (path.compare(p)) { NamedAction valueAction =
+     * super.get(p); if (valueAction.getSetter() != null &&
+     * valueAction.getSetter() instanceof SetAction) { return valueAction; } } }
+     * return null; }
+     */
+
     public boolean contains(TagPath path) {
-        for (TagPath p : keySet()) {
-            if (path.compare(p)) {
-                return true;
-            }
-        }
-        return false;
+        TagPath bestPath = searchTheBestMatchingPath(path);
+        return (bestPath != null);
     }
 
-    public void setValue(TagPath valuePath,TagPath setterPath) {
-        if (valuePath == null || setterPath == null) {
+    public void setValue(TagPath setterPath) {
+        if (setterPath == null) {
             return;
         }
-        log.debug("Verbinde " + valuePath + " auf " + setterPath);
-        NamedAction valueAction = getValueAction(valuePath);
+        log.debug("Suche Setter zu {} ", setterPath);
         NamedAction setter = getSetterAction(setterPath);
-        if (valueAction != null) {
-            log.debug("Value gefunden " + valueAction.getName() +  " action " + valueAction.getAction());
-        }
-        if (setter != null) {
+        if (setter != null && setter.getSetter() != null
+                && !setter.isSetableFromString()) {
             log.debug("Setter gefunden " + setter.getName());
+            NamedAction valueAction = getValueAction(setter.getValuePath());
+            if (valueAction != null && valueAction.getAction() instanceof Value) {
+                log.debug("Value gefunden " + valueAction.getName()
+                        + " action " + valueAction.getAction());
+                Value value = (Value) valueAction.getAction();
+                Object currentValue = value.getCurrent().next();
+                log.debug("gesetzt wird " + value.getCurrent().getCurrent()
+                        + " mit " + setter + " auf " + currentValue);
+                setter.setValue(currentValue);
+                value.getCurrent().setCurrent(currentValue);
+            }
         } else {
-            log.debug("Kein Setter gefunden zu " + setterPath);
-        }
-       
-        if (valueAction != null && setter != null && valueAction.getAction() instanceof Value) {
-            log.debug("kann gesetzt werden");
-            Value value = (Value)valueAction.getAction();
-            Object currentValue = value.getCurrent().next();
-            log.debug("gesetzt wird " + value.getCurrent().getCurrent() + " mit " + setter + " auf " + currentValue);
-            setter.setValue(currentValue);
-            value.getCurrent().setCurrent(currentValue);
+            if (setter == null || setter.getSetter() == null) {
+                log.debug("Kein Setter gefunden zu " + setterPath);
+            } else {
+                log.debug("Setter wird ueber String gesetzt");
+            }
         }
     }
-
 }

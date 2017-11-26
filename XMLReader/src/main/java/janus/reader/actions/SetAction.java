@@ -6,7 +6,9 @@ package janus.reader.actions;
  * @author javaman
  *
  */
-@FunctionalInterface
+//@FunctionalInterface
 public interface SetAction {
     void setValue(Object value);
+    boolean isSetableFromString();
+    TagPath getValuePath();
 }
