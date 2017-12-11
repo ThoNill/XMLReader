@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 // @FunctionalInterface
 public class Setter extends PathEntry {
-    static Logger LOG = LoggerFactory.getLogger(Setter.class);
+    private static final    Logger log = LoggerFactory.getLogger(Setter.class);
 
     Method m;
     Value v;
@@ -30,17 +30,15 @@ public class Setter extends PathEntry {
         this.v = v;
     }
 
-    // public abstract void setValue(Object value);
-    // public abstract boolean isSetableFromString();
-
+  
     public void setValue(Object value) {
         try {
-            LOG.debug("setMethod {} to Value {} ", m, value);
+            log.debug("setMethod {} to Value {} ", m, value);
             if (m.getParameters()[0].getType().isAssignableFrom(
                     value.getClass())) {
                 m.invoke(v.getValue(), value);
             } else {
-                LOG.debug("The Method {} is not asignable from {} ", m,
+                log.debug("The Method {} is not asignable from {} ", m,
                         value.getClass());
             }
         } catch (Exception e) {
@@ -55,7 +53,7 @@ public class Setter extends PathEntry {
     }
 
     public List<TagPath> getValuePaths() {
-        List<TagPath> tagPathList = new ArrayList<TagPath>();
+        List<TagPath> tagPathList = new ArrayList<>();
         Class<?> parameterType = m.getParameterTypes()[0];
         if (parameterType.isAnnotationPresent(XmlPath.class)
                 || parameterType.isAnnotationPresent(XmlPaths.class)) {

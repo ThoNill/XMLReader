@@ -1,17 +1,10 @@
 package janus.reader.actions;
 
-import janus.reader.adapters.AdapterMap;
-import janus.reader.annotations.XmlPath;
-import janus.reader.annotations.XmlPaths;
-import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +20,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class Value extends PathEntry implements Action {
-    static Logger LOG = LoggerFactory.getLogger(Value.class);
+    private static final Logger log = LoggerFactory.getLogger(Value.class);
 
     private Class<?> clazz;
     private Method staticCreationMethod;
@@ -40,7 +33,7 @@ public class Value extends PathEntry implements Action {
 
     public Value(TagPath path,Class<?> clazz, CurrentObject current,String staticMethodName,CurrentObject objectOfClass) {
         super(path);
-        LOG.debug("Create Value for path {} " ,path);
+        log.debug("Create Value for path {} " ,path);
         this.clazz = clazz;
         this.current = current;
         this.objectOfClass = objectOfClass;
@@ -79,13 +72,13 @@ public class Value extends PathEntry implements Action {
                 objectOfClass.setCurrent(staticCreationMethod.invoke(null)); 
             }
         } catch (InstantiationException e) {
-            LOG.error("The Object could not be instantiated",e);
+            log.error("The Object could not be instantiated",e);
         } catch (IllegalAccessException e) {
-            LOG.error("Illegal Access",e);
+            log.error("Illegal Access",e);
         } catch (IllegalArgumentException e) {
-            LOG.error("The method " + ((staticCreationMethod==null) ? "NN" : staticCreationMethod.getName()) + " is called with wrong arguments",e);
+            log.error("The method " + ((staticCreationMethod==null) ? "NN" : staticCreationMethod.getName()) + " is called with wrong arguments",e);
         } catch (InvocationTargetException e) {
-            LOG.error("The method " + ((staticCreationMethod==null) ? "NN" :  staticCreationMethod.getName()) + " can not been invoced",e);
+            log.error("The method " + ((staticCreationMethod==null) ? "NN" :  staticCreationMethod.getName()) + " can not been invoced",e);
         }
     }
 

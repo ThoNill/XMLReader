@@ -12,7 +12,6 @@ import java.io.FileNotFoundException;
 import java.util.HashMap;
 
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -23,7 +22,7 @@ import javax.xml.stream.XMLStreamReader;
  * @author Thomas Nill
  *
  */
-public class TagReader {
+public class TagReader extends BasisReader {
     private HashMap<TagPath, TagPath> tags;
     private ValueMap map;
     private ElementNameStack s;
@@ -90,43 +89,19 @@ public class TagReader {
     }
 
 
-    private void next(XMLStreamReader xmlr) {
-        switch (xmlr.getEventType()) {
-        case XMLStreamConstants.START_ELEMENT:
-            nextStartElement(xmlr);
-            break;
-        case XMLStreamConstants.END_ELEMENT:
-            nextEndElement(xmlr);
-            break;
-        case XMLStreamConstants.SPACE:
-        case XMLStreamConstants.CHARACTERS:
-            nextText(xmlr);
-            break;
-        case XMLStreamConstants.PROCESSING_INSTRUCTION:
-        case XMLStreamConstants.CDATA:
-        case XMLStreamConstants.COMMENT:
-        case XMLStreamConstants.ENTITY_REFERENCE:
-        case XMLStreamConstants.START_DOCUMENT:
-        default:
-            break;
-        }
-
-    }
-
-
-    private void nextText(XMLStreamReader xmlr) {
+    protected void nextText(XMLStreamReader xmlr) {
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
         s.setText(new String(xmlr.getTextCharacters(), start, length));
     }
 
-    private void nextEndElement(XMLStreamReader xmlr) {
+    protected void nextEndElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             s.pop();
         }
     }
 
-    private void nextStartElement(XMLStreamReader xmlr) {
+    protected void nextStartElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             s.push(xmlr.getLocalName());
             TagPath pfad = s.getCurrentPath();

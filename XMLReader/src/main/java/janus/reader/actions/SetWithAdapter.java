@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 //@FunctionalInterface
 public class SetWithAdapter extends Setter {
-    static Logger LOG = LoggerFactory.getLogger(SetWithAdapter.class);
+    private static final Logger log = LoggerFactory.getLogger(SetWithAdapter.class);
 
     
     private XmlAdapter<String, ?> a;
@@ -29,7 +29,7 @@ public class SetWithAdapter extends Setter {
     
     @Override
     public void setValue(Object value) {
-        LOG.debug("setValue 2");
+        log.debug("setValue 2");
         Object o = "";
         try {
             o = a.unmarshal(value.toString());

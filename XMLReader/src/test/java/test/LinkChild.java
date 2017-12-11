@@ -1,14 +1,13 @@
 package test;
 
+import janus.reader.annotations.XmlPath;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import janus.reader.actions.Value;
-import janus.reader.annotations.XmlPath;
-
 @XmlPath(path="child")
 public class LinkChild {
-    static private Logger log = LoggerFactory.getLogger(LinkChild.class);
+    private static final Logger  log = LoggerFactory.getLogger(LinkChild.class);
 
     private String name;
     private LinkChild child;

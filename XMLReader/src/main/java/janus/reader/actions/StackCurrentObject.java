@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class StackCurrentObject implements CurrentObject {
-    static private Logger log = LoggerFactory.getLogger(StackCurrentObject.class);
+    private static final Logger  log = LoggerFactory.getLogger(StackCurrentObject.class);
 
     private ArrayDeque<Object> current = new ArrayDeque<>();
 

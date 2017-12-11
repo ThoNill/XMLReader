@@ -1,10 +1,7 @@
 package janus.reader.actions;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * The NamedActionMap calls the {@link Action} and {@link Setter} actions,
@@ -14,8 +11,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ValueMap extends PathEntryMap<Value> {
-    static private Logger log = LoggerFactory.getLogger(ValueMap.class);
-
+  
     /**
      * constructor of parent class
      */

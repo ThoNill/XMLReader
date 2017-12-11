@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
-    static private Logger log = LoggerFactory.getLogger(PathEntryMap.class);
+    private static final Logger  log = LoggerFactory.getLogger(PathEntryMap.class);
 
     /**
      * Constructor of parent class

@@ -7,7 +7,6 @@ import janus.reader.exceptions.ReaderRuntimeException;
 
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
-import java.util.HashMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -38,7 +37,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class ElementNameStack extends ArrayDeque<String> {
-    static private Logger log = LoggerFactory.getLogger(ElementNameStack.class);
+    private static final Logger log = LoggerFactory.getLogger(ElementNameStack.class);
 
     
     private static final long serialVersionUID = 773837341597279034L;
@@ -188,7 +187,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     }
 
     private CurrentObject createCurrentObject(TagPath name) {
-        return (name.isAbsolut()) ? new SimpleCurrentObject() : new StackCurrentObject();
+        return name.isAbsolut() ? new SimpleCurrentObject() : new StackCurrentObject();
     }
 
     /**
@@ -277,8 +276,8 @@ public class ElementNameStack extends ArrayDeque<String> {
             throw new IllegalArgumentException(
                     "Pfade oder Feldnamen muessen != null sein");
         }
-        Object o = checkName(valueName);
-        return checkValue(valueName, o);
+        checkName(valueName);
+        return checkValue(valueName);
     }
 
     private Object checkName(TagPath valueName) {
@@ -290,7 +289,7 @@ public class ElementNameStack extends ArrayDeque<String> {
         return o;
     }
 
-    private Value checkValue(TagPath valueName, Object o) {
+    private Value checkValue(TagPath valueName) {
         return valueMap.get(valueName);
     }
     
@@ -369,8 +368,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @return
      * @throws Exception
      */
-    private Method searchTheMethod(Class<?> clazz, String name,
-            Class<?> targetClass) {
+    private Method searchTheMethod(Class<?> clazz, String name,Class<?> targetClass) {
         Method bestMethod = null;
         Method usableMethod = null;
         for (Method method : clazz.getMethods()) {

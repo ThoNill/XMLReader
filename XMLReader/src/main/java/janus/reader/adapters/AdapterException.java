@@ -9,6 +9,7 @@ package janus.reader.adapters;
 public class AdapterException extends RuntimeException {
 
     public AdapterException() {
+        super();
     }
 
     public AdapterException(String message) {

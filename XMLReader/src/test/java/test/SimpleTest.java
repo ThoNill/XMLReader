@@ -1,8 +1,6 @@
 package test;
 
 import static org.junit.Assert.fail;
-
-
 import janus.reader.Formater;
 import janus.reader.Reader;
 import janus.reader.TagReader;
@@ -15,7 +13,6 @@ import janus.reader.actions.TagPath;
 import janus.reader.actions.Value;
 import janus.reader.actions.ValueMap;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import javax.xml.stream.XMLStreamException;
@@ -27,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SimpleTest {
-    static private Logger log = LoggerFactory.getLogger(Value.class);
+    private static final Logger  log = LoggerFactory.getLogger(Value.class);
 
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";

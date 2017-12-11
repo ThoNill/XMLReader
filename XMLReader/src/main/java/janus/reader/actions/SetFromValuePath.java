@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SetFromValuePath extends TagPath {
-    static private Logger log = LoggerFactory.getLogger(SetFromValuePath.class);
+    private static final Logger  log = LoggerFactory.getLogger(SetFromValuePath.class);
 
     private TagPath valuePath;
     
