@@ -21,12 +21,12 @@ import org.slf4j.LoggerFactory;
  * in the push action, this instance ist generated
  * in the pop action this object is transfered to the current Object
  * 
- * there ar different methods to create {@link SetAction} 
+ * there ar different methods to create {@link Setter} 
  * 
  * @author Thomas Nill
  *
  */
-public class Value implements Action {
+public class Value extends PathEntry implements Action {
     static Logger LOG = LoggerFactory.getLogger(Value.class);
 
     private Class<?> clazz;
@@ -34,12 +34,13 @@ public class Value implements Action {
     private CurrentObject objectOfClass;
     private CurrentObject current;
 
-    public Value(Class<?> clazz, CurrentObject current,CurrentObject objectOfClass) {
-        this(clazz,current,null,objectOfClass);
+    public Value(TagPath path,Class<?> clazz, CurrentObject current,CurrentObject objectOfClass) {
+        this(path,clazz,current,null,objectOfClass);
     }
 
-    public Value(Class<?> clazz, CurrentObject current,String staticMethodName,CurrentObject objectOfClass) {
-        super();
+    public Value(TagPath path,Class<?> clazz, CurrentObject current,String staticMethodName,CurrentObject objectOfClass) {
+        super(path);
+        LOG.debug("Create Value for path {} " ,path);
         this.clazz = clazz;
         this.current = current;
         this.objectOfClass = objectOfClass;
@@ -103,161 +104,6 @@ public class Value implements Action {
     
     public Class<?> getClazz() {
         return clazz;
-    }
-
-    /**
-     * create form a method name
-     * 
-     * @param name
-     * @return
-     */
-    public SetAction createSetAction(TagPath valuePath,String name) {
-        try {
-            if (name == null) {
-                throw new IllegalArgumentException(
-                        "seter Funktionsname muss != null sein");
-            }
-            String methodName = "set" + name;
-            Method method = searchTheMethod(this.getClazz(), methodName,
-                    String.class);
-            Class<?> targetClass = method.getParameterTypes()[0];
-            if(targetClass.isAnnotationPresent(XmlPath.class)) {
-                XmlPath xpath = targetClass.getAnnotation(XmlPath.class);
-                return createSetAction(new TagPath(xpath.path()),method);     
-            }
-            if(targetClass.equals(String.class) ) {
-                return createSetAction(valuePath,method);     
-            } else {
-                return createSetAction(valuePath,method,
-                        AdapterMap.getAdapter(targetClass));
-            }
-           
-        } catch (Exception e) {
-            throw new ReaderRuntimeException("Die Klasse "
-                    + getClazz().getName() + " hat keine Methode set" + name
-                    + " oder sie ist privat", e);
-        }
-    }
-    
-    /**
-     * create SetAction from a {@link Method}
-     * 
-     * @param handle
-     * @return
-     */
-    
-    private SetAction createSetAction(TagPath rValuePath,Method handle) {
-        Value v = this;
-
-        return new SetAction() {
-            Method m = handle;
-            TagPath valuePath = rValuePath;
-
-            @Override
-            public void setValue(Object value) {
-                try {
-                    LOG.debug("setMethod {} to Value {} ",m,value );
-                    if (m.getParameters()[0].getType().isAssignableFrom(value.getClass())) {
-                        m.invoke(v.getValue(), value);
-                    } else {
-                        LOG.debug("The Method {} is not asignable from {} ",m,value.getClass() );
-                    }
-                } catch (Exception e) {
-                    throw new ReaderRuntimeException(" Kann die Methode "
-                            + m.getName() + "("
-                            + m.getParameterTypes()[0].getTypeName()
-                            + "  " + value + ") nicht auf " + v.getValue() + " anwenden",e);
-                }
-            }
-            
-            public boolean isSetableFromString() {
-                return m.getParameterTypes()[0].equals(String.class);
-            }
-            
-            public TagPath getValuePath() {
-                return valuePath;
-            }
-        };
-
-    }
-
-    
-    /**
-     * create SetAction from a {@link Method}
-     * 
-     * @param handle
-     * @param adapter
-     * @return
-     */
-
-  private SetAction createSetAction(TagPath rValuePath,Method handle, XmlAdapter<String, ?> adapter) {
-        Value v = this;
- 
-        return new SetAction() {
-            Method m = handle;
-            TagPath valuePath = rValuePath;
-
-            XmlAdapter<String, ?> a = adapter;
- 
-            @Override
-            public void setValue(Object value) {
-                LOG.debug("setValue 2");
-                Object o = "";
-                try {
-                    o = a.unmarshal(value.toString());
-                    m.invoke(v.getValue(), o);
-                } catch (Exception e) {
-                    throw new ReaderRuntimeException(" Kann die Methode "
-                            + m.getName() + "("
-                            + m.getParameterTypes()[0].getTypeName()
-                            + " mit dem Objecttyp " + o.getClass()
-                            + " nicht auf " + v.getValue() + " anwenden",e);
-                }
-            }
-            
-            public boolean isSetableFromString() {
-                return true;
-            }
-
-            public TagPath getValuePath() {
-                return valuePath;
-            }
-        };
- 
-    }
-
-     /** search a method
-     * 
-     * @param clazz
-     * @param name
-     * @param targetClass
-     * @return
-     * @throws Exception
-     */
-    private Method searchTheMethod(Class<?> clazz, String name,
-            Class<?> targetClass) {
-        Method bestMethod = null;
-        Method usableMethod = null;
-        for (Method method : clazz.getMethods()) {
-            if (name.equals(method.getName())
-                    && method.getParameterCount() == 1) {
-                Class<?> parameterType = method.getParameterTypes()[0];
-                if (parameterType == targetClass) {
-                    bestMethod = method;
-                }
-                if (AdapterMap
-                        .hasAdapterForClass(parameterType)) {
-                    usableMethod = method;
-                }
-                if (parameterType.isAnnotationPresent(XmlPath.class) || parameterType.isAnnotationPresent(XmlPaths.class)) {
-                    usableMethod = method;
-                }
-            }
-        }
-        if (bestMethod != null) {
-            return bestMethod;
-        }
-        return usableMethod;
     }
 
     public CurrentObject getCurrent() {

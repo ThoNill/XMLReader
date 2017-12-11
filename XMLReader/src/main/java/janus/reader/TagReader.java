@@ -2,9 +2,9 @@ package janus.reader;
 
 import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
-import janus.reader.actions.NamedActionMap;
 import janus.reader.actions.SimpleCurrentObject;
 import janus.reader.actions.TagPath;
+import janus.reader.actions.ValueMap;
 import janus.reader.exceptions.ReaderRuntimeException;
 
 import java.io.FileInputStream;
@@ -25,7 +25,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class TagReader {
     private HashMap<TagPath, TagPath> tags;
-    private NamedActionMap map;
+    private ValueMap map;
     private ElementNameStack s;
     private CurrentObject current;
     private XMLStreamReader xmlr;
@@ -34,7 +34,7 @@ public class TagReader {
         super();
         tags = new HashMap<>();
         current = new SimpleCurrentObject();
-        map = new NamedActionMap();
+        map = new ValueMap();
         s = new ElementNameStack(current, map);
     }
 

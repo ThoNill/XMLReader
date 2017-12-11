@@ -1,17 +1,19 @@
 package test;
 
 import static org.junit.Assert.fail;
+
+
 import janus.reader.Formater;
 import janus.reader.Reader;
 import janus.reader.TagReader;
 import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
-import janus.reader.actions.NamedActionMap;
-import janus.reader.actions.SetAction;
+import janus.reader.actions.Setter;
 import janus.reader.actions.SimpleCurrentObject;
 import janus.reader.actions.StackCurrentObject;
 import janus.reader.actions.TagPath;
 import janus.reader.actions.Value;
+import janus.reader.actions.ValueMap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -43,10 +45,10 @@ public class SimpleTest {
         Assert.assertTrue(absolut.isAbsolut());
         Assert.assertFalse(relativ.isAbsolut());
         
-        Assert.assertTrue(absolut.compare(relativ));
-        Assert.assertFalse(absolut.compare(new TagPath("a")));
+        Assert.assertTrue(relativ.compare(absolut));
+        Assert.assertFalse(new TagPath("a").compare(absolut));
         Assert.assertTrue(absolut.compare(absolut));
-        Assert.assertFalse(absolut.compare(new TagPath("/a")));
+        Assert.assertFalse(new TagPath("/a").compare(absolut));
         
     }
     
@@ -63,9 +65,12 @@ public class SimpleTest {
     @Test
     public void methodHandle() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(TObject.class, current,new SimpleCurrentObject());
+        Value value = new Value(new TagPath("/value"),TObject.class, current,new SimpleCurrentObject());
         value.push();
-        SetAction action = value.createSetAction(new TagPath("/first"),"Name");
+        
+        ElementNameStack stack = new ElementNameStack(current);
+        
+        Setter action = stack.createSetAction(value,new TagPath("/value/first"),"Name");
         action.setValue("Test");
 
         value.pop();
@@ -78,9 +83,12 @@ public class SimpleTest {
     @Test
     public void methodHandleWithStack() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(TObject.class, current,new StackCurrentObject());
+        Value value = new Value(new TagPath("/value"),TObject.class, current,new StackCurrentObject());
         value.push();
-        SetAction action = value.createSetAction(new TagPath("/first/is"),"Name");
+        
+        ElementNameStack stack = new ElementNameStack(current);
+        
+        Setter action = stack.createSetAction(value,new TagPath("/value/first/is"),"Name");
         action.setValue("Test");
 
         value.pop();
@@ -95,12 +103,12 @@ public class SimpleTest {
     public void stringStack() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(TObject.class, current,new SimpleCurrentObject());
-        NamedActionMap map = new NamedActionMap();
+        Value value = new Value(new TagPath("/first/is"),TObject.class, current,new SimpleCurrentObject());
+        ValueMap map = new ValueMap();
 
         ElementNameStack stack = new ElementNameStack(current, map);
-        stack.addAction(new TagPath("/first/is"), value);
-        stack.addAction(new TagPath("/first/is/name"), value.createSetAction(new TagPath("/first/is"),"Name"));
+        stack.addValue( value);
+        stack.addSetter(stack.createSetAction(value,new TagPath("name"),"Name"));
 
         stack.push("first");
         stack.push("is");
@@ -119,12 +127,15 @@ public class SimpleTest {
     public void adapter() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(TObject.class, current,new SimpleCurrentObject());
-        SetAction iSetter = value.createSetAction(new TagPath("/first"),"Nummer");
-        SetAction bSetter = value.createSetAction(new TagPath("/first"),"bValue");
-        SetAction fSetter = value.createSetAction(new TagPath("/first"),"fValue");
-        SetAction dSetter = value.createSetAction(new TagPath("/first"),"dValue");
-        SetAction lSetter = value.createSetAction(new TagPath("/first"),"lValue");
+        Value value = new Value(new TagPath("/first"),TObject.class, current,new SimpleCurrentObject());
+        
+        ElementNameStack stack = new ElementNameStack(current);
+        
+        Setter iSetter = stack.createSetAction(value,new TagPath("/first/n"),"Nummer");
+        Setter bSetter = stack.createSetAction(value,new TagPath("/first/b"),"bValue");
+        Setter fSetter = stack.createSetAction(value,new TagPath("/first/f"),"fValue");
+        Setter dSetter = stack.createSetAction(value,new TagPath("/first/d"),"dValue");
+        Setter lSetter = stack.createSetAction(value,new TagPath("/first/l"),"lValue");
 
         value.push();
         iSetter.setValue("66");
@@ -206,8 +217,8 @@ public class SimpleTest {
         reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
         reader.addSetter(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-        new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-                "Name");
+                         new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+                                            "Name");
 
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -371,8 +382,6 @@ public class SimpleTest {
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Hans", ((LinkChild) o).getName());
         
-        System.out.println(o);
-        Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild().getName());
     }
 
     @Test
@@ -391,9 +400,15 @@ public class SimpleTest {
         Assert.assertEquals("C", ((City) o).getName());
     
         o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof City);
+        Assert.assertEquals("D", ((City) o).getName());
+    
+        o = reader.next();
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Vera", ((LinkChild) o).getName());
         Assert.assertEquals("C", ((LinkChild) o).getCity().getName());
+        Assert.assertEquals("D", ((LinkChild) o).getSecond().getName());
         
         o = reader.next();
         Assert.assertNotNull(o);
@@ -406,7 +421,6 @@ public class SimpleTest {
         Assert.assertEquals("Hans", ((LinkChild) o).getName());
         Assert.assertEquals("A", ((LinkChild) o).getCity().getName());
         
-        System.out.println(o);
         Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild().getName());
     }
 

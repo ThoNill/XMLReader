@@ -1,7 +1,15 @@
 package janus.reader.actions;
 
+import janus.reader.adapters.AdapterMap;
+import janus.reader.annotations.XmlPath;
+import janus.reader.annotations.XmlPaths;
+import janus.reader.exceptions.ReaderRuntimeException;
+
+import java.lang.reflect.Method;
 import java.util.ArrayDeque;
 import java.util.HashMap;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,17 +42,17 @@ public class ElementNameStack extends ArrayDeque<String> {
 
     
     private static final long serialVersionUID = 773837341597279034L;
-    private NamedActionMap map;
     private CurrentObject current;
-    private HashMap<TagPath,Value> valueHash = new HashMap<>();
-
+    private ValueMap valueMap = new ValueMap();
+    private SetterMap setterMap = new SetterMap();
+    private SetFromValueMap setFromValueMap = new SetFromValueMap();
     /**
      * constructor with a empty configuration
      * 
      * @param current
      */
     public ElementNameStack(CurrentObject current) {
-        this(current, new NamedActionMap());
+        this(current, new ValueMap());
     }
 
     /**
@@ -53,10 +61,10 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param current
      * @param map
      */
-    public ElementNameStack(CurrentObject current, NamedActionMap map) {
+    public ElementNameStack(CurrentObject current, ValueMap map) {
         super();
         this.current = current;
-        this.map = map;
+        this.valueMap = map;
     }
 
     /**
@@ -85,7 +93,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @return
      */
     public Object getValueObject(TagPath name) {
-        Value value = valueHash.get(name);
+        Value value = valueMap.get(name);
         if (value != null) {
             return value.getValue();
         } 
@@ -118,7 +126,7 @@ public class ElementNameStack extends ArrayDeque<String> {
         log.debug("Push a Tag " + item);
         super.push(item);
         TagPath path = getCurrentPath();
-        map.push(path);
+        valueMap.push(path);
     }
 
     /**
@@ -130,16 +138,17 @@ public class ElementNameStack extends ArrayDeque<String> {
     public String pop() {
         TagPath path = getCurrentPath();
         
-        setParentValue(path);
+        setFromValue(path);
         
         String erg = super.pop();
-        map.pop(path);
+        valueMap.pop(path);
         return erg;
     }
     
     
-    public void setParentValue(TagPath path) {
-        map.setValue(path);
+    public void setFromValue(TagPath path) {
+        log.debug("at pop  {} ",path);
+        setFromValueMap.setValue(path);    
     }
 
     /**
@@ -149,7 +158,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     public void setAttribute(String item, String value) {
         super.push("@" + item);
         TagPath path = getCurrentPath();
-        map.setValue(path, value);
+        setterMap.setValue(path, value);
         super.pop();
     }
 
@@ -160,7 +169,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
     public void setText(String value) {
         TagPath path = getCurrentPath();
-        map.setValue(path, value);
+        setterMap.setValue(path, value);
     }
 
     /**
@@ -172,11 +181,10 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (class of the generated instance)
      */
 
-    public void addValue(TagPath name, Class<?> clazz) {
-        Value value = new Value(clazz, current, 
-                createCurrentObject(name));
-        addAction(name, value);
-        valueHash.put(name, value);
+    public void addValue(TagPath path, Class<?> clazz) {
+        Value value = new Value(path,clazz, current, 
+                createCurrentObject(path));
+        addValue(value);
     }
 
     private CurrentObject createCurrentObject(TagPath name) {
@@ -192,10 +200,9 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (class of the generated instance)
      */
 
-    public void addValue(TagPath name, Class<?> clazz,String methodName) {
-        Value value = new Value(clazz, current,methodName,createCurrentObject(name));
-        addAction(name, value);
-        valueHash.put(name, value);
+    public void addValue(TagPath path, Class<?> clazz,String methodName) {
+        Value value = new Value(path,clazz, current,methodName,createCurrentObject(path));
+        addValue(value);
     }
 
     
@@ -214,8 +221,8 @@ public class ElementNameStack extends ArrayDeque<String> {
 
     public void addSetter(TagPath valueName, TagPath absPath, String field) {
         Value value = checkArguments(valueName, absPath, field);
-        SetAction setter = value.createSetAction(valueName,field);
-        addAction(absPath, setter);
+        Setter setter = createSetAction(value,absPath,field);
+        addSetter(setter);
     }
 
     /**
@@ -232,7 +239,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
 
     public void addRelativSetter(TagPath valueName, TagPath relPath, String field) {
-        addSetter(valueName, new TagPath(valueName.toString() + "/" + relPath.toString()), field);
+        addSetter(valueName,valueName.concat(relPath), field);
     }
 
     /**
@@ -246,8 +253,8 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            the path)
      */
 
-    public void addAction(TagPath name, Action action) {
-        map.put(new SimpleNamedAction(name, action, null));
+    public void addValue(Value value) {
+        valueMap.put(value);
     }
 
     /**
@@ -261,8 +268,8 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            the path)
      */
 
-    public void addAction(TagPath name, SetAction action) {
-        map.put(new SimpleNamedAction(name, null, action));
+    public void addSetter(Setter action) {
+        setterMap.put(action);
     }
 
     private Value checkArguments(TagPath valueName, TagPath absPath, String field) {
@@ -271,12 +278,11 @@ public class ElementNameStack extends ArrayDeque<String> {
                     "Pfade oder Feldnamen muessen != null sein");
         }
         Object o = checkName(valueName);
-        checkNamedAction(valueName, o);
         return checkValue(valueName, o);
     }
 
     private Object checkName(TagPath valueName) {
-        Object o = map.get(valueName);
+        Object o = valueMap.get(valueName);
         if (o == null) {
             throw new IllegalArgumentException("Value " + valueName
                     + " ist nicht vorhanden");
@@ -284,20 +290,109 @@ public class ElementNameStack extends ArrayDeque<String> {
         return o;
     }
 
-    private void checkNamedAction(TagPath valueName, Object o) {
-        if (!(o instanceof NamedAction)) {
-            throw new IllegalArgumentException("Object " + valueName
-                    + " ist keine NamedAction sondern "
-                    + o.getClass().getName());
+    private Value checkValue(TagPath valueName, Object o) {
+        return valueMap.get(valueName);
+    }
+    
+
+    /**
+     * create form a method name
+     * 
+     * @param name
+     * @return
+     */
+    public Setter createSetAction(Value value,TagPath valuePath,String name) {
+        try {
+            if (name == null) {
+                throw new IllegalArgumentException(
+                        "seter Funktionsname muss != null sein");
+            }
+            String methodName = "set" + name;
+            Method method = searchTheMethod(value.getClazz(), methodName,
+                    String.class);
+            Class<?> targetClass = method.getParameterTypes()[0];
+            if(targetClass.isAnnotationPresent(XmlPath.class)) {
+                XmlPath xpath = targetClass.getAnnotation(XmlPath.class);
+                return createSetFromValue(value,valuePath,new TagPath(xpath.path()),method);     
+            }
+            if(targetClass.equals(String.class) ) {
+                return createSetAction(value,valuePath,method);     
+            } else {
+                return createSetAction(value,valuePath,method,
+                        AdapterMap.getAdapter(targetClass));
+            }
+           
+        } catch (Exception e) {
+            throw new ReaderRuntimeException("Die Klasse "
+                    + value.getClazz().getName() + " hat keine Methode set" + name
+                    + " oder sie ist privat", e);
         }
+    }
+    
+    /**
+     * create SetAction from a {@link Method}
+     * 
+     * @param handle
+     * @return
+     */
+    
+    private Setter createSetAction(Value value,TagPath rValuePath,Method handle) {
+        return new Setter(rValuePath,handle,value);
     }
 
-    private Value checkValue(TagPath valueName, Object o) {
-        Action a = ((NamedAction) o).getAction();
-        if (!(a instanceof Value)) {
-            throw new IllegalArgumentException("Object " + valueName
-                    + " ist kein Value sondern " + a.getClass().getName());
-        }
-        return (Value) a;
+    
+    private Setter createSetFromValue(Value value,TagPath setterPath,TagPath valuePath,Method handle) {
+        log.debug(" createSetFromValuAction Setter {} From {} ",setterPath,valuePath);
+        SetFromValue setFromValue = new SetFromValue(setterPath, valuePath, valueMap, setterMap);
+        setFromValueMap.put(setFromValue);
+        return new Setter(setterPath,handle,value);
     }
+
+    
+    /**
+     * create SetAction from a {@link Method}
+     * 
+     * @param handle
+     * @param adapter
+     * @return
+     */
+
+  private Setter createSetAction(Value value,TagPath rValuePath,Method handle, XmlAdapter<String, ?> adapter) {
+          return new SetWithAdapter(rValuePath,handle,value,adapter);
+      }
+
+     /** search a method
+     * 
+     * @param clazz
+     * @param name
+     * @param targetClass
+     * @return
+     * @throws Exception
+     */
+    private Method searchTheMethod(Class<?> clazz, String name,
+            Class<?> targetClass) {
+        Method bestMethod = null;
+        Method usableMethod = null;
+        for (Method method : clazz.getMethods()) {
+            if (name.equals(method.getName())
+                    && method.getParameterCount() == 1) {
+                Class<?> parameterType = method.getParameterTypes()[0];
+                if (parameterType == targetClass) {
+                    bestMethod = method;
+                }
+                if (AdapterMap
+                        .hasAdapterForClass(parameterType)) {
+                    usableMethod = method;
+                }
+                if (parameterType.isAnnotationPresent(XmlPath.class) || parameterType.isAnnotationPresent(XmlPaths.class)) {
+                    usableMethod = method;
+                }
+            }
+        }
+        if (bestMethod != null) {
+            return bestMethod;
+        }
+        return usableMethod;
+    }
+
 }

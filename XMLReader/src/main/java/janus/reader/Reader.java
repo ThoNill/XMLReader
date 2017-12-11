@@ -3,10 +3,10 @@ package janus.reader;
 import janus.reader.actions.Action;
 import janus.reader.actions.CurrentObject;
 import janus.reader.actions.ElementNameStack;
-import janus.reader.actions.NamedActionMap;
-import janus.reader.actions.SetAction;
+import janus.reader.actions.Setter;
 import janus.reader.actions.SimpleCurrentObject;
 import janus.reader.actions.TagPath;
+import janus.reader.actions.ValueMap;
 import janus.reader.annotations.AnnotationProcessor;
 import janus.reader.exceptions.ReaderRuntimeException;
 
@@ -34,7 +34,7 @@ public class Reader implements Iterator<Object> {
     private ElementNameStack elementNameStack;
     private CurrentObject current;
     private XMLStreamReader xmlr;
-    private NamedActionMap map;
+    private ValueMap map;
 
     /**
      * Constructor of an uninitialized Reader
@@ -43,7 +43,7 @@ public class Reader implements Iterator<Object> {
     public Reader() {
         super();
         current = new SimpleCurrentObject();
-        map = new NamedActionMap();
+        map = new ValueMap();
         elementNameStack = new ElementNameStack(current, map);
     }
 
@@ -149,34 +149,6 @@ public class Reader implements Iterator<Object> {
      */
     public void addRelativSetter(TagPath valueName, TagPath relPath, String field) {
         elementNameStack.addRelativSetter(valueName, relPath, field);
-    }
-
-    /**
-     * Add a @{Action} to a path of XML Elements
-     * 
-     * @param name
-     *            (the path of XML elements to the object instance, that will be
-     *            set)
-     * @param action
-     *            (the action, that will be executed at the start and end-tag of
-     *            the path)
-     */
-    public void addAction(TagPath name, Action action) {
-        elementNameStack.addAction(name, action);
-    }
-
-    /**
-     * Add a @{SetAction} to a path of XML Elements
-     * 
-     * @param name
-     *            (the path of XML elements to the object instance, that will be
-     *            set)
-     * @param action
-     *            (the action, that will be executed at the start and end-tag of
-     *            the path)
-     */
-    public void addAction(TagPath name, SetAction action) {
-        elementNameStack.addAction(name, action);
     }
 
     private void next(XMLStreamReader xmlr) {

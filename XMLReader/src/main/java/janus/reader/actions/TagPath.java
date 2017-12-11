@@ -6,15 +6,20 @@ package janus.reader.actions;
 public class TagPath {
     private String path;
     private int depth= 0;
-    
+ 
+
     
     public TagPath(String path) {
         super();
         this.path = path;
-        this.depth = calculateDpth(path);
+        this.depth = calculateDepth(path);
     }
 
-    private int calculateDpth(String pathString) {
+    public TagPath(TagPath path) {
+        this(path.getPath());
+    }
+
+    private int calculateDepth(String pathString) {
  
         int count=0;
         for(int i=pathString.length()-1;i>=0;i--) {
@@ -60,10 +65,10 @@ public class TagPath {
     }
 
     public boolean compare(TagPath path) {
-        if (path.isAbsolut()) {
+        if (isAbsolut()) {
             return this.path.equals(path.path);
         }
-        return this.path.endsWith(path.path);
+        return path.path.endsWith(this.path);
     }
     
     public TagPath parent() {
@@ -76,6 +81,14 @@ public class TagPath {
 
     public int getDepth() {
         return depth;
+    }
+    
+    public TagPath concat(TagPath p) {
+        return new TagPath(this.path + "/" + p.path);
+    }
+
+    public String getPath() {
+        return path;
     }
 
 }
