@@ -3,9 +3,19 @@ package janus.reader;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
 
+/**
+ * The BasisReader is a baseclass for reading XML Files with a StaxReader
+ *  
+ * @author Thomas Nill
+ *
+ */
+
 public abstract class BasisReader {
 
-    public BasisReader() {
+    /**
+     * Constructor for super class
+     */
+    protected BasisReader() {
         super();
     }
 

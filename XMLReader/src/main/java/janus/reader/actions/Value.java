@@ -27,10 +27,28 @@ public class Value extends PathEntry implements Action {
     private CurrentObject objectOfClass;
     private CurrentObject current;
 
+    
+    /**
+     * Constructor
+     * 
+     * @param path
+     * @param clazz
+     * @param current
+     * @param objectOfClass
+     */
     public Value(TagPath path,Class<?> clazz, CurrentObject current,CurrentObject objectOfClass) {
         this(path,clazz,current,null,objectOfClass);
     }
 
+    /**
+     * Constructor
+     * 
+     * @param path
+     * @param clazz
+     * @param current
+     * @param staticMethodName
+     * @param objectOfClass
+     */
     public Value(TagPath path,Class<?> clazz, CurrentObject current,String staticMethodName,CurrentObject objectOfClass) {
         super(path);
         log.debug("Create Value for path {} " ,path);

@@ -3,17 +3,30 @@ package janus.reader.actions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * The TagPath to a property of a class
+ * This is a path to the setter and a path to a value class
+ * 
+ * @author Thomas Nill
+ *
+ */
 public class SetFromValuePath extends TagPath {
     private static final Logger  log = LoggerFactory.getLogger(SetFromValuePath.class);
 
     private TagPath valuePath;
     
+    /**
+     * Constructor
+     * 
+     * @param setterPath
+     * @param valuePath
+     */
     public SetFromValuePath(TagPath setterPath,TagPath valuePath) {
         super(setterPath);
         this.valuePath = valuePath;
     }
 
-    
+    @Override
     public boolean compare(TagPath path) {
         log.debug("compare {} and {}",this,path);
         String pathString = path.getPath();

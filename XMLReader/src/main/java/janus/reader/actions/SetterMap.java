@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class SetterMap extends PathEntryMap<Setter> {
-    private static final Logger  log = LoggerFactory.getLogger(SetterMap.class);
+    private static final Logger log = LoggerFactory.getLogger(SetterMap.class);
 
     /**
      * constructor of parent class
@@ -21,6 +21,9 @@ public class SetterMap extends PathEntryMap<Setter> {
 
     /**
      * constructor of parent class
+     * 
+     * @param initialCapacity
+     * @param loadFactor
      */
     public SetterMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
@@ -28,6 +31,8 @@ public class SetterMap extends PathEntryMap<Setter> {
 
     /**
      * constructor of parent class
+     * 
+     * @param initialCapacity
      */
     public SetterMap(int initialCapacity) {
         super(initialCapacity);
@@ -35,6 +40,8 @@ public class SetterMap extends PathEntryMap<Setter> {
 
     /**
      * constructor of parent class
+     * 
+     * @param m
      */
     public SetterMap(SetterMap m) {
         super(m);
@@ -46,7 +53,6 @@ public class SetterMap extends PathEntryMap<Setter> {
      * @param path
      * @param value
      */
-    
     public void setValue(TagPath path, String value) {
         log.debug(" setValue auf Path {} to {} ", path, value);
         Setter action = get(path);
@@ -55,6 +61,5 @@ public class SetterMap extends PathEntryMap<Setter> {
             action.setValue(value);
         }
     }
-
 
 }

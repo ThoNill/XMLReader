@@ -10,7 +10,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Action that sets a attribute
+ * Setter that sets a property where the vale is a string.
+ * The string value ist first translatet to a class with an adapter
  * 
  * @author javaman
  *
@@ -22,6 +23,14 @@ public class SetWithAdapter extends Setter {
     
     private XmlAdapter<String, ?> a;
 
+    /**
+     * Constructor
+     * 
+     * @param path
+     * @param m
+     * @param v
+     * @param a
+     */
     public SetWithAdapter(TagPath path, Method m, Value v,XmlAdapter<String, ?> a) {
         super(path,m,v);
         this.a = a;
@@ -43,6 +52,11 @@ public class SetWithAdapter extends Setter {
         }
     }
     
+    /**
+     * is this class setable from a String class
+     * 
+     * @return
+     */
     public boolean isSetableFromString() {
         return true;
     }

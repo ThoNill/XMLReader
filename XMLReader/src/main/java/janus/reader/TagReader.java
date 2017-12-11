@@ -29,6 +29,10 @@ public class TagReader extends BasisReader {
     private CurrentObject current;
     private XMLStreamReader xmlr;
 
+    /**
+     * Constructor of an uninitialized Reader
+     * 
+     */
     public TagReader() {
         super();
         tags = new HashMap<>();
@@ -55,6 +59,11 @@ public class TagReader extends BasisReader {
 
     }
 
+
+    /**
+     * read the next Object from the Stax-Stream
+     * @return the next Object in the Stream
+     */
     public Object next() throws XMLStreamException {
         while ((!current.hasObject()) && xmlr.hasNext()) {
             next(xmlr);

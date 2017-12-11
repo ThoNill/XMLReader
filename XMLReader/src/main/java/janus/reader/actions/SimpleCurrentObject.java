@@ -23,6 +23,8 @@ public class SimpleCurrentObject implements CurrentObject {
         this.current = current;
     }
 
+    
+    @Override
     public boolean hasObject() {
         return current != null;
     }

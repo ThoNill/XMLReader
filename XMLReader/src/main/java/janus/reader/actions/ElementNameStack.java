@@ -153,6 +153,8 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * call a setter from a attribut in a XML document
      * 
+     * @param item
+     * @param value
      */
     public void setAttribute(String item, String value) {
         super.push("@" + item);
@@ -174,10 +176,8 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * Add the creation of a class instance to a path of XML Elements
      * 
-     * @param name
-     *            (path of XML Elements)
-     * @param clazz
-     *            (class of the generated instance)
+     * @param path (path of XML Elements)
+     * @param clazz  (class of the generated instance)
      */
 
     public void addValue(TagPath path, Class<?> clazz) {
@@ -193,10 +193,11 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * Add the creation of a class instance to a path of XML Elements
      * 
-     * @param name
+     * @param path
      *            (path of XML Elements)
      * @param clazz
      *            (class of the generated instance)
+     * @param methodName           
      */
 
     public void addValue(TagPath path, Class<?> clazz,String methodName) {
@@ -208,7 +209,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * Add the setXXXX setter to a path of XML Elements
      * 
-     * @param valueName
+     * @param valuePath
      *            (the path of XML elements to the object instance, that will be
      *            set)
      * @param absPath
@@ -218,8 +219,8 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (the name of the setter Method)
      */
 
-    public void addSetter(TagPath valueName, TagPath absPath, String field) {
-        Value value = checkArguments(valueName, absPath, field);
+    public void addSetter(TagPath valuePath, TagPath absPath, String field) {
+        Value value = checkArguments(valuePath, absPath, field);
         Setter setter = createSetAction(value,absPath,field);
         addSetter(setter);
     }
@@ -227,7 +228,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * Add the setXXXX setter to a path of XML Elements
      * 
-     * @param valueName
+     * @param valuePath
      *            (the path of XML elements to the object instance, that will be
      *            set)
      * @param relPath
@@ -237,19 +238,14 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (the name of the setter Method)
      */
 
-    public void addRelativSetter(TagPath valueName, TagPath relPath, String field) {
-        addSetter(valueName,valueName.concat(relPath), field);
+    public void addRelativSetter(TagPath valuePath, TagPath relPath, String field) {
+        addSetter(valuePath,valuePath.concat(relPath), field);
     }
 
     /**
      * Add a @{Action} to a path of XML Elements
      * 
-     * @param name
-     *            (the path of XML elements to the object instance, that will be
-     *            set)
-     * @param action
-     *            (the action, that will be executed at the start and end-tag of
-     *            the path)
+     * @param value
      */
 
     public void addValue(Value value) {
@@ -259,16 +255,11 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * Add a @{SetAction} to a path of XML Elements
      * 
-     * @param name
-     *            (the path of XML elements to the object instance, that will be
-     *            set)
-     * @param action
-     *            (the action, that will be executed at the start and end-tag of
-     *            the path)
+     * @param setter
      */
 
-    public void addSetter(Setter action) {
-        setterMap.put(action);
+    public void addSetter(Setter setter) {
+        setterMap.put(setter);
     }
 
     private Value checkArguments(TagPath valueName, TagPath absPath, String field) {
@@ -295,9 +286,12 @@ public class ElementNameStack extends ArrayDeque<String> {
     
 
     /**
-     * create form a method name
+     * create a Setter form a method name
      * 
+     * @param value
+     * @param valuePath
      * @param name
+     * 
      * @return
      */
     public Setter createSetAction(Value value,TagPath valuePath,String name) {

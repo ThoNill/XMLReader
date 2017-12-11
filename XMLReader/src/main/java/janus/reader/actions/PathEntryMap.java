@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
  * The PathEntryMap is a Hash of PathEntrys
  * The searching in the hash is not the default.
  * 
+ * @param <T>
+ * 
  * @author Thomas Nill
  *
  */
@@ -24,21 +26,28 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
     }
 
     /**
-     * constructor of parent class
+     * Constructor 
+     *      * 
+     * @param initialCapacity
+     * @param loadFactor
      */
     public PathEntryMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
     }
 
     /**
-     * constructor of parent class
+     * Constructor 
+     * 
+     * @param initialCapacity
      */
     public PathEntryMap(int initialCapacity) {
         super(initialCapacity);
     }
 
     /**
-     * constructor of parent class
+     * Constructor 
+     * 
+     * @param m
      */
     public PathEntryMap(Map<? extends TagPath, T> m) {
         super(m);
@@ -47,7 +56,7 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
     /**
      * put an entry into the map
      * 
-     * @param action
+     * @param entry
      */
     public void put(T entry) {
         log.debug(" add an entry {} of class {} ",entry.getPath(),entry.getClass().getName() );
@@ -57,7 +66,8 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
     /**
      * get the best matching entry
      * 
-     * @param action
+     * @param path
+     * @return the entry with the path
      */
     
     public T get(TagPath path) {
@@ -70,9 +80,10 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
     }
 
     /**
-     * get the best matching TagPath in the keyset
+     * search the best matching TagPath in the keyset
      * 
-     * @param action
+     * @param path
+     * @return the best matching path
      */
      protected TagPath searchTheBestMatchingPath(TagPath path) {
         log.debug("searchTheBestMatchingPath {} ", path);

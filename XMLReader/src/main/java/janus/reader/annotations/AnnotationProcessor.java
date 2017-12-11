@@ -7,14 +7,39 @@ import janus.reader.helper.ClassHelper;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+/**
+ * Processor for the XmlPath annotations
+ * 
+ * @author Thaoms Nill
+ *
+ */
 public class AnnotationProcessor {
 
+    /**
+     * Constructor
+     */
+    public AnnotationProcessor() {
+        super();
+    }
+    
+    /**
+     * Process a array of classes
+     * 
+     * @param stack
+     * @param clazzes
+     */
     public void processClasses(ElementNameStack stack, Class<?>... clazzes) {
         for (Class<?> clazz : clazzes) {
             processClass(stack, clazz);
         }
     }
 
+    /**
+     * Process a single class
+     * 
+     * @param stack
+     * @param clazzes
+     */
     public void processClass(ElementNameStack stack, Class<?> clazz) {
         checkClass(clazz);
         processAllXmlPathAnnotations(stack, clazz);

@@ -21,6 +21,9 @@ public class ValueMap extends PathEntryMap<Value> {
 
     /**
      * constructor of parent class
+     * 
+     * @param initialCapacity
+     * @param loadFactor
      */
     public ValueMap(int initialCapacity, float loadFactor) {
         super(initialCapacity, loadFactor);
@@ -28,6 +31,8 @@ public class ValueMap extends PathEntryMap<Value> {
 
     /**
      * constructor of parent class
+     * 
+     * @param initialCapacity
      */
     public ValueMap(int initialCapacity) {
         super(initialCapacity);
@@ -35,6 +40,8 @@ public class ValueMap extends PathEntryMap<Value> {
 
     /**
      * constructor of parent class
+     * 
+     * @param m
      */
     public ValueMap(Map<? extends TagPath,Value> m) {
         super(m);
@@ -45,7 +52,6 @@ public class ValueMap extends PathEntryMap<Value> {
      * call a {@link NamedAction} push action
      * 
      * @param name
-     * @param value
      */
     public void push(TagPath name) {
         Value action = get(name);
@@ -58,7 +64,6 @@ public class ValueMap extends PathEntryMap<Value> {
      * call a {@link NamedAction} pop action
      * 
      * @param name
-     * @param value
      */
     public void pop(TagPath name) {
         Value action = get(name);

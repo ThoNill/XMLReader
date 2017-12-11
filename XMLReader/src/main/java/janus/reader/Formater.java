@@ -63,7 +63,7 @@ public class Formater {
     /**
     * Write to System.out 
     * 
-    * @Param inFilename Name of the file that is reading
+    * @param inFilename Name of the file that is reading
     * 
     */
     public void write(String inFilename)  throws IOException{

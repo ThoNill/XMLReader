@@ -15,12 +15,17 @@ import org.slf4j.LoggerFactory;
 public class StackCurrentObject implements CurrentObject {
     private static final Logger  log = LoggerFactory.getLogger(StackCurrentObject.class);
 
-    private ArrayDeque<Object> current = new ArrayDeque<>();
+    private ArrayDeque<Object> current;
 
     /**
-     * emit the next value
-     * @return
+     * Constructor 
      */
+    public StackCurrentObject() {
+        super();
+        current = new ArrayDeque<>();
+    }
+    
+    @Override
     public Object next() {
         if (current.isEmpty()) {
             return null;
@@ -28,15 +33,18 @@ public class StackCurrentObject implements CurrentObject {
         return current.pop();
     }
 
+    @Override
     public void setCurrent(Object obj) {
         log.debug("-------------push " +obj);
         this.current.push(obj);
     }
 
+    @Override
     public boolean hasObject() {
         return current.isEmpty();
     }
     
+    @Override
     public Object getCurrent() {
         log.debug("peek " + current.peek());
         return current.peek();

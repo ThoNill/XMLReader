@@ -2,32 +2,32 @@ package janus.reader.actions;
 
 /**
  * The Path of the Tags
+ * 
+ * @author Thomas Nill
+ *
  */
 public class TagPath {
     private String path;
-    private int depth= 0;
- 
+    private int depth = 0;
 
-    
+    /**
+     * Constructor
+     * 
+     * @param path
+     */
     public TagPath(String path) {
         super();
         this.path = path;
         this.depth = calculateDepth(path);
     }
 
+    /**
+     * Constructor
+     * 
+     * @param path
+     */
     public TagPath(TagPath path) {
         this(path.getPath());
-    }
-
-    private int calculateDepth(String pathString) {
- 
-        int count=0;
-        for(int i=pathString.length()-1;i>=0;i--) {
-            if (pathString.charAt(i)=='/') {
-                count++;
-            }
-        }
-        return count+1;
     }
 
     @Override
@@ -60,17 +60,33 @@ public class TagPath {
         return path;
     }
 
+    /**
+     * is a absolute path example: /a/b/c
+     * 
+     * @return
+     */
     public boolean isAbsolut() {
         return path.charAt(0) == '/';
     }
 
+    /**
+     * compares two paths
+     * 
+     * @param path
+     * @return
+     */
     public boolean compare(TagPath path) {
         if (isAbsolut()) {
             return this.path.equals(path.path);
         }
         return path.path.endsWith(this.path);
     }
-    
+
+    /**
+     * get the paranet path example: the paranet path of /a/b/c is /a/b
+     * 
+     * @return
+     */
     public TagPath parent() {
         int lastIndex = this.path.lastIndexOf('/');
         if (lastIndex >= 0) {
@@ -82,7 +98,12 @@ public class TagPath {
     public int getDepth() {
         return depth;
     }
-    
+
+    /**
+     * concatenation of paths
+     * @param p
+     * @return
+     */
     public TagPath concat(TagPath p) {
         return new TagPath(this.path + "/" + p.path);
     }
@@ -91,4 +112,16 @@ public class TagPath {
         return path;
     }
 
+    /*
+     * The depth of a path example: the depth of /a/b/c is 4
+     */
+    private int calculateDepth(String pathString) {
+        int calcDepth = 0;
+        for (int i = pathString.length() - 1; i >= 0; i--) {
+            if (pathString.charAt(i) == '/') {
+                calcDepth++;
+            }
+        }
+        return calcDepth + 1;
+    }
 }

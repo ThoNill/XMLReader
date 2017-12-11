@@ -1,5 +1,11 @@
 package janus.reader.helper;
 
+/**
+ * Helper Method for subclassing
+ * 
+ * @author Thomas Nill
+ *
+ */
 public class ClassHelper {
 
     private ClassHelper() {
@@ -10,6 +16,9 @@ public class ClassHelper {
     /**
      * check that the method return object of type c
      * 
+     * @param clazz
+     * @param c
+     * @return
      */
     public static boolean isThisClassOrASuperClass(Class<?> clazz, Class<?> c) {
         if (clazz.equals(Void.class)) {
