@@ -355,7 +355,8 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param adapter
      * @return
      */
-
+    //NOSONAR because this method is USED
+    @SuppressWarnings("squid:UnusedPrivateMethod")
     private Setter createSetAction(Value value, TagPath rValuePath,
             Method handle, XmlAdapter<String, ?> adapter) {
         return new SetWithAdapter(rValuePath, handle, value, adapter);
@@ -364,12 +365,15 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * search a method
      * 
+     * 
      * @param clazz
      * @param name
      * @param targetClass
      * @return
      * @throws Exception
      */
+    //NOSONAR because this method is USED 
+    @SuppressWarnings("squid:UnusedPrivateMethod")
     private Method searchTheMethod(Class<?> clazz, String name,
             Class<?> targetClass) {
         Method bestMethod = null;
