@@ -5,7 +5,7 @@ import javax.xml.stream.XMLStreamReader;
 
 /**
  * The BasisReader is a baseclass for reading XML Files with a StaxReader
- *  
+ * 
  * @author Thomas Nill
  *
  */
@@ -39,7 +39,7 @@ public abstract class BasisReader {
         default:
             break;
         }
-    
+
     }
 
     protected abstract void nextText(XMLStreamReader xmlr);

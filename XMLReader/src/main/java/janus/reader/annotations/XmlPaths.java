@@ -16,6 +16,7 @@ import java.lang.annotation.Target;
 public @interface XmlPaths {
     /**
      * the array entries
+     * 
      * @return
      */
     XmlPath[] value();

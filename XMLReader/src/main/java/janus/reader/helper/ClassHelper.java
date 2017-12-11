@@ -12,7 +12,6 @@ public class ClassHelper {
         super();
     }
 
-    
     /**
      * check that the method return object of type c
      * 

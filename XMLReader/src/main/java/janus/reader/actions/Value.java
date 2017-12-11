@@ -10,11 +10,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A value holds a instance of a class {@value clazz}.
- * in the push action, this instance ist generated
- * in the pop action this object is transfered to the current Object
+ * A value holds a instance of a class {@value clazz}. in the push action, this
+ * instance ist generated in the pop action this object is transfered to the
+ * current Object
  * 
- * there ar different methods to create {@link Setter} 
+ * there ar different methods to create {@link Setter}
  * 
  * @author Thomas Nill
  *
@@ -27,7 +27,6 @@ public class Value extends PathEntry implements Action {
     private CurrentObject objectOfClass;
     private CurrentObject current;
 
-    
     /**
      * Constructor
      * 
@@ -36,8 +35,9 @@ public class Value extends PathEntry implements Action {
      * @param current
      * @param objectOfClass
      */
-    public Value(TagPath path,Class<?> clazz, CurrentObject current,CurrentObject objectOfClass) {
-        this(path,clazz,current,null,objectOfClass);
+    public Value(TagPath path, Class<?> clazz, CurrentObject current,
+            CurrentObject objectOfClass) {
+        this(path, clazz, current, null, objectOfClass);
     }
 
     /**
@@ -49,9 +49,10 @@ public class Value extends PathEntry implements Action {
      * @param staticMethodName
      * @param objectOfClass
      */
-    public Value(TagPath path,Class<?> clazz, CurrentObject current,String staticMethodName,CurrentObject objectOfClass) {
+    public Value(TagPath path, Class<?> clazz, CurrentObject current,
+            String staticMethodName, CurrentObject objectOfClass) {
         super(path);
-        log.debug("Create Value for path {} " ,path);
+        log.debug("Create Value for path {} ", path);
         this.clazz = clazz;
         this.current = current;
         this.objectOfClass = objectOfClass;
@@ -59,20 +60,24 @@ public class Value extends PathEntry implements Action {
             try {
                 staticCreationMethod = clazz.getMethod(staticMethodName);
             } catch (NoSuchMethodException | SecurityException e) {
-                throw new IllegalArgumentException(
-                        "the method " + staticMethodName + " does not exist or is privat/protected",e);
+                throw new IllegalArgumentException("the method "
+                        + staticMethodName
+                        + " does not exist or is privat/protected", e);
             }
-            if (!ClassHelper.isThisClassOrASuperClass(staticCreationMethod.getReturnType(),clazz)) {
-                throw new IllegalArgumentException(
-                        "the method " + staticMethodName + " create a Object that is not of type " + clazz.getCanonicalName());
+            if (!ClassHelper.isThisClassOrASuperClass(
+                    staticCreationMethod.getReturnType(), clazz)) {
+                throw new IllegalArgumentException("the method "
+                        + staticMethodName
+                        + " create a Object that is not of type "
+                        + clazz.getCanonicalName());
             }
             if (!Modifier.isStatic(staticCreationMethod.getModifiers())) {
-                throw new IllegalArgumentException(
-                        "the method " + staticMethodName + " is not static ");
+                throw new IllegalArgumentException("the method "
+                        + staticMethodName + " is not static ");
             }
-            if (staticCreationMethod.getParameterCount()> 0) {
-                throw new IllegalArgumentException(
-                        "the method " + staticMethodName + " has parameters ");
+            if (staticCreationMethod.getParameterCount() > 0) {
+                throw new IllegalArgumentException("the method "
+                        + staticMethodName + " has parameters ");
             }
         }
     }
@@ -85,18 +90,24 @@ public class Value extends PathEntry implements Action {
     public void push() {
         try {
             if (staticCreationMethod == null) {
-               objectOfClass.setCurrent(clazz.newInstance());
+                objectOfClass.setCurrent(clazz.newInstance());
             } else {
-                objectOfClass.setCurrent(staticCreationMethod.invoke(null)); 
+                objectOfClass.setCurrent(staticCreationMethod.invoke(null));
             }
         } catch (InstantiationException e) {
-            log.error("The Object could not be instantiated",e);
+            log.error("The Object could not be instantiated", e);
         } catch (IllegalAccessException e) {
-            log.error("Illegal Access",e);
+            log.error("Illegal Access", e);
         } catch (IllegalArgumentException e) {
-            log.error("The method " + ((staticCreationMethod==null) ? "NN" : staticCreationMethod.getName()) + " is called with wrong arguments",e);
+            log.error("The method "
+                    + ((staticCreationMethod == null) ? "NN"
+                            : staticCreationMethod.getName())
+                    + " is called with wrong arguments", e);
         } catch (InvocationTargetException e) {
-            log.error("The method " + ((staticCreationMethod==null) ? "NN" :  staticCreationMethod.getName()) + " can not been invoced",e);
+            log.error("The method "
+                    + ((staticCreationMethod == null) ? "NN"
+                            : staticCreationMethod.getName())
+                    + " can not been invoced", e);
         }
     }
 
@@ -108,11 +119,11 @@ public class Value extends PathEntry implements Action {
     public void pop() {
         current.setCurrent(objectOfClass.next());
     }
-    
+
     public Object getValue() {
         return objectOfClass.getCurrent();
     }
-    
+
     public Class<?> getClazz() {
         return clazz;
     }

@@ -7,16 +7,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The PathEntryMap is a Hash of PathEntrys
- * The searching in the hash is not the default.
+ * The PathEntryMap is a Hash of PathEntrys The searching in the hash is not the
+ * default.
  * 
  * @param <T>
  * 
  * @author Thomas Nill
  *
  */
-public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
-    private static final Logger  log = LoggerFactory.getLogger(PathEntryMap.class);
+public class PathEntryMap<T extends PathEntry> extends HashMap<TagPath, T> {
+    private static final Logger log = LoggerFactory
+            .getLogger(PathEntryMap.class);
 
     /**
      * Constructor of parent class
@@ -26,8 +27,8 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
     }
 
     /**
-     * Constructor 
-     *      * 
+     * Constructor *
+     * 
      * @param initialCapacity
      * @param loadFactor
      */
@@ -36,7 +37,7 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
     }
 
     /**
-     * Constructor 
+     * Constructor
      * 
      * @param initialCapacity
      */
@@ -45,7 +46,7 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
     }
 
     /**
-     * Constructor 
+     * Constructor
      * 
      * @param m
      */
@@ -59,7 +60,8 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
      * @param entry
      */
     public void put(T entry) {
-        log.debug(" add an entry {} of class {} ",entry.getPath(),entry.getClass().getName() );
+        log.debug(" add an entry {} of class {} ", entry.getPath(), entry
+                .getClass().getName());
         put(entry.getPath(), entry);
     }
 
@@ -69,7 +71,7 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
      * @param path
      * @return the entry with the path
      */
-    
+
     public T get(TagPath path) {
         log.debug("get an entry {} ", path);
         TagPath bestPath = searchTheBestMatchingPath(path);
@@ -85,7 +87,7 @@ public class PathEntryMap<T extends  PathEntry> extends HashMap<TagPath,T> {
      * @param path
      * @return the best matching path
      */
-     protected TagPath searchTheBestMatchingPath(TagPath path) {
+    protected TagPath searchTheBestMatchingPath(TagPath path) {
         log.debug("searchTheBestMatchingPath {} ", path);
         int bestDepth = 0;
         TagPath bestPath = null;

@@ -1,4 +1,5 @@
 package test;
+
 import janus.reader.annotations.XmlPath;
 
 public class TStaticAnnotated extends TSuper {
@@ -9,19 +10,18 @@ public class TStaticAnnotated extends TSuper {
     private double dValue;
     private long lValue;
 
-    @XmlPath(path=Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
+    @XmlPath(path = Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
     public static TStaticAnnotated namedThomas() {
         TStaticAnnotated o = new TStaticAnnotated();
         o.setVorName("Thomas");
         return o;
     }
-    
-    
+
     public String getName() {
         return name;
     }
 
-    @XmlPath(path=Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
+    @XmlPath(path = Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
     public void setName(String name) {
         this.name = name;
     }
@@ -63,15 +63,12 @@ public class TStaticAnnotated extends TSuper {
         this.lValue = lValue;
     }
 
-
     public String getVorName() {
         return vorName;
     }
-
 
     public void setVorName(String vorName) {
         this.vorName = vorName;
     }
 
 }
-

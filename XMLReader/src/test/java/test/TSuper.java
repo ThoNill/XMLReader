@@ -1,10 +1,10 @@
 package test;
 
 public class TSuper {
-  
+
     private String verwendungszweck;
     private int nummer;
-    
+
     public String getVerwendungszweck() {
         return verwendungszweck;
     }
@@ -17,14 +17,13 @@ public class TSuper {
     public String toString() {
         return "TSuper [verwendungszweck=" + verwendungszweck + "]";
     }
-    
+
     public int getNummer() {
         return nummer;
     }
+
     public void setNummer(int nummer) {
         this.nummer = nummer;
     }
- 
-  
-    
+
 }

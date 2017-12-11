@@ -144,11 +144,12 @@ public class Reader extends BasisReader implements Iterator<Object> {
      * @param field
      *            (the name of the setter Method)
      */
-    public void addRelativSetter(TagPath valueName, TagPath relPath, String field) {
+    public void addRelativSetter(TagPath valueName, TagPath relPath,
+            String field) {
         elementNameStack.addRelativSetter(valueName, relPath, field);
     }
 
- 
+    @Override
     protected void nextText(XMLStreamReader xmlr) {
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
@@ -156,12 +157,14 @@ public class Reader extends BasisReader implements Iterator<Object> {
                 length));
     }
 
+    @Override
     protected void nextEndElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             elementNameStack.pop();
         }
     }
 
+    @Override
     protected void nextStartElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             elementNameStack.push(xmlr.getLocalName());
@@ -198,8 +201,8 @@ public class Reader extends BasisReader implements Iterator<Object> {
     }
 
     /**
-     * Created Object for a Class, perhaps it is not fully instantiated
-     * with a Exception if the value or Object does not exist
+     * Created Object for a Class, perhaps it is not fully instantiated with a
+     * Exception if the value or Object does not exist
      * 
      * @param name
      * @return

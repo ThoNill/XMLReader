@@ -18,7 +18,7 @@ public class FloatAdapter extends XmlAdapter<String, Float> {
     }
 
     @Override
-    public String marshal(Float v)  {
+    public String marshal(Float v) {
         return v.toString();
     }
 

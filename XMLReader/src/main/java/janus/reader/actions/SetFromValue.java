@@ -3,15 +3,15 @@ package janus.reader.actions;
 import janus.reader.annotations.XmlPath;
 
 /**
- * set a property of a class with a {@link XmlPath} annotation 
- * where the property is an object of another class that has a {@link XmlPath} annotation
+ * set a property of a class with a {@link XmlPath} annotation where the
+ * property is an object of another class that has a {@link XmlPath} annotation
  * 
  * @author Thomas Nill
  *
  */
 
-public class SetFromValue extends PathEntry{
-     
+public class SetFromValue extends PathEntry {
+
     private TagPath valuePath;
     private TagPath setterPath;
 
@@ -19,8 +19,7 @@ public class SetFromValue extends PathEntry{
     private SetterMap setterMap;
     private Value value;
     private Setter setter;
-       
-       
+
     /**
      * Constructor
      * 
@@ -29,14 +28,15 @@ public class SetFromValue extends PathEntry{
      * @param valueMap
      * @param setterMap
      */
-    public SetFromValue(TagPath setterPath,TagPath valuePath,ValueMap valueMap, SetterMap setterMap) {
+    public SetFromValue(TagPath setterPath, TagPath valuePath,
+            ValueMap valueMap, SetterMap setterMap) {
         super(new SetFromValuePath(setterPath, valuePath));
         this.valueMap = valueMap;
         this.setterMap = setterMap;
         this.valuePath = valuePath;
         this.setterPath = setterPath;
     }
-       
+
     /**
      * set the value of the property
      */

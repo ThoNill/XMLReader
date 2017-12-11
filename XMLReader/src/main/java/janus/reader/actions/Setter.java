@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 // @FunctionalInterface
 public class Setter extends PathEntry {
-    private static final    Logger log = LoggerFactory.getLogger(Setter.class);
+    private static final Logger log = LoggerFactory.getLogger(Setter.class);
 
     Method m;
     Value v;
@@ -37,7 +37,6 @@ public class Setter extends PathEntry {
         this.v = v;
     }
 
-  
     public void setValue(Object value) {
         try {
             log.debug("setMethod {} to Value {} ", m, value);
@@ -55,17 +54,18 @@ public class Setter extends PathEntry {
         }
     }
 
-   /**
-    * settable from a String
-    * 
-    * @return
-    */
+    /**
+     * settable from a String
+     * 
+     * @return
+     */
     public boolean isSetableFromString() {
         return m.getParameterTypes()[0].equals(String.class);
     }
 
     /**
      * The list of TagPath of the value (class) of the property
+     * 
      * @return
      */
     public List<TagPath> getValuePaths() {

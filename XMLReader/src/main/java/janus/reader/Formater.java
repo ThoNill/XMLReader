@@ -30,11 +30,11 @@ public class Formater {
     private String tab;
     private Writer writer;
 
-/**
-* Formater with tab as tabulator String
-*
-* @param tab 
-*/
+    /**
+     * Formater with tab as tabulator String
+     *
+     * @param tab
+     */
     public Formater(String tab) {
         super();
         this.tab = tab;
@@ -48,49 +48,49 @@ public class Formater {
     private void decDepth() {
         depth--;
         leaf = lastDepth == depth;
-        
+
     }
 
-    private void writeTabs(int depth)  throws IOException{
+    private void writeTabs(int depth) throws IOException {
         writer.write("\n");
         for (int i = 0; i < depth; i++) {
             writer.write(tab);
         }
     }
 
-    
-    
     /**
-    * Write to System.out 
-    * 
-    * @param inFilename Name of the file that is reading
-    * 
-    */
-    public void write(String inFilename)  throws IOException{
+     * Write to System.out
+     * 
+     * @param inFilename
+     *            Name of the file that is reading
+     * 
+     */
+    public void write(String inFilename) throws IOException {
         InputStream in = new FileInputStream(inFilename);
-        Writer out = new OutputStreamWriter(System.out,"UTF8");
-        write(in,out);
+        Writer out = new OutputStreamWriter(System.out, "UTF8");
+        write(in, out);
         in.close();
         out.close();
     }
-    
-    
-/**
- * Format a XML File
- * 
- * @param inFilename
- * @param outFilename
- * @param charset
- * @throws IOException
- */
-    public void write(String inFilename,String outFilename,String charset)  throws IOException{
+
+    /**
+     * Format a XML File
+     * 
+     * @param inFilename
+     * @param outFilename
+     * @param charset
+     * @throws IOException
+     */
+    public void write(String inFilename, String outFilename, String charset)
+            throws IOException {
         InputStream in = new FileInputStream(inFilename);
-        Writer out = new OutputStreamWriter(new FileOutputStream(outFilename),charset);
-        write(in,out);
+        Writer out = new OutputStreamWriter(new FileOutputStream(outFilename),
+                charset);
+        write(in, out);
         in.close();
         out.close();
     }
-    
+
     /**
      * Format a INputStream
      * 
@@ -98,7 +98,7 @@ public class Formater {
      * @param writer
      * @throws IOException
      */
-    public void write(InputStream input,Writer writer)  throws IOException{
+    public void write(InputStream input, Writer writer) throws IOException {
         try {
             this.writer = writer;
             XMLInputFactory xmlif = XMLInputFactory.newInstance();
@@ -114,9 +114,7 @@ public class Formater {
 
     }
 
-    
-    
-    private void next(XMLStreamReader xmlr)  throws IOException{
+    private void next(XMLStreamReader xmlr) throws IOException {
         switch (xmlr.getEventType()) {
         case XMLStreamConstants.START_ELEMENT:
             nextStartElement(xmlr);
@@ -139,39 +137,42 @@ public class Formater {
 
     }
 
-    private void nextText(XMLStreamReader xmlr)  throws IOException{
+    private void nextText(XMLStreamReader xmlr) throws IOException {
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
-        writer.write(new String(xmlr.getTextCharacters(), start, length).replaceAll("\\n",""));
+        writer.write(new String(xmlr.getTextCharacters(), start, length)
+                .replaceAll("\\n", ""));
     }
 
     private void nextEndElement(XMLStreamReader xmlr) throws IOException {
         if (xmlr.hasName()) {
             decDepth();
             if (!leaf) {
-                writeTabs(depth+1);
+                writeTabs(depth + 1);
             }
-            writer.write("</"+ xmlr.getLocalName() + ">");
+            writer.write("</" + xmlr.getLocalName() + ">");
         }
     }
 
-    private void nextStartElement(XMLStreamReader xmlr)  throws IOException{
+    private void nextStartElement(XMLStreamReader xmlr) throws IOException {
         incDepth();
         writeTabs(depth);
-        writer.write("<"+ xmlr.getLocalName());
+        writer.write("<" + xmlr.getLocalName());
         bearbeiteAttribute(xmlr);
         writer.write(">");
     }
 
-    private void bearbeiteAttribute(XMLStreamReader xmlr)  throws IOException{
+    private void bearbeiteAttribute(XMLStreamReader xmlr) throws IOException {
         for (int i = 0; i < xmlr.getAttributeCount(); i++) {
             bearbeiteAttribut(xmlr, i);
         }
     }
 
-    private void bearbeiteAttribut(XMLStreamReader xmlr, int index)  throws IOException{
+    private void bearbeiteAttribut(XMLStreamReader xmlr, int index)
+            throws IOException {
         String localName = xmlr.getAttributeLocalName(index);
-        writer.write(" " + localName + "=\"" + xmlr.getAttributeValue(index)+ "\" ");
+        writer.write(" " + localName + "=\"" + xmlr.getAttributeValue(index)
+                + "\" ");
     }
 
 }

@@ -5,9 +5,9 @@ import janus.reader.annotations.XmlPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@XmlPath(path="child")
+@XmlPath(path = "child")
 public class LinkChild {
-    private static final Logger  log = LoggerFactory.getLogger(LinkChild.class);
+    private static final Logger log = LoggerFactory.getLogger(LinkChild.class);
 
     private String name;
     private LinkChild child;
@@ -15,18 +15,18 @@ public class LinkChild {
     private City second;
     private static int snr;
     private int nr;
-    
+
     public LinkChild() {
         super();
         snr++;
         nr = snr;
     }
-    
+
     public String getName() {
         return name;
     }
 
-    @XmlPath(path="name")
+    @XmlPath(path = "name")
     public void setName(String name) {
         log.debug(" Childname auf " + name);
         this.name = name;
@@ -36,19 +36,17 @@ public class LinkChild {
         return child;
     }
 
-    @XmlPath(path="child")
+    @XmlPath(path = "child")
     public void setChild(LinkChild child) {
         log.debug(" Child " + this + " auf Child " + child);
         this.child = child;
     }
 
- 
-
     public City getCity() {
         return city;
     }
 
-    @XmlPath(path="city")
+    @XmlPath(path = "city")
     public void setCity(City city) {
         log.debug(" City " + this + " auf city " + city);
         this.city = city;
@@ -58,7 +56,7 @@ public class LinkChild {
         return second;
     }
 
-    @XmlPath(path="second")
+    @XmlPath(path = "second")
     public void setSecond(City second) {
         this.second = second;
     }
@@ -68,5 +66,5 @@ public class LinkChild {
         return "LinkChild [name=" + name + ", child=" + child + ", city="
                 + city + ", second=" + second + ", nr=" + nr + "]";
     }
-    
+
 }

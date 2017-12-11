@@ -81,4 +81,5 @@ public interface Const {
     String Id_Othr_FinInstnId_Svcr_Acct_Ntfctn_BkToCstmrDbtCdtNtfctn_Document = "/Document/BkToCstmrDbtCdtNtfctn/Ntfctn/Acct/Svcr/FinInstnId/Othr/Id";
     String AcctSvcrRef_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document = "/Document/BkToCstmrDbtCdtNtfctn/Ntfctn/Ntry/AcctSvcrRef";
     String BkTxCd_TxDtls_NtryDtls_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document = "/Document/BkToCstmrDbtCdtNtfctn/Ntfctn/Ntry/NtryDtls/TxDtls/BkTxCd";
-    String MsgId_GrpHdr_BkToCstmrDbtCdtNtfctn_Document = "/Document/BkToCstmrDbtCdtNtfctn/GrpHdr/MsgId";}
+    String MsgId_GrpHdr_BkToCstmrDbtCdtNtfctn_Document = "/Document/BkToCstmrDbtCdtNtfctn/GrpHdr/MsgId";
+}

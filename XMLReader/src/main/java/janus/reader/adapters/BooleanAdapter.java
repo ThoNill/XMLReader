@@ -4,7 +4,6 @@ import java.text.ParseException;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-
 /**
  * Adapter for boolean values
  * 

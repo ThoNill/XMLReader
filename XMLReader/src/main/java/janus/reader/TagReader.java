@@ -16,8 +16,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * Helper to generate a interface with string constants of the different paths in a
- * xml file.
+ * Helper to generate a interface with string constants of the different paths
+ * in a xml file.
  * 
  * @author Thomas Nill
  *
@@ -46,22 +46,22 @@ public class TagReader extends BasisReader {
      * 
      * @param filename
      */
-    public void read(String filename)  {
+    public void read(String filename) {
 
         try {
             XMLInputFactory xmlif = XMLInputFactory.newInstance();
-        xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
-                filename));
-        
-    } catch (FileNotFoundException | XMLStreamException e) {
-        throw new ReaderRuntimeException("Failed to process file", e);
-    }
+            xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
+                    filename));
+
+        } catch (FileNotFoundException | XMLStreamException e) {
+            throw new ReaderRuntimeException("Failed to process file", e);
+        }
 
     }
-
 
     /**
      * read the next Object from the Stax-Stream
+     * 
      * @return the next Object in the Stream
      */
     public Object next() throws XMLStreamException {
@@ -71,6 +71,7 @@ public class TagReader extends BasisReader {
         }
         return current.next();
     }
+
     /**
      * create the source text for a class in a package und classname
      * 
@@ -97,19 +98,21 @@ public class TagReader extends BasisReader {
         return builder.toString();
     }
 
-
+    @Override
     protected void nextText(XMLStreamReader xmlr) {
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
         s.setText(new String(xmlr.getTextCharacters(), start, length));
     }
 
+    @Override
     protected void nextEndElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             s.pop();
         }
     }
 
+    @Override
     protected void nextStartElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             s.push(xmlr.getLocalName());
@@ -133,6 +136,5 @@ public class TagReader extends BasisReader {
         s.pop();
 
     }
-
 
 }

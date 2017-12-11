@@ -2,7 +2,7 @@ package test;
 
 import janus.reader.annotations.XmlPath;
 
-@XmlPath(path=Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
+@XmlPath(path = Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
 public class TFalschAnnotiert extends TSuper {
     private String name;
     private boolean bValue;
@@ -10,7 +10,7 @@ public class TFalschAnnotiert extends TSuper {
     private double dValue;
     private long lValue;
 
-    @XmlPath(path=Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
+    @XmlPath(path = Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
     public String getName() {
         return name;
     }

@@ -24,50 +24,48 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SimpleTest {
-    private static final Logger  log = LoggerFactory.getLogger(Value.class);
+    private static final Logger log = LoggerFactory.getLogger(Value.class);
 
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
     private static final String CHILDS_XML = "src/test/resources/childs.xml";
     private static final String CHILDSANDCITY_XML = "src/test/resources/childsAndCity.xml";
-    
-    
-    
-    
-    @Test 
+
+    @Test
     public void compareTest() {
         TagPath absolut = new TagPath("/a/b/c");
         TagPath relativ = new TagPath("b/c");
-        
+
         Assert.assertTrue(absolut.isAbsolut());
         Assert.assertFalse(relativ.isAbsolut());
-        
+
         Assert.assertTrue(relativ.compare(absolut));
         Assert.assertFalse(new TagPath("a").compare(absolut));
         Assert.assertTrue(absolut.compare(absolut));
         Assert.assertFalse(new TagPath("/a").compare(absolut));
-        
+
     }
-    
-    @Test 
+
+    @Test
     public void parentPathTest() {
         TagPath child = new TagPath("/a/b/cc");
         TagPath parent = new TagPath("/a/b");
-        
-        Assert.assertEquals(parent,child.parent());
-        
+
+        Assert.assertEquals(parent, child.parent());
+
     }
-    
-    
+
     @Test
     public void methodHandle() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/value"),TObject.class, current,new SimpleCurrentObject());
+        Value value = new Value(new TagPath("/value"), TObject.class, current,
+                new SimpleCurrentObject());
         value.push();
-        
+
         ElementNameStack stack = new ElementNameStack(current);
-        
-        Setter action = stack.createSetAction(value,new TagPath("/value/first"),"Name");
+
+        Setter action = stack.createSetAction(value,
+                new TagPath("/value/first"), "Name");
         action.setValue("Test");
 
         value.pop();
@@ -80,12 +78,14 @@ public class SimpleTest {
     @Test
     public void methodHandleWithStack() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/value"),TObject.class, current,new StackCurrentObject());
+        Value value = new Value(new TagPath("/value"), TObject.class, current,
+                new StackCurrentObject());
         value.push();
-        
+
         ElementNameStack stack = new ElementNameStack(current);
-        
-        Setter action = stack.createSetAction(value,new TagPath("/value/first/is"),"Name");
+
+        Setter action = stack.createSetAction(value, new TagPath(
+                "/value/first/is"), "Name");
         action.setValue("Test");
 
         value.pop();
@@ -95,17 +95,18 @@ public class SimpleTest {
 
     }
 
-    
     @Test
     public void stringStack() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/first/is"),TObject.class, current,new SimpleCurrentObject());
+        Value value = new Value(new TagPath("/first/is"), TObject.class,
+                current, new SimpleCurrentObject());
         ValueMap map = new ValueMap();
 
         ElementNameStack stack = new ElementNameStack(current, map);
-        stack.addValue( value);
-        stack.addSetter(stack.createSetAction(value,new TagPath("name"),"Name"));
+        stack.addValue(value);
+        stack.addSetter(stack.createSetAction(value, new TagPath("name"),
+                "Name"));
 
         stack.push("first");
         stack.push("is");
@@ -124,15 +125,21 @@ public class SimpleTest {
     public void adapter() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/first"),TObject.class, current,new SimpleCurrentObject());
-        
+        Value value = new Value(new TagPath("/first"), TObject.class, current,
+                new SimpleCurrentObject());
+
         ElementNameStack stack = new ElementNameStack(current);
-        
-        Setter iSetter = stack.createSetAction(value,new TagPath("/first/n"),"Nummer");
-        Setter bSetter = stack.createSetAction(value,new TagPath("/first/b"),"bValue");
-        Setter fSetter = stack.createSetAction(value,new TagPath("/first/f"),"fValue");
-        Setter dSetter = stack.createSetAction(value,new TagPath("/first/d"),"dValue");
-        Setter lSetter = stack.createSetAction(value,new TagPath("/first/l"),"lValue");
+
+        Setter iSetter = stack.createSetAction(value, new TagPath("/first/n"),
+                "Nummer");
+        Setter bSetter = stack.createSetAction(value, new TagPath("/first/b"),
+                "bValue");
+        Setter fSetter = stack.createSetAction(value, new TagPath("/first/f"),
+                "fValue");
+        Setter dSetter = stack.createSetAction(value, new TagPath("/first/d"),
+                "dValue");
+        Setter lSetter = stack.createSetAction(value, new TagPath("/first/l"),
+                "lValue");
 
         value.push();
         iSetter.setValue("66");
@@ -151,9 +158,8 @@ public class SimpleTest {
 
     }
 
-  
     @Test
-    public void reader()  {
+    public void reader() {
         Reader reader = new Reader();
 
         reader.read(KONTOAUSZUG_XML);
@@ -162,25 +168,26 @@ public class SimpleTest {
 
     @Ignore
     @Test
-    public void tagReader()  {
+    public void tagReader() {
         try {
             TagReader reader = new TagReader();
-            
+
             reader.read(KONTOAUSZUG_XML);
             reader.next();
             System.out.print(reader.source("reader", "Const"));
         } catch (XMLStreamException e) {
-            log.error("Unerwartete Ausnahem,",e);
+            log.error("Unerwartete Ausnahem,", e);
             fail("Unerwartete Ausnahme");
         }
 
     }
 
     @Test
-    public void readerGesetzt()  {
+    public void readerGesetzt() {
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addValue(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -192,11 +199,13 @@ public class SimpleTest {
     public void readerGesetztMitName() {
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addValue(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
         reader.addSetter(
                 new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-                new TagPath(Const.TxId_Refs_TxDtls_NtryDtls_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+                new TagPath(
+                        Const.TxId_Refs_TxDtls_NtryDtls_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Name");
 
         reader.read(KONTOAUSZUG_XML);
@@ -208,14 +217,16 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztMitAttribut()  {
+    public void readerGesetztMitAttribut() {
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addValue(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-                         new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-                                            "Name");
+        reader.addSetter(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new TagPath(
+                Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+                "Name");
 
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -225,26 +236,27 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztSuperKlasse()  {
+    public void readerGesetztSuperKlasse() {
 
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addValue(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-                new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addSetter(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new TagPath(
+                Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
         reader.read(KONTOAUSZUG_XML);
-       
+
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TObject);
         Assert.assertEquals("EUR", ((TObject) o).getVerwendungszweck());
-        
+
     }
 
-    
     @Test
     public void readerParent() {
 
@@ -256,23 +268,25 @@ public class SimpleTest {
                 new TagPath(Const.MsgId_GrpHdr_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
-        reader.addValue(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addValue(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-                new TagPath(Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addSetter(new TagPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new TagPath(
+                Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
         reader.read(KONTOAUSZUG_XML);
         reader.next();
-        
-        Object ov = reader.getValueObject(new TagPath(Const.BkToCstmrDbtCdtNtfctn_Document));
+
+        Object ov = reader.getValueObject(new TagPath(
+                Const.BkToCstmrDbtCdtNtfctn_Document));
         Assert.assertNotNull(ov);
         Assert.assertTrue(ov instanceof TObject);
         Assert.assertEquals("MSG1", ((TObject) ov).getVerwendungszweck());
-        
+
     }
 
-    
     @Test
     public void readAnnotierteKlasse() {
         Reader reader = new Reader(TAnnotated.class);
@@ -293,9 +307,8 @@ public class SimpleTest {
         Assert.assertEquals("Thomas", ((TAnnotated) o).getName());
     }
 
-    
     @Test
-    public void readStatischAnnotierteKlasse()  {
+    public void readStatischAnnotierteKlasse() {
         Reader reader = new Reader(TStaticAnnotated.class);
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -305,9 +318,8 @@ public class SimpleTest {
         Assert.assertEquals("Thomas", ((TStaticAnnotated) o).getVorName());
     }
 
-    
     @Test
-    public void falschAnnotierteKlasse()  {
+    public void falschAnnotierteKlasse() {
         try {
             new Reader(TObject.class);
             fail("Keine Ausnahme");
@@ -316,9 +328,8 @@ public class SimpleTest {
         }
     }
 
-    
     @Test
-    public void falschAnnotierteMethode()  {
+    public void falschAnnotierteMethode() {
         try {
             new Reader(TFalschAnnotiert.class);
             fail("Keine Ausnahme");
@@ -329,18 +340,18 @@ public class SimpleTest {
 
     @Ignore
     @Test
-    public void format()  {
+    public void format() {
         Formater reader = new Formater("   ");
         try {
             reader.write(KONTOAUSZUG_XML);
         } catch (IOException ex) {
-            log.info("unexpected Exception",ex);
+            log.info("unexpected Exception", ex);
             fail("unexpected Exception");
         }
     }
-    
+
     @Test
-    public void readChilds()  {
+    public void readChilds() {
         Reader reader = new Reader(Child.class);
         reader.read(CHILDS_XML);
         Object o = reader.next();
@@ -361,14 +372,14 @@ public class SimpleTest {
     }
 
     @Test
-    public void readLinkChilds()  {
+    public void readLinkChilds() {
         Reader reader = new Reader(LinkChild.class);
         reader.read(CHILDS_XML);
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Vera", ((LinkChild) o).getName());
-        
+
         o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof LinkChild);
@@ -378,35 +389,35 @@ public class SimpleTest {
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Hans", ((LinkChild) o).getName());
-        
+
     }
 
     @Test
-    public void readLinkChildsAndCity()  {
-        Reader reader = new Reader(LinkChild.class,City.class);
+    public void readLinkChildsAndCity() {
+        Reader reader = new Reader(LinkChild.class, City.class);
         reader.read(CHILDSANDCITY_XML);
-    
+
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof City);
         Assert.assertEquals("A", ((City) o).getName());
-    
+
         o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof City);
         Assert.assertEquals("C", ((City) o).getName());
-    
+
         o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof City);
         Assert.assertEquals("D", ((City) o).getName());
-    
+
         o = reader.next();
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Vera", ((LinkChild) o).getName());
         Assert.assertEquals("C", ((LinkChild) o).getCity().getName());
         Assert.assertEquals("D", ((LinkChild) o).getSecond().getName());
-        
+
         o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof LinkChild);
@@ -417,8 +428,9 @@ public class SimpleTest {
         Assert.assertTrue(o instanceof LinkChild);
         Assert.assertEquals("Hans", ((LinkChild) o).getName());
         Assert.assertEquals("A", ((LinkChild) o).getCity().getName());
-        
-        Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild().getName());
+
+        Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild()
+                .getName());
     }
 
 }

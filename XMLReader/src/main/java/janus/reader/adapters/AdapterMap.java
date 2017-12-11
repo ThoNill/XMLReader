@@ -4,7 +4,6 @@ import java.util.HashMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-
 /**
  * a bundle of different adapters, you can add other adapters to this bundle
  * 
@@ -28,10 +27,10 @@ public class AdapterMap {
         addAdapter(boolean.class, new BooleanAdapter());
 
     }
-    
+
     private AdapterMap() {
     }
-     
+
     /**
      * add an adapter for a class targetClass
      * 
@@ -45,11 +44,12 @@ public class AdapterMap {
 
     /**
      * get the adapter for the targetClass
+     * 
      * @param targetClass
      * 
      * @return
      */
-    public static XmlAdapter<String,?> getAdapter(Class<?> targetClass) {
+    public static XmlAdapter<String, ?> getAdapter(Class<?> targetClass) {
         return adapters.get(targetClass);
     }
 
@@ -64,8 +64,8 @@ public class AdapterMap {
     }
 
     /**
-     * get the adapter for a specific class targetClass
-     * und unmashal the string value
+     * get the adapter for a specific class targetClass und unmashal the string
+     * value
      * 
      * @param targetClass
      * @param text
@@ -77,7 +77,8 @@ public class AdapterMap {
             return adapter.unmarshal(text);
         } catch (Exception ex) {
             throw new AdapterException(
-                    "Error within Adapter or Adapter not found for " + targetClass.getName(), ex);
+                    "Error within Adapter or Adapter not found for "
+                            + targetClass.getName(), ex);
         }
     }
 

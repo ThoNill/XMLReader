@@ -2,7 +2,7 @@ package test;
 
 import janus.reader.annotations.XmlPath;
 
-@XmlPath(path="child")
+@XmlPath(path = "child")
 public class Child {
 
     private String name;
@@ -11,9 +11,9 @@ public class Child {
         return name;
     }
 
-    @XmlPath(path="name")
+    @XmlPath(path = "name")
     public void setName(String name) {
         this.name = name;
     }
-    
+
 }

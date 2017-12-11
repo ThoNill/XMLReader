@@ -18,7 +18,7 @@ public class LongAdapter extends XmlAdapter<String, Long> {
     }
 
     @Override
-    public String marshal(Long v)  {
+    public String marshal(Long v) {
         return v.toString();
     }
 

@@ -11,7 +11,8 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class SetFromValueMap extends PathEntryMap<SetFromValue> {
-    private static final Logger  log = LoggerFactory.getLogger(SetFromValueMap.class);
+    private static final Logger log = LoggerFactory
+            .getLogger(SetFromValueMap.class);
 
     /**
      * constructor of parent class

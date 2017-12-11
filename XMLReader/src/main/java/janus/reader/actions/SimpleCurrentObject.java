@@ -11,24 +11,27 @@ public class SimpleCurrentObject implements CurrentObject {
 
     /**
      * emit the next value
+     * 
      * @return
      */
+    @Override
     public Object next() {
         Object o = current;
         current = null;
         return o;
     }
 
+    @Override
     public void setCurrent(Object current) {
         this.current = current;
     }
 
-    
     @Override
     public boolean hasObject() {
         return current != null;
     }
 
+    @Override
     public Object getCurrent() {
         return current;
     }

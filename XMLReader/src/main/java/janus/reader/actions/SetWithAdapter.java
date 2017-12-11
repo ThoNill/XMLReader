@@ -10,17 +10,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Setter that sets a property where the vale is a string.
- * The string value ist first translatet to a class with an adapter
+ * Setter that sets a property where the vale is a string. The string value ist
+ * first translatet to a class with an adapter
  * 
  * @author javaman
  *
  */
-//@FunctionalInterface
+// @FunctionalInterface
 public class SetWithAdapter extends Setter {
-    private static final Logger log = LoggerFactory.getLogger(SetWithAdapter.class);
+    private static final Logger log = LoggerFactory
+            .getLogger(SetWithAdapter.class);
 
-    
     private XmlAdapter<String, ?> a;
 
     /**
@@ -31,11 +31,12 @@ public class SetWithAdapter extends Setter {
      * @param v
      * @param a
      */
-    public SetWithAdapter(TagPath path, Method m, Value v,XmlAdapter<String, ?> a) {
-        super(path,m,v);
+    public SetWithAdapter(TagPath path, Method m, Value v,
+            XmlAdapter<String, ?> a) {
+        super(path, m, v);
         this.a = a;
     }
-    
+
     @Override
     public void setValue(Object value) {
         log.debug("setValue 2");
@@ -44,19 +45,19 @@ public class SetWithAdapter extends Setter {
             o = a.unmarshal(value.toString());
             m.invoke(v.getValue(), o);
         } catch (Exception e) {
-            throw new ReaderRuntimeException(" Kann die Methode "
-                    + m.getName() + "("
-                    + m.getParameterTypes()[0].getTypeName()
-                    + " mit dem Objecttyp " + o.getClass()
-                    + " nicht auf " + v.getValue() + " anwenden",e);
+            throw new ReaderRuntimeException(" Kann die Methode " + m.getName()
+                    + "(" + m.getParameterTypes()[0].getTypeName()
+                    + " mit dem Objecttyp " + o.getClass() + " nicht auf "
+                    + v.getValue() + " anwenden", e);
         }
     }
-    
+
     /**
      * is this class setable from a String class
      * 
      * @return
      */
+    @Override
     public boolean isSetableFromString() {
         return true;
     }

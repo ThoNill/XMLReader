@@ -4,7 +4,6 @@ import java.text.ParseException;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-
 /**
  * Adapter for double values
  * 
@@ -19,7 +18,7 @@ public class DoubleAdapter extends XmlAdapter<String, Double> {
     }
 
     @Override
-    public String marshal(Double v)  {
+    public String marshal(Double v) {
         return v.toString();
     }
 

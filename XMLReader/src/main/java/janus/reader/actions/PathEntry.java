@@ -6,13 +6,13 @@ package janus.reader.actions;
  * @author javaman
  *
  */
-public class PathEntry  {
+public class PathEntry {
     private TagPath path;
-    
+
     /**
-     * Constructor with a String representation of a Path 
-     * examples: /x, /x/y, z/y
-     *  
+     * Constructor with a String representation of a Path examples: /x, /x/y,
+     * z/y
+     * 
      * @param path
      */
     public PathEntry(TagPath path) {
@@ -32,6 +32,5 @@ public class PathEntry  {
     public String toString() {
         return "PathEntry [path=" + path + "]";
     }
-    
-    
+
 }

@@ -5,7 +5,6 @@ import java.util.ArrayDeque;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  * holds the current object that will be emitted
  * 
@@ -13,18 +12,19 @@ import org.slf4j.LoggerFactory;
  *
  */
 public class StackCurrentObject implements CurrentObject {
-    private static final Logger  log = LoggerFactory.getLogger(StackCurrentObject.class);
+    private static final Logger log = LoggerFactory
+            .getLogger(StackCurrentObject.class);
 
     private ArrayDeque<Object> current;
 
     /**
-     * Constructor 
+     * Constructor
      */
     public StackCurrentObject() {
         super();
         current = new ArrayDeque<>();
     }
-    
+
     @Override
     public Object next() {
         if (current.isEmpty()) {
@@ -35,7 +35,7 @@ public class StackCurrentObject implements CurrentObject {
 
     @Override
     public void setCurrent(Object obj) {
-        log.debug("-------------push " +obj);
+        log.debug("-------------push " + obj);
         this.current.push(obj);
     }
 
@@ -43,7 +43,7 @@ public class StackCurrentObject implements CurrentObject {
     public boolean hasObject() {
         return current.isEmpty();
     }
-    
+
     @Override
     public Object getCurrent() {
         log.debug("peek " + current.peek());

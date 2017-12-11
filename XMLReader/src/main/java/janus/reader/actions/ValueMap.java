@@ -2,16 +2,15 @@ package janus.reader.actions;
 
 import java.util.Map;
 
-
 /**
- * The NamedActionMap calls the {@link Action} and {@link Setter} actions,
- * for a path. It connects the path, with the actions.
+ * The NamedActionMap calls the {@link Action} and {@link Setter} actions, for a
+ * path. It connects the path, with the actions.
  * 
  * @author Thomas Nill
  *
  */
 public class ValueMap extends PathEntryMap<Value> {
-  
+
     /**
      * constructor of parent class
      */
@@ -43,11 +42,10 @@ public class ValueMap extends PathEntryMap<Value> {
      * 
      * @param m
      */
-    public ValueMap(Map<? extends TagPath,Value> m) {
+    public ValueMap(Map<? extends TagPath, Value> m) {
         super(m);
     }
 
- 
     /**
      * call a {@link NamedAction} push action
      * 

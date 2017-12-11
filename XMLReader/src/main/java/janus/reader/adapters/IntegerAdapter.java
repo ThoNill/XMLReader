@@ -19,7 +19,7 @@ public class IntegerAdapter extends XmlAdapter<String, Integer> {
     }
 
     @Override
-    public String marshal(Integer v)  {
+    public String marshal(Integer v) {
         return v.toString();
     }
 

@@ -12,7 +12,7 @@ public interface Action {
      * Action at start-tag
      */
     void push();
-    
+
     /**
      * Action at end-tag
      */

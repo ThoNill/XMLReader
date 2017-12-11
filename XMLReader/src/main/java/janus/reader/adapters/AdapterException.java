@@ -17,6 +17,7 @@ public class AdapterException extends RuntimeException {
 
     /**
      * Constructor
+     * 
      * @param message
      */
     public AdapterException(String message) {
@@ -25,6 +26,7 @@ public class AdapterException extends RuntimeException {
 
     /**
      * Constructor
+     * 
      * @param cause
      */
     public AdapterException(Throwable cause) {
