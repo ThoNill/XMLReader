@@ -4,6 +4,7 @@ import janus.reader.adapters.AdapterMap;
 import janus.reader.annotations.XmlPath;
 import janus.reader.annotations.XmlPaths;
 import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.nls.Messages;
 
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
@@ -320,9 +321,8 @@ public class ElementNameStack extends ArrayDeque<String> {
             }
 
         } catch (Exception e) {
-            throw new ReaderRuntimeException("Die Klasse "
-                    + value.getClazz().getName() + " hat keine Methode set"
-                    + name + " oder sie ist privat", e);
+            Messages.throwReaderRuntimeException(e, "Runtime.NOT_METHOD", value.getClazz().getName(),name);
+            return null;
         }
     }
 

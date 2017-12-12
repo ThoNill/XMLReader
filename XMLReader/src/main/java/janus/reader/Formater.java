@@ -1,6 +1,7 @@
 package janus.reader;
 
 import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.nls.Messages;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +12,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 
 import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -22,7 +22,7 @@ import javax.xml.stream.XMLStreamReader;
  * @author Thomas Nill
  *
  */
-public class Formater {
+public class Formater extends BasisReader {
     private XMLStreamReader xmlr;
     private int lastDepth = 0;
     private int depth = 0;
@@ -109,57 +109,46 @@ public class Formater {
             }
             writer.flush();
         } catch (FileNotFoundException | XMLStreamException e) {
-            throw new ReaderRuntimeException("Failed to process file", e);
+            Messages.throwReaderRuntimeException(e,"Runtime.FILE_PROCESSING");
         }
 
     }
 
-    private void next(XMLStreamReader xmlr) throws IOException {
-        switch (xmlr.getEventType()) {
-        case XMLStreamConstants.START_ELEMENT:
-            nextStartElement(xmlr);
-            break;
-        case XMLStreamConstants.END_ELEMENT:
-            nextEndElement(xmlr);
-            break;
-        case XMLStreamConstants.SPACE:
-        case XMLStreamConstants.CHARACTERS:
-            nextText(xmlr);
-            break;
-        case XMLStreamConstants.PROCESSING_INSTRUCTION:
-        case XMLStreamConstants.CDATA:
-        case XMLStreamConstants.COMMENT:
-        case XMLStreamConstants.ENTITY_REFERENCE:
-        case XMLStreamConstants.START_DOCUMENT:
-        default:
-            break;
-        }
-
-    }
-
-    private void nextText(XMLStreamReader xmlr) throws IOException {
+    protected void nextText(XMLStreamReader xmlr) {
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
-        writer.write(new String(xmlr.getTextCharacters(), start, length)
-                .replaceAll("\\n", ""));
-    }
-
-    private void nextEndElement(XMLStreamReader xmlr) throws IOException {
-        if (xmlr.hasName()) {
-            decDepth();
-            if (!leaf) {
-                writeTabs(depth + 1);
-            }
-            writer.write("</" + xmlr.getLocalName() + ">");
+        try {
+            writer.write(new String(xmlr.getTextCharacters(), start, length)
+                    .replaceAll("\\n", ""));
+        } catch (IOException e) {
+            throw new ReaderRuntimeException(e);
         }
     }
 
-    private void nextStartElement(XMLStreamReader xmlr) throws IOException {
-        incDepth();
-        writeTabs(depth);
-        writer.write("<" + xmlr.getLocalName());
-        bearbeiteAttribute(xmlr);
-        writer.write(">");
+    protected void nextEndElement(XMLStreamReader xmlr) {
+        try {
+            if (xmlr.hasName()) {
+                decDepth();
+                if (!leaf) {
+                    writeTabs(depth + 1);
+                }
+                writer.write("</" + xmlr.getLocalName() + ">");
+            }
+        } catch (IOException e) {
+            throw new ReaderRuntimeException(e);
+        }
+    }
+
+    protected void nextStartElement(XMLStreamReader xmlr)  {
+        try {
+            incDepth();
+            writeTabs(depth);
+            writer.write("<" + xmlr.getLocalName());
+            bearbeiteAttribute(xmlr);
+            writer.write(">");
+        } catch (IOException e) {
+            throw new ReaderRuntimeException(e);
+        }
     }
 
     private void bearbeiteAttribute(XMLStreamReader xmlr) throws IOException {
@@ -173,6 +162,14 @@ public class Formater {
         String localName = xmlr.getAttributeLocalName(index);
         writer.write(" " + localName + "=\"" + xmlr.getAttributeValue(index)
                 + "\" ");
+    }
+
+    /**
+     *  no implementation needed
+     */
+    @Override
+    protected void processAttribute(XMLStreamReader xmlr, int i) {
+      
     }
 
 }

@@ -7,6 +7,7 @@ import janus.reader.actions.TagPath;
 import janus.reader.actions.ValueMap;
 import janus.reader.annotations.AnnotationProcessor;
 import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.nls.Messages;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -67,7 +68,7 @@ public class Reader extends BasisReader implements Iterator<Object> {
             xmlr = xmlif.createXMLStreamReader(filename, new FileInputStream(
                     filename));
         } catch (FileNotFoundException | XMLStreamException e) {
-            throw new ReaderRuntimeException("Failed to process file", e);
+            Messages.throwReaderRuntimeException(e,"Runtime.FILE_PROCESSING");
         }
     }
 
@@ -169,16 +170,10 @@ public class Reader extends BasisReader implements Iterator<Object> {
         if (xmlr.hasName()) {
             elementNameStack.push(xmlr.getLocalName());
         }
-        traverseAttributes(xmlr);
+        processAttributes(xmlr);
     }
 
-    private void traverseAttributes(XMLStreamReader xmlr) {
-        for (int i = 0; i < xmlr.getAttributeCount(); i++) {
-            handleAttribut(xmlr, i);
-        }
-    }
-
-    private void handleAttribut(XMLStreamReader xmlr, int index) {
+    protected void processAttribute(XMLStreamReader xmlr, int index) {
         String localName = xmlr.getAttributeLocalName(index);
         String value = xmlr.getAttributeValue(index);
         elementNameStack.setAttribute(localName, value);

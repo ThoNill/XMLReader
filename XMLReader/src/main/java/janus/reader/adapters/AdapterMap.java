@@ -1,5 +1,9 @@
 package janus.reader.adapters;
 
+import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.nls.Messages;
+
+import java.text.MessageFormat;
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -76,9 +80,8 @@ public class AdapterMap {
             XmlAdapter<String, ?> adapter = getAdapter(targetClass);
             return adapter.unmarshal(text);
         } catch (Exception ex) {
-            throw new AdapterException(
-                    "Error within Adapter or Adapter not found for "
-                            + targetClass.getName(), ex);
+            String pattern = Messages.getString("Adapter.NOT_FOUND");
+            throw new AdapterException(MessageFormat.format(pattern, targetClass.getName()),ex);
         }
     }
 

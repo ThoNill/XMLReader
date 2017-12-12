@@ -159,14 +159,14 @@ public class SimpleTest {
     }
 
     @Test
-    public void reader() {
+    public void readerInitialization() {
         Reader reader = new Reader();
 
         reader.read(KONTOAUSZUG_XML);
 
     }
 
-    @Ignore
+    
     @Test
     public void tagReader() {
         try {
@@ -183,7 +183,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetzt() {
+    public void reader() {
         Reader reader = new Reader();
 
         reader.addValue(new TagPath(
@@ -196,7 +196,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztMitName() {
+    public void readerWithName() {
         Reader reader = new Reader();
 
         reader.addValue(new TagPath(
@@ -217,7 +217,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztMitAttribut() {
+    public void readerWithAttribute() {
         Reader reader = new Reader();
 
         reader.addValue(new TagPath(
@@ -236,7 +236,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readerGesetztSuperKlasse() {
+    public void readerWithSuperClass() {
 
         Reader reader = new Reader();
 
@@ -288,7 +288,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readAnnotierteKlasse() {
+    public void readAnnotatedClass() {
         Reader reader = new Reader(TAnnotated.class);
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -298,7 +298,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readAnnotierteKlasse2() {
+    public void readAnnotatedClass2() {
         Reader reader = new Reader(TAnnotated.class);
         reader.read(KONTOAUSZUG_XML2);
         Object o = reader.next();
@@ -308,7 +308,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void readStatischAnnotierteKlasse() {
+    public void readStaticAnnotatedClass() {
         Reader reader = new Reader(TStaticAnnotated.class);
         reader.read(KONTOAUSZUG_XML);
         Object o = reader.next();
@@ -319,7 +319,7 @@ public class SimpleTest {
     }
 
     @Test
-    public void falschAnnotierteKlasse() {
+    public void wrongAnnotatedClass() {
         try {
             new Reader(TObject.class);
             fail("Keine Ausnahme");
@@ -329,16 +329,16 @@ public class SimpleTest {
     }
 
     @Test
-    public void falschAnnotierteMethode() {
+    public void wrongAnnotatedMethod() {
         try {
-            new Reader(TFalschAnnotiert.class);
+            new Reader(TWrongAnnotated.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
             log.info("Expected exception", ex);
         }
     }
 
-    @Ignore
+    
     @Test
     public void format() {
         Formater reader = new Formater("   ");

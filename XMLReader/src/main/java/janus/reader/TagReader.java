@@ -6,6 +6,7 @@ import janus.reader.actions.SimpleCurrentObject;
 import janus.reader.actions.TagPath;
 import janus.reader.actions.ValueMap;
 import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.nls.Messages;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -54,7 +55,7 @@ public class TagReader extends BasisReader {
                     filename));
 
         } catch (FileNotFoundException | XMLStreamException e) {
-            throw new ReaderRuntimeException("Failed to process file", e);
+            Messages.throwReaderRuntimeException(e,"Runtime.FILE_PROCESSING");
         }
 
     }
@@ -119,16 +120,10 @@ public class TagReader extends BasisReader {
             TagPath pfad = s.getCurrentPath();
             tags.put(pfad, pfad);
         }
-        bearbeiteAttribute(xmlr);
+        processAttributes(xmlr);
     }
 
-    private void bearbeiteAttribute(XMLStreamReader xmlr) {
-        for (int i = 0; i < xmlr.getAttributeCount(); i++) {
-            bearbeiteAttribut(xmlr, i);
-        }
-    }
-
-    private void bearbeiteAttribut(XMLStreamReader xmlr, int index) {
+    protected void processAttribute(XMLStreamReader xmlr, int index) {
         String localName = xmlr.getAttributeLocalName(index);
         s.push("@" + localName);
         TagPath pfad = s.getCurrentPath();

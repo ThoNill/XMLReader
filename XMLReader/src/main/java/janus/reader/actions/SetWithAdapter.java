@@ -1,6 +1,7 @@
 package janus.reader.actions;
 
 import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.nls.Messages;
 
 import java.lang.reflect.Method;
 
@@ -45,10 +46,7 @@ public class SetWithAdapter extends Setter {
             o = a.unmarshal(value.toString());
             m.invoke(v.getValue(), o);
         } catch (Exception e) {
-            throw new ReaderRuntimeException(" Kann die Methode " + m.getName()
-                    + "(" + m.getParameterTypes()[0].getTypeName()
-                    + " mit dem Objecttyp " + o.getClass() + " nicht auf "
-                    + v.getValue() + " anwenden", e);
+            Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),v.getValue(),o.getClass());
         }
     }
 

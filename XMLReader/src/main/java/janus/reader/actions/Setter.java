@@ -3,8 +3,10 @@ package janus.reader.actions;
 import janus.reader.annotations.XmlPath;
 import janus.reader.annotations.XmlPaths;
 import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.nls.Messages;
 
 import java.lang.reflect.Method;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,9 +50,7 @@ public class Setter extends PathEntry {
                         value.getClass());
             }
         } catch (Exception e) {
-            throw new ReaderRuntimeException(" Kann die Methode " + m.getName()
-                    + "(" + m.getParameterTypes()[0].getTypeName() + "  "
-                    + value + ") nicht auf " + v.getValue() + " anwenden", e);
+            Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),v.getValue(),v.getValue().getClass().getName());;
         }
     }
 
@@ -80,5 +80,10 @@ public class Setter extends PathEntry {
 
         }
         return tagPathList;
+    }
+    
+    private void throwException(String patternName,Object ... arguments) {
+        String pattern = Messages.getString(patternName);
+        throw new IllegalArgumentException(MessageFormat.format(pattern, arguments));
     }
 }

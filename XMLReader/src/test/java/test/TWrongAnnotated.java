@@ -3,7 +3,7 @@ package test;
 import janus.reader.annotations.XmlPath;
 
 @XmlPath(path = Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
-public class TFalschAnnotiert extends TSuper {
+public class TWrongAnnotated extends TSuper {
     private String name;
     private boolean bValue;
     private float fValue;

@@ -3,9 +3,11 @@ package janus.reader.annotations;
 import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.TagPath;
 import janus.reader.helper.ClassHelper;
+import janus.reader.nls.Messages;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.text.MessageFormat;
 
 /**
  * Processor for the XmlPath annotations
@@ -75,15 +77,11 @@ public class AnnotationProcessor {
 
     private void checkStaticMethod(Class<?> clazz, Method m) {
         if (m.getParameterCount() != 0) {
-            throw new IllegalArgumentException("In der Klasse "
-                    + m.getDeclaringClass().getName() + " darf die Methode "
-                    + m.getName() + " keine Paramter haben ");
+            Messages.throwIllegalArgumentException("AnnotationProcessor.NO_PARAMETER",m.getDeclaringClass().getName(),m.getName()); //$NON-NLS-1$
         }
         if (!ClassHelper.isThisClassOrASuperClass(m.getReturnType(), clazz)) {
-            throw new IllegalArgumentException("In der Klasse "
-                    + m.getDeclaringClass().getName() + " muss die Methode "
-                    + m.getName() + " ein Object dieser Klasse "
-                    + clazz.getCanonicalName() + " zurueckgeben");
+            Messages.throwIllegalArgumentException("AnnotationProcessor.WRONG_RETURN_TYPE",m.getDeclaringClass().getName(),m.getName(),clazz.getCanonicalName()); //$NON-NLS-1$
+            
         }
 
     }
@@ -133,27 +131,18 @@ public class AnnotationProcessor {
 
         if (!(clazz.isAnnotationPresent(XmlPath.class) || clazz
                 .isAnnotationPresent(XmlPaths.class))) {
-            throw new IllegalArgumentException("Die Klasse " + clazz.getName()
-                    + " muss mit XmlPath annotiert sein");
+            Messages.throwIllegalArgumentException("AnnotationProcessor.WITH_ANNOTATION",clazz.getName()); //$NON-NLS-1$
         }
     }
 
     private void checkMethod(Method m) {
         if (m.getParameterCount() != 1) {
-            throw new IllegalArgumentException(
-                    "In der Klasse "
-                            + m.getDeclaringClass().getName()
-                            + " darf die Methode "
-                            + m.getName()
-                            + " nicht mit XmlPath annotiert sein, da die Parameterzahl != 1 ist ");
+            Messages.throwIllegalArgumentException("AnnotationProcessor.WRONG_PARAMETER_COUNT",m.getDeclaringClass().getName(),m.getName()); //$NON-NLS-1$
         }
-        if (!m.getName().startsWith("set")) {
-            throw new IllegalArgumentException(
-                    "In der Klasse "
-                            + m.getDeclaringClass().getName()
-                            + " darf die Methode "
-                            + m.getName()
-                            + " nicht mit XmlPath annotiert sein, da der Parametername != setXXX ist ");
+        if (!m.getName().startsWith("set")) { 
+            Messages.throwIllegalArgumentException("AnnotationProcessor.WRONG_FUNCTION_NAME",m.getDeclaringClass().getName(),m.getName()); //$NON-NLS-1$
         }
     }
+    
+   
 }

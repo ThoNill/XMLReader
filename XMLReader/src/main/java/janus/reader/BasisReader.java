@@ -41,6 +41,14 @@ public abstract class BasisReader {
         }
 
     }
+    
+    protected void processAttributes(XMLStreamReader xmlr) {
+        for (int i = 0; i < xmlr.getAttributeCount(); i++) {
+            processAttribute(xmlr, i);
+        }
+    }
+
+    protected abstract void processAttribute(XMLStreamReader xmlr, int i);
 
     protected abstract void nextText(XMLStreamReader xmlr);
 
