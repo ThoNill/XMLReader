@@ -164,12 +164,9 @@ public class Formater extends BasisReader {
                 + "\" ");
     }
 
-    /**
-     *  no implementation needed
-     */
     @Override
     protected void processAttribute(XMLStreamReader xmlr, int i) {
-      
+      //  no implementation needed
     }
 
 }

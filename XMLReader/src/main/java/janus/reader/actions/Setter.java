@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Nill
  *
  */
-// @FunctionalInterface
 public class Setter extends PathEntry {
     private static final Logger log = LoggerFactory.getLogger(Setter.class);
 
@@ -49,7 +48,7 @@ public class Setter extends PathEntry {
                         value.getClass());
             }
         } catch (Exception e) {
-            Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),v.getValue(),v.getValue().getClass().getName());;
+            Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),v.getValue(),v.getValue().getClass().getName());
         }
     }
 
@@ -81,8 +80,5 @@ public class Setter extends PathEntry {
         return tagPathList;
     }
     
-    private void throwException(String patternName,Object ... arguments) {
-        String pattern = Messages.getString(patternName);
-        throw new IllegalArgumentException(MessageFormat.format(pattern, arguments));
-    }
+  
 }
