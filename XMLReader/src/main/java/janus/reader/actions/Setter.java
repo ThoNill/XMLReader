@@ -2,7 +2,6 @@ package janus.reader.actions;
 
 import janus.reader.annotations.XmlPath;
 import janus.reader.annotations.XmlPaths;
-import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.nls.Messages;
 
 import java.lang.reflect.Method;

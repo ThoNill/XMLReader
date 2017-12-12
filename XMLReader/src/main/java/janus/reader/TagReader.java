@@ -5,7 +5,6 @@ import janus.reader.actions.ElementNameStack;
 import janus.reader.actions.SimpleCurrentObject;
 import janus.reader.actions.TagPath;
 import janus.reader.actions.ValueMap;
-import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.nls.Messages;
 
 import java.io.FileInputStream;

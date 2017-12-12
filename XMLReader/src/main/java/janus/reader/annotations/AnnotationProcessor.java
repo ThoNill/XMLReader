@@ -7,7 +7,6 @@ import janus.reader.nls.Messages;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.text.MessageFormat;
 
 /**
  * Processor for the XmlPath annotations

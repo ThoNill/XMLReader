@@ -1,6 +1,5 @@
 package janus.reader.adapters;
 
-import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.nls.Messages;
 
 import java.text.MessageFormat;
