@@ -5,7 +5,6 @@ import janus.reader.annotations.XmlPaths;
 import janus.reader.nls.Messages;
 
 import java.lang.reflect.Method;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
