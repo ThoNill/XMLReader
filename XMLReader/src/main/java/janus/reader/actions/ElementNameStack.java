@@ -222,9 +222,11 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
 
     public void addSetter(TagPath valuePath, TagPath absPath, String field) {
-        Value value = checkArguments(valuePath, absPath, field);
-        Setter setter = createSetAction(value, absPath, field);
-        addSetter(setter);
+        if (absPath.startsWith(valuePath)) {
+            Value value = checkArguments(valuePath, absPath, field);
+            Setter setter = createSetAction(value, absPath, field);
+            addSetter(setter);
+        }
     }
 
     /**
@@ -320,7 +322,8 @@ public class ElementNameStack extends ArrayDeque<String> {
             }
 
         } catch (Exception e) {
-            Messages.throwReaderRuntimeException(e, "Runtime.NOT_METHOD", value.getClazz().getName(),name);
+            Messages.throwReaderRuntimeException(e, "Runtime.NOT_METHOD", value
+                    .getClazz().getName(), name);
             return null;
         }
     }
@@ -354,7 +357,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param adapter
      * @return
      */
-    //NOSONAR because this method is USED
+    // NOSONAR because this method is USED
     @SuppressWarnings("squid:UnusedPrivateMethod")
     private Setter createSetAction(Value value, TagPath rValuePath,
             Method handle, XmlAdapter<String, ?> adapter) {
@@ -371,7 +374,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @return
      * @throws Exception
      */
-    //NOSONAR because this method is USED 
+    // NOSONAR because this method is USED
     @SuppressWarnings("squid:UnusedPrivateMethod")
     private Method searchTheMethod(Class<?> clazz, String name,
             Class<?> targetClass) {

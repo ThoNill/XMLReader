@@ -38,7 +38,7 @@ public class Setter extends PathEntry {
 
     public void setValue(Object value) {
         try {
-            log.debug("setMethod {} to Value {} ", m, value);
+            log.debug("setMethod {} of Value {} to {}", m,v.getPath(), value);
             if (m.getParameters()[0].getType().isAssignableFrom(
                     value.getClass())) {
                 m.invoke(v.getValue(), value);
@@ -47,8 +47,11 @@ public class Setter extends PathEntry {
                         value.getClass());
             }
         } catch (Exception e) {
-            Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),v.getValue(),v.getValue().getClass().getName());
-        }
+            if (v.getValue()== null) {
+                Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),"null","unknown");
+            } else {
+                Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),v.getValue(),v.getValue().getClass().getName());
+            }       }
     }
 
     /**

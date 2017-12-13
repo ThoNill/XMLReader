@@ -12,8 +12,16 @@ import janus.reader.actions.StackCurrentObject;
 import janus.reader.actions.TagPath;
 import janus.reader.actions.Value;
 import janus.reader.actions.ValueMap;
+import janus.reader.adapters.BooleanAdapter;
+import janus.reader.adapters.DoubleAdapter;
+import janus.reader.adapters.FloatAdapter;
+import janus.reader.adapters.IntegerAdapter;
+import janus.reader.adapters.LongAdapter;
+import janus.reader.helper.ClassHelper;
+import janus.reader.nls.Messages;
 
 import java.io.IOException;
+import java.text.ParseException;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -30,6 +38,67 @@ public class SimpleTest {
     private static final String CHILDS_XML = "src/test/resources/childs.xml";
     private static final String CHILDSANDCITY_XML = "src/test/resources/childsAndCity.xml";
 
+    @Test
+    public void testClassHelper() {
+        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Void.class,Object.class));
+        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Object.class, Void.class));
+        Assert.assertTrue(ClassHelper.isThisClassOrASuperClass(TObject.class, Object.class));
+        Assert.assertTrue(ClassHelper.isThisClassOrASuperClass(Double.class, Number.class));  
+        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Double.class, TObject.class)); 
+    }
+    
+    @Test
+    public void testMessages() {
+      try {
+          IllegalArgumentException cause = new IllegalArgumentException();
+          Messages.throwReaderRuntimeException(cause, "Runtime.FILE_PROCESSING");
+          fail("Ausnahme erwartet");
+      } catch (Exception ex) {
+          log.error("Ausnahme erwartet");
+      }
+    }
+
+    @Test
+    public void testStartWithPaths() {
+        TagPath a = new TagPath("/aa/bb/cc");
+        TagPath b = new TagPath("/a");
+        TagPath c = new TagPath("/aa");
+        TagPath d = new TagPath("/aa/bb");
+        Assert.assertTrue(a.startsWith(a));
+        Assert.assertTrue(a.startsWith(c));
+        Assert.assertTrue(a.startsWith(d));
+        Assert.assertFalse(a.startsWith(b));
+    }
+
+    @Test
+    public void testEndWithPaths() {
+        TagPath a = new TagPath("/aa/bb/cc");
+        TagPath b = new TagPath("/c");
+        TagPath c1 = new TagPath("/cc");
+        TagPath d1 = new TagPath("/bb/cc");
+        TagPath c2 = new TagPath("cc");
+        TagPath d2 = new TagPath("bb/cc");
+        Assert.assertTrue(a.endsWith(a));
+        Assert.assertFalse(a.endsWith(c1));
+        Assert.assertFalse(a.endsWith(d1));
+        Assert.assertTrue(a.endsWith(c2));
+        Assert.assertTrue(a.endsWith(d2));
+        Assert.assertFalse(a.endsWith(b));
+    }
+
+    
+    @Test
+    public void testNonExistentMessages() {
+      try {
+          IllegalArgumentException cause = new IllegalArgumentException();
+          Messages.throwReaderRuntimeException(cause, "NotExists");
+          fail("Ausnahme erwartet");
+      } catch (Exception ex) {
+          log.error("Ausnahme erwartet");
+      }
+    }
+
+    
     @Test
     public void compareTest() {
         TagPath absolut = new TagPath("/a/b/c");
@@ -121,6 +190,50 @@ public class SimpleTest {
     }
 
     @Test
+    public void adapterMarshallTests() {
+        DoubleAdapter dAdapter = new DoubleAdapter();
+        Assert.assertEquals("2.0", dAdapter.marshal(new Double(2.0)));
+
+        FloatAdapter fAdapter = new FloatAdapter();
+        Assert.assertEquals("2.0", fAdapter.marshal(new Float(2.0)));
+
+        IntegerAdapter iAdapter = new IntegerAdapter();
+        Assert.assertEquals("2", iAdapter.marshal(new Integer(2)));
+
+        LongAdapter lAdapter = new LongAdapter();
+        Assert.assertEquals("2", lAdapter.marshal(new Long(2L)));
+
+        BooleanAdapter bAdapter = new BooleanAdapter();
+        Assert.assertEquals("true", bAdapter.marshal(Boolean.TRUE));
+
+    }
+
+    @Test
+    public void adapterUnmarshallTests() {
+        try {
+            DoubleAdapter dAdapter = new DoubleAdapter();
+            Assert.assertEquals(new Double(2.0), dAdapter.unmarshal("2.0"));
+
+            FloatAdapter fAdapter = new FloatAdapter();
+            Assert.assertEquals(new Float(2.0), fAdapter.unmarshal("2.0"));
+
+            IntegerAdapter iAdapter = new IntegerAdapter();
+            Assert.assertEquals(new Integer(2), iAdapter.unmarshal("2"));
+
+            LongAdapter lAdapter = new LongAdapter();
+            Assert.assertEquals(new Long(2L), lAdapter.unmarshal("2"));
+
+            BooleanAdapter bAdapter = new BooleanAdapter();
+            Assert.assertEquals(Boolean.TRUE, bAdapter.unmarshal("true"));
+            Assert.assertEquals(Boolean.FALSE, bAdapter.unmarshal("false"));
+        } catch (ParseException e) {
+            log.error("Unerwartete Ausnahme {}", e);
+            fail("Unerwartete Ausnahme");
+        }
+
+    }
+
+    @Test
     public void adapter() {
 
         CurrentObject current = new SimpleCurrentObject();
@@ -165,7 +278,6 @@ public class SimpleTest {
 
     }
 
-    
     @Test
     public void tagReader() {
         try {
@@ -175,7 +287,7 @@ public class SimpleTest {
             reader.next();
             System.out.print(reader.source("reader", "Const"));
         } catch (XMLStreamException e) {
-            log.error("Unerwartete Ausnahem,", e);
+            log.error("Unerwartete Ausnahme,", e);
             fail("Unerwartete Ausnahme");
         }
 
@@ -317,6 +429,8 @@ public class SimpleTest {
         Assert.assertEquals("Thomas", ((TStaticAnnotated) o).getVorName());
     }
 
+    
+    
     @Test
     public void wrongAnnotatedClass() {
         try {
@@ -331,6 +445,46 @@ public class SimpleTest {
     public void wrongAnnotatedMethod() {
         try {
             new Reader(TWrongAnnotated.class);
+            fail("Keine Ausnahme");
+        } catch (Exception ex) {
+            log.info("Expected exception", ex);
+        }
+    }
+
+    @Test
+    public void wrongFunctionName() {
+        try {
+            new Reader(TWrongFunctionNameAnnotated.class);
+            fail("Keine Ausnahme");
+        } catch (Exception ex) {
+            log.info("Expected exception", ex);
+        }
+    }
+
+    @Test
+    public void wrongFunctionParameterCountName() {
+        try {
+            new Reader(TWrongFunctionParameterCountAnnotated.class);
+            fail("Keine Ausnahme");
+        } catch (Exception ex) {
+            log.info("Expected exception", ex);
+        }
+    }
+
+    @Test
+    public void wrongStaticFunctionParameterCount() {
+        try {
+            new Reader(TWrongStaticFunctionParameterCountAnnotated.class);
+            fail("Keine Ausnahme");
+        } catch (Exception ex) {
+            log.info("Expected exception", ex);
+        }
+    }
+
+    @Test
+    public void wrongStaticFunctionReturnType() {
+        try {
+            new Reader(TWrongStaticFunctionReturnWrongTypeAnnotated.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
             log.info("Expected exception", ex);

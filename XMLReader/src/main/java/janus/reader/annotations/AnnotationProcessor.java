@@ -64,8 +64,9 @@ public class AnnotationProcessor {
     private void processOneStaticMethod(ElementNameStack stack, Class<?> clazz,
             Method m) {
         if (Modifier.isStatic(m.getModifiers())
-                && (m.isAnnotationPresent(XmlPath.class) || m
-                        .isAnnotationPresent(XmlPaths.class))) {
+                && (m.isAnnotationPresent(XmlPath.class)
+                        || m.isAnnotationPresent(XmlPaths.class)
+                        )) {
             for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
                 checkStaticMethod(clazz, m);
                 stack.addValue(new TagPath(mPath.path()), clazz, m.getName());

@@ -23,6 +23,7 @@ public class Messages {
             .getBundle(BUNDLE_NAME);
 
     private Messages() {
+        super();
     }
 
     /**

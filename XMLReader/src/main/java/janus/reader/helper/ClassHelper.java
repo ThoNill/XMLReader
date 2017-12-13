@@ -1,5 +1,7 @@
 package janus.reader.helper;
 
+import org.omg.CORBA.Object;
+
 /**
  * Helper Method for subclassing
  * 
@@ -27,7 +29,7 @@ public class ClassHelper {
             return true;
         }
         Class<?> superClass = clazz.getSuperclass();
-        if (superClass.equals(Object.class)) {
+        if (superClass == null) {
             return false;
         }
         return isThisClassOrASuperClass(superClass, c);

@@ -2,38 +2,19 @@ package test;
 
 import janus.reader.annotations.XmlPath;
 
-public class TStaticAnnotated extends TSuper {
+@XmlPath(path = Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
+public class TWrongFunctionNameAnnotated extends TSuper {
     private String name;
-    private String vorName;
     private boolean bValue;
     private float fValue;
     private double dValue;
     private long lValue;
 
-    @XmlPath(path = Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
-    @XmlPath(path = "/D")
-    public static TStaticAnnotated namedThomas() {
-        TStaticAnnotated o = new TStaticAnnotated();
-        o.setVorName("Thomas");
-        return o;
-    }
-
-    @XmlPath(path = "/A")
-    @XmlPath(path = "/B")
-    public static TStaticAnnotated namedVera() {
-        TStaticAnnotated o = new TStaticAnnotated();
-        o.setVorName("Vera");
-        return o;
-    }
-
-    
+    @XmlPath(path = Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
     public String getName() {
         return name;
     }
 
-    @XmlPath(path = Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
-    @XmlPath(path = "/A/C")
-    @XmlPath(path = "/B/C")
     public void setName(String name) {
         this.name = name;
     }
@@ -73,14 +54,6 @@ public class TStaticAnnotated extends TSuper {
 
     public void setlValue(long lValue) {
         this.lValue = lValue;
-    }
-
-    public String getVorName() {
-        return vorName;
-    }
-
-    public void setVorName(String vorName) {
-        this.vorName = vorName;
     }
 
 }

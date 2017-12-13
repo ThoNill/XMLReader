@@ -8,6 +8,7 @@ package janus.reader.actions;
  */
 public class TagPath {
     private String path;
+    private String parts[];
     private int depth = 0;
 
     /**
@@ -18,6 +19,7 @@ public class TagPath {
     public TagPath(String path) {
         super();
         this.path = path;
+        this.parts = path.split("\\/");
         this.depth = calculateDepth(path);
     }
 
@@ -82,6 +84,38 @@ public class TagPath {
         return path.path.endsWith(this.path);
     }
 
+    /**
+     * starts with this TagPath
+     * 
+     * @param path
+     * @return
+     */
+    public boolean startsWith(TagPath path) {
+        for (int okIndex = 0; okIndex < path.parts.length; okIndex++) {
+            if (okIndex >= parts.length || (!path.parts[okIndex].equals(parts[okIndex]))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * ends with this TagPath
+     * 
+     * @param path
+     * @return
+     */
+    public boolean endsWith(TagPath path) {
+        int index = parts.length-1;
+        for (int okIndex = path.parts.length-1; okIndex>=0;okIndex--,index--) {
+            if (index <0 || (!path.parts[okIndex].equals(parts[index]))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    
     /**
      * get the paranet path example: the paranet path of /a/b/c is /a/b
      * 

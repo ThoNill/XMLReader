@@ -32,6 +32,7 @@ public class AdapterMap {
     }
 
     private AdapterMap() {
+        super();
     }
 
     /**
@@ -66,22 +67,5 @@ public class AdapterMap {
         return adapters.containsKey(targetClass);
     }
 
-    /**
-     * get the adapter for a specific class targetClass und unmashal the string
-     * value
-     * 
-     * @param targetClass
-     * @param text
-     * @return
-     */
-    public static Object unmashal(Class<?> targetClass, String text) {
-        try {
-            XmlAdapter<String, ?> adapter = getAdapter(targetClass);
-            return adapter.unmarshal(text);
-        } catch (Exception ex) {
-            String pattern = Messages.getString("Adapter.NOT_FOUND");
-            throw new AdapterException(MessageFormat.format(pattern, targetClass.getName()),ex);
-        }
-    }
 
 }
