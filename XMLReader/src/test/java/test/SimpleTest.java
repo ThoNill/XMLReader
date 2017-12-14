@@ -1,6 +1,7 @@
 package test;
 
 import static org.junit.Assert.fail;
+import janus.reader.BasisReader;
 import janus.reader.Formater;
 import janus.reader.Reader;
 import janus.reader.TagReader;
@@ -17,11 +18,13 @@ import janus.reader.adapters.DoubleAdapter;
 import janus.reader.adapters.FloatAdapter;
 import janus.reader.adapters.IntegerAdapter;
 import janus.reader.adapters.LongAdapter;
+import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
 import janus.reader.nls.Messages;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.NoSuchElementException;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -36,26 +39,34 @@ public class SimpleTest {
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
     private static final String CHILDS_XML = "src/test/resources/childs.xml";
+    private static final String WRONG_XML = "src/test/resources/wrongChilds.xml";
+
     private static final String CHILDSANDCITY_XML = "src/test/resources/childsAndCity.xml";
 
     @Test
     public void testClassHelper() {
-        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Void.class,Object.class));
-        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Object.class, Void.class));
-        Assert.assertTrue(ClassHelper.isThisClassOrASuperClass(TObject.class, Object.class));
-        Assert.assertTrue(ClassHelper.isThisClassOrASuperClass(Double.class, Number.class));  
-        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Double.class, TObject.class)); 
+        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Void.class,
+                Object.class));
+        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Object.class,
+                Void.class));
+        Assert.assertTrue(ClassHelper.isThisClassOrASuperClass(TObject.class,
+                Object.class));
+        Assert.assertTrue(ClassHelper.isThisClassOrASuperClass(Double.class,
+                Number.class));
+        Assert.assertFalse(ClassHelper.isThisClassOrASuperClass(Double.class,
+                TObject.class));
     }
-    
+
     @Test
     public void testMessages() {
-      try {
-          IllegalArgumentException cause = new IllegalArgumentException();
-          Messages.throwReaderRuntimeException(cause, "Runtime.FILE_PROCESSING");
-          fail("Ausnahme erwartet");
-      } catch (Exception ex) {
-          log.error("Ausnahme erwartet");
-      }
+        try {
+            IllegalArgumentException cause = new IllegalArgumentException();
+            Messages.throwReaderRuntimeException(cause,
+                    "Runtime.FILE_PROCESSING");
+            fail("Ausnahme erwartet");
+        } catch (Exception ex) {
+            log.error("Ausnahme erwartet");
+        }
     }
 
     @Test
@@ -78,27 +89,28 @@ public class SimpleTest {
         TagPath d1 = new TagPath("/bb/cc");
         TagPath c2 = new TagPath("cc");
         TagPath d2 = new TagPath("bb/cc");
+        TagPath d3 = new TagPath("/ee/aa/bb/cc");
+        TagPath d4 = new TagPath("/ee/ee/ee");
         Assert.assertTrue(a.endsWith(a));
         Assert.assertFalse(a.endsWith(c1));
         Assert.assertFalse(a.endsWith(d1));
         Assert.assertTrue(a.endsWith(c2));
         Assert.assertTrue(a.endsWith(d2));
-        Assert.assertFalse(a.endsWith(b));
+        Assert.assertFalse(a.endsWith(d3));
+        Assert.assertFalse(a.endsWith(d4));
     }
 
-    
     @Test
     public void testNonExistentMessages() {
-      try {
-          IllegalArgumentException cause = new IllegalArgumentException();
-          Messages.throwReaderRuntimeException(cause, "NotExists");
-          fail("Ausnahme erwartet");
-      } catch (Exception ex) {
-          log.error("Ausnahme erwartet");
-      }
+        try {
+            IllegalArgumentException cause = new IllegalArgumentException();
+            Messages.throwReaderRuntimeException(cause, "NotExists");
+            fail("Ausnahme erwartet");
+        } catch (Exception ex) {
+            log.error("Ausnahme erwartet");
+        }
     }
 
-    
     @Test
     public void compareTest() {
         TagPath absolut = new TagPath("/a/b/c");
@@ -143,6 +155,45 @@ public class SimpleTest {
 
     }
 
+    @Test
+    public void methodHandleWithWrongValue() {
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new Value(new TagPath("/value"), TObject.class, current,
+                new SimpleCurrentObject());
+        value.push();
+        ElementNameStack stack = new ElementNameStack(current);
+
+        Setter action = stack.createSetAction(value,
+                new TagPath("/value/first"), "fValue");
+
+        try {
+            action.setValue("Test");
+            fail("Ausnahme erwartet");
+        } catch (ReaderRuntimeException e) {
+            log.error("Erwartete Ausnahem", e);
+        }
+        value.pop();
+    }
+
+    @Test
+    public void methodHandleWithEmptyValue() {
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new Value(new TagPath("/value"), TObject.class, current,
+                new SimpleCurrentObject());
+        ElementNameStack stack = new ElementNameStack(current);
+
+        Setter action = stack.createSetAction(value,
+                new TagPath("/value/first"), "Name");
+
+        try {
+            action.setValue("Test");
+            fail("Ausnahme erwartet");
+        } catch (ReaderRuntimeException e) {
+            log.error("Erwartete Ausnahem", e);
+        }
+    }
+
+    
     @Test
     public void methodHandleWithStack() {
         CurrentObject current = new SimpleCurrentObject();
@@ -284,7 +335,7 @@ public class SimpleTest {
             TagReader reader = new TagReader();
 
             reader.read(KONTOAUSZUG_XML);
-            reader.next();
+            reader.read();
             System.out.print(reader.source("reader", "Const"));
         } catch (XMLStreamException e) {
             log.error("Unerwartete Ausnahme,", e);
@@ -429,8 +480,6 @@ public class SimpleTest {
         Assert.assertEquals("Thomas", ((TStaticAnnotated) o).getVorName());
     }
 
-    
-    
     @Test
     public void wrongAnnotatedClass() {
         try {
@@ -491,15 +540,47 @@ public class SimpleTest {
         }
     }
 
-    
     @Test
     public void format() {
         Formater reader = new Formater("   ");
         try {
             reader.write(KONTOAUSZUG_XML);
+            reader.write(KONTOAUSZUG_XML, "test.erg", "UTF-8");
         } catch (IOException ex) {
             log.info("unexpected Exception", ex);
             fail("unexpected Exception");
+        }
+    }
+
+    @Test
+    public void readWrongXml() {
+        Reader reader = new Reader(Child.class);
+        try {
+            reader.read(WRONG_XML);
+            while (reader.hasNext()) {
+                reader.next();
+            }
+            Assert.fail("Exception erwartet");
+        } catch (ReaderRuntimeException e) {
+            log.error("Erwartete Ausnahme", e);
+        } catch (Exception e) {
+            log.error("Unerwartete Ausnahme", e);
+            Assert.fail("Unerwartete Exception");
+        }
+    }
+
+    @Test
+    public void readWrongXml2() {
+        TagReader reader = new TagReader();
+        try {
+            reader.read(WRONG_XML);
+            reader.read();
+            Assert.fail("Exception erwartet");
+        } catch (ReaderRuntimeException e) {
+            log.error("Erwartete Ausnahme", e);
+        } catch (Exception e) {
+            log.error("Unerwartete Ausnahme", e);
+            Assert.fail("Unerwartete Exception");
         }
     }
 
@@ -512,16 +593,28 @@ public class SimpleTest {
         Assert.assertTrue(o instanceof Child);
         Assert.assertEquals("Vera", ((Child) o).getName());
 
+        Assert.assertTrue(reader.hasNext());
         o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof Child);
         Assert.assertEquals("Thomas", ((Child) o).getName());
 
+        Assert.assertTrue(reader.hasNext());
         o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof Child);
         Assert.assertEquals("Hans", ((Child) o).getName());
 
+        try {
+            o = reader.next();
+            Assert.fail("Exception erwartet");
+        } catch (NoSuchElementException e) {
+            log.error("Erwartete Ausnahme", e);
+        } catch (Exception e) {
+            log.error("Unerwartete Ausnahme", e);
+            Assert.fail("Unerwartete Exception");
+        }
+        Assert.assertFalse(reader.hasNext());
     }
 
     @Test

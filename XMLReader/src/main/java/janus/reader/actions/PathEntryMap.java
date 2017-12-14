@@ -27,34 +27,6 @@ public class PathEntryMap<T extends PathEntry> extends HashMap<TagPath, T> {
     }
 
     /**
-     * Constructor *
-     * 
-     * @param initialCapacity
-     * @param loadFactor
-     */
-    public PathEntryMap(int initialCapacity, float loadFactor) {
-        super(initialCapacity, loadFactor);
-    }
-
-    /**
-     * Constructor
-     * 
-     * @param initialCapacity
-     */
-    public PathEntryMap(int initialCapacity) {
-        super(initialCapacity);
-    }
-
-    /**
-     * Constructor
-     * 
-     * @param m
-     */
-    public PathEntryMap(Map<? extends TagPath, T> m) {
-        super(m);
-    }
-
-    /**
      * put an entry into the map
      * 
      * @param entry

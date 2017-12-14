@@ -63,24 +63,6 @@ public class Setter extends PathEntry {
         return m.getParameterTypes()[0].equals(String.class);
     }
 
-    /**
-     * The list of TagPath of the value (class) of the property
-     * 
-     * @return
-     */
-    public List<TagPath> getValuePaths() {
-        List<TagPath> tagPathList = new ArrayList<>();
-        Class<?> parameterType = m.getParameterTypes()[0];
-        if (parameterType.isAnnotationPresent(XmlPath.class)
-                || parameterType.isAnnotationPresent(XmlPaths.class)) {
-            for (XmlPath cPath : parameterType
-                    .getAnnotationsByType(XmlPath.class)) {
-                tagPathList.add(new TagPath(cPath.path()));
-            }
-
-        }
-        return tagPathList;
-    }
-    
+      
   
 }

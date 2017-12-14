@@ -49,14 +49,4 @@ public class SetWithAdapter extends Setter {
         }
     }
 
-    /**
-     * is this class setable from a String class
-     * 
-     * @return
-     */
-    @Override
-    public boolean isSetableFromString() {
-        return true;
-    }
-
 }

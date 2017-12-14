@@ -1,6 +1,8 @@
 package janus.reader.actions;
 
+import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
+import janus.reader.nls.Messages;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -94,20 +96,8 @@ public class Value extends PathEntry implements Action {
             } else {
                 objectOfClass.setCurrent(staticCreationMethod.invoke(null));
             }
-        } catch (InstantiationException e) {
-            log.error("The Object could not be instantiated", e);
-        } catch (IllegalAccessException e) {
-            log.error("Illegal Access", e);
-        } catch (IllegalArgumentException e) {
-            log.error("The method "
-                    + ((staticCreationMethod == null) ? "NN"
-                            : staticCreationMethod.getName())
-                    + " is called with wrong arguments", e);
-        } catch (InvocationTargetException e) {
-            log.error("The method "
-                    + ((staticCreationMethod == null) ? "NN"
-                            : staticCreationMethod.getName())
-                    + " can not been invoced", e);
+        } catch (Exception e) {
+            throw new ReaderRuntimeException(e);
         }
     }
 

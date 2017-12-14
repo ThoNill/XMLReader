@@ -20,34 +20,6 @@ public class SetterMap extends PathEntryMap<Setter> {
     }
 
     /**
-     * constructor of parent class
-     * 
-     * @param initialCapacity
-     * @param loadFactor
-     */
-    public SetterMap(int initialCapacity, float loadFactor) {
-        super(initialCapacity, loadFactor);
-    }
-
-    /**
-     * constructor of parent class
-     * 
-     * @param initialCapacity
-     */
-    public SetterMap(int initialCapacity) {
-        super(initialCapacity);
-    }
-
-    /**
-     * constructor of parent class
-     * 
-     * @param m
-     */
-    public SetterMap(SetterMap m) {
-        super(m);
-    }
-
-    /**
      * call a {@link Setter} setValue action
      * 
      * @param path
@@ -55,10 +27,10 @@ public class SetterMap extends PathEntryMap<Setter> {
      */
     public void setValue(TagPath path, String value) {
         log.debug(" setValue auf Path {} to {} ", path, value);
-        Setter action = get(path);
-        if (action != null && action.isSetableFromString()) {
-            log.debug(" find {} ", action.getPath());
-            action.setValue(value);
+        Setter setter = get(path);
+        if (setter != null && setter.isSetableFromString()) {
+            log.debug(" find {} ", setter.getPath());
+            setter.setValue(value);
         }
     }
 

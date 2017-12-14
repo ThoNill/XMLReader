@@ -10,26 +10,10 @@ public class ReaderRuntimeException extends RuntimeException {
 
     /**
      * Constructor
-     */
-    public ReaderRuntimeException() {
-        super();
-    }
-
-    /**
-     * Constructor
-     * 
-     * @param message
-     */
-    public ReaderRuntimeException(String message) {
-        super(message);
-    }
-
-    /**
-     * Constructor
      * 
      * @param cause
      */
-    public ReaderRuntimeException(Throwable cause) {
+    public ReaderRuntimeException( Throwable cause) {
         super(cause);
     }
 
@@ -43,17 +27,5 @@ public class ReaderRuntimeException extends RuntimeException {
         super(message, cause);
     }
 
-    /**
-     * Constructor
-     * 
-     * @param message
-     * @param cause
-     * @param enableSuppression
-     * @param writableStackTrace
-     */
-    public ReaderRuntimeException(String message, Throwable cause,
-            boolean enableSuppression, boolean writableStackTrace) {
-        super(message, cause, enableSuppression, writableStackTrace);
-    }
 
 }

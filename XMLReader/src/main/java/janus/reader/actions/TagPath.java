@@ -81,7 +81,7 @@ public class TagPath {
         if (isAbsolut()) {
             return this.path.equals(path.path);
         }
-        return path.path.endsWith(this.path);
+        return path.endsWith(this);
     }
 
     /**

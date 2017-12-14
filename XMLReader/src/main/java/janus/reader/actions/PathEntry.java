@@ -24,13 +24,5 @@ public class PathEntry {
         return path;
     }
 
-    public void setPath(TagPath path) {
-        this.path = path;
-    }
-
-    @Override
-    public String toString() {
-        return "PathEntry [path=" + path + "]";
-    }
-
+ 
 }

@@ -24,9 +24,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 public class TagReader extends BasisReader {
     private HashMap<TagPath, TagPath> tags;
-    private ValueMap map;
     private ElementNameStack s;
-    private CurrentObject current;
     private XMLStreamReader xmlr;
 
     /**
@@ -36,8 +34,8 @@ public class TagReader extends BasisReader {
     public TagReader() {
         super();
         tags = new HashMap<>();
-        current = new SimpleCurrentObject();
-        map = new ValueMap();
+        SimpleCurrentObject current = new SimpleCurrentObject();
+        ValueMap map = new ValueMap();
         s = new ElementNameStack(current, map);
     }
 
@@ -54,7 +52,7 @@ public class TagReader extends BasisReader {
                     filename));
 
         } catch (FileNotFoundException | XMLStreamException e) {
-            Messages.throwReaderRuntimeException(e,"Runtime.FILE_PROCESSING");
+            Messages.throwReaderRuntimeException(e, "Runtime.FILE_PROCESSING");
         }
 
     }
@@ -64,12 +62,16 @@ public class TagReader extends BasisReader {
      * 
      * @return the next Object in the Stream
      */
-    public Object next() throws XMLStreamException {
-        while ((!current.hasObject()) && xmlr.hasNext()) {
-            next(xmlr);
-            xmlr.next();
+    public void read() throws XMLStreamException {
+        try {
+            while (xmlr.hasNext()) {
+                next(xmlr);
+                xmlr.next();
+            }
+        } catch (XMLStreamException e) {
+            Messages.throwReaderRuntimeException(e, "Runtime.FILE_PROCESSING");
         }
-        return current.next();
+
     }
 
     /**

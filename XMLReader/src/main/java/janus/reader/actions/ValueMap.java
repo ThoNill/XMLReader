@@ -19,34 +19,6 @@ public class ValueMap extends PathEntryMap<Value> {
     }
 
     /**
-     * constructor of parent class
-     * 
-     * @param initialCapacity
-     * @param loadFactor
-     */
-    public ValueMap(int initialCapacity, float loadFactor) {
-        super(initialCapacity, loadFactor);
-    }
-
-    /**
-     * constructor of parent class
-     * 
-     * @param initialCapacity
-     */
-    public ValueMap(int initialCapacity) {
-        super(initialCapacity);
-    }
-
-    /**
-     * constructor of parent class
-     * 
-     * @param m
-     */
-    public ValueMap(Map<? extends TagPath, Value> m) {
-        super(m);
-    }
-
-    /**
      * call a {@link NamedAction} push action
      * 
      * @param name
