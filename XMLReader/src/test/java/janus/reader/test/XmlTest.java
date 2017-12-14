@@ -17,6 +17,8 @@ import janus.reader.nls.Messages;
 import janus.reader.path.XmlElementPath;
 import janus.reader.test.entities.Child;
 import janus.reader.test.entities.City;
+import janus.reader.test.entities.DeepChild;
+import janus.reader.test.entities.DeepCity;
 import janus.reader.test.entities.LinkChild;
 import janus.reader.test.entities.TAnnotated;
 import janus.reader.test.entities.TObject;
@@ -52,7 +54,7 @@ public class XmlTest {
     private static final String WRONG_XML = "src/test/resources/wrongChilds.xml";
 
     private static final String CHILDSANDCITY_XML = "src/test/resources/childsAndCity.xml";
-
+    private static final String DEEPCHILDS_XML = "src/test/resources/deepChildsAndCity.xml";
    
     @Test
     public void readerInitialization() {
@@ -350,6 +352,48 @@ public class XmlTest {
         Assert.assertEquals("A", ((LinkChild) o).getCity().getName());
 
         Assert.assertEquals("Vera", ((LinkChild) o).getChild().getChild()
+                .getName());
+    }
+
+
+    @Test
+    public void readDeepChildsAndCity() {
+        Reader reader = new Reader(DeepChild.class, DeepCity.class);
+        reader.read(DEEPCHILDS_XML);
+
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof DeepCity);
+        Assert.assertEquals("A", ((DeepCity) o).getName());
+
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof DeepCity);
+        Assert.assertEquals("C", ((DeepCity) o).getName());
+
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof DeepCity);
+        Assert.assertEquals("D", ((DeepCity) o).getName());
+
+        o = reader.next();
+        Assert.assertTrue(o instanceof DeepChild);
+        Assert.assertEquals("Vera", ((DeepChild) o).getName());
+        Assert.assertEquals("C", ((DeepChild) o).getCity().getName());
+        Assert.assertEquals("D", ((DeepChild) o).getSecond().getName());
+
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof DeepChild);
+        Assert.assertEquals("Thomas", ((DeepChild) o).getName());
+
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof DeepChild);
+        Assert.assertEquals("Hans", ((DeepChild) o).getName());
+        Assert.assertEquals("A", ((DeepChild) o).getCity().getName());
+
+        Assert.assertEquals("Vera", ((DeepChild) o).getChild().getChild()
                 .getName());
     }
 
