@@ -3,6 +3,7 @@ package janus.reader.value;
 import janus.reader.attribute.Attribute;
 import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
+import janus.reader.nls.Messages;
 import janus.reader.path.PathEntry;
 import janus.reader.path.XmlElementPath;
 
@@ -63,24 +64,18 @@ public class Value extends PathEntry {
             try {
                 staticCreationMethod = clazz.getMethod(staticMethodName);
             } catch (NoSuchMethodException | SecurityException e) {
-                throw new IllegalArgumentException("the method "
-                        + staticMethodName
-                        + " does not exist or is privat/protected", e);
+                log.debug("Error {}",e);
+                Messages.throwIllegalArgumentException("Value.METHOD_DOESNOT_EXIST",staticMethodName);
             }
             if (!ClassHelper.isThisClassOrASuperClass(
                     staticCreationMethod.getReturnType(), clazz)) {
-                throw new IllegalArgumentException("the method "
-                        + staticMethodName
-                        + " create a Object that is not of type "
-                        + clazz.getCanonicalName());
+                Messages.throwIllegalArgumentException("Value.METHOD_WRONG_TYPE",staticMethodName,clazz.getCanonicalName());
             }
             if (!Modifier.isStatic(staticCreationMethod.getModifiers())) {
-                throw new IllegalArgumentException("the method "
-                        + staticMethodName + " is not static ");
+                Messages.throwIllegalArgumentException("Value.METHOD_NOT_STATIC",staticMethodName);
             }
             if (staticCreationMethod.getParameterCount() > 0) {
-                throw new IllegalArgumentException("the method "
-                        + staticMethodName + " has parameters ");
+                Messages.throwIllegalArgumentException("Value.METHOD_HAS_PARAMETER",staticMethodName);
             }
         }
     }

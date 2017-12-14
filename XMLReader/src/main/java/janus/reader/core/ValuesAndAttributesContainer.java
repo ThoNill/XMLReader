@@ -8,8 +8,6 @@ import janus.reader.attribute.AttributeMap;
 import janus.reader.attribute.AttributeWithAdapter;
 import janus.reader.attribute.AttributeWithValue;
 import janus.reader.attribute.AttributeWithValueMap;
-//import janus.reader.annotations.XmlPath;
-//import janus.reader.annotations.XmlPaths;
 import janus.reader.nls.Messages;
 import janus.reader.path.XmlElementPath;
 import janus.reader.value.CurrentObject;

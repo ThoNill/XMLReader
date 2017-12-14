@@ -8,7 +8,7 @@ package janus.reader.path;
  */
 public class XmlElementPath {
     private String path;
-    private String parts[];
+    private String[] parts;
     private int depth = 0;
 
     /**
