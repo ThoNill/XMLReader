@@ -1,10 +1,6 @@
-package test;
+package janus.reader.test.entities;
 
-import janus.reader.annotations.XmlPath;
-
-@XmlPath(path = "/Document/test")
-@XmlPath(path = Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
-public class TAnnotated extends TSuper {
+public class TObject extends TSuper {
     private String name;
     private boolean bValue;
     private float fValue;
@@ -15,8 +11,6 @@ public class TAnnotated extends TSuper {
         return name;
     }
 
-    @XmlPath(path = "name")
-    @XmlPath(path = Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document)
     public void setName(String name) {
         this.name = name;
     }

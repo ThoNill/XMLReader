@@ -1,4 +1,4 @@
-package test;
+package janus.reader.test.entities;
 
 public class TSuper {
 

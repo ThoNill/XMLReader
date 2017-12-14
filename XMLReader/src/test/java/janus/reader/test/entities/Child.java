@@ -1,4 +1,4 @@
-package test;
+package janus.reader.test.entities;
 
 import janus.reader.annotations.XmlPath;
 
