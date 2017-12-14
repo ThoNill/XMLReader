@@ -1,4 +1,4 @@
-package janus.reader.actions;
+package janus.reader.path;
 
 /**
  * The Path of the Tags
@@ -6,7 +6,7 @@ package janus.reader.actions;
  * @author Thomas Nill
  *
  */
-public class TagPath {
+public class XmlElementPath {
     private String path;
     private String parts[];
     private int depth = 0;
@@ -16,7 +16,7 @@ public class TagPath {
      * 
      * @param path
      */
-    public TagPath(String path) {
+    public XmlElementPath(String path) {
         super();
         this.path = path;
         this.parts = path.split("\\/");
@@ -28,7 +28,7 @@ public class TagPath {
      * 
      * @param path
      */
-    public TagPath(TagPath path) {
+    public XmlElementPath(XmlElementPath path) {
         this(path.getPath());
     }
 
@@ -48,7 +48,7 @@ public class TagPath {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        TagPath other = (TagPath) obj;
+        XmlElementPath other = (XmlElementPath) obj;
         if (path == null) {
             if (other.path != null)
                 return false;
@@ -77,7 +77,7 @@ public class TagPath {
      * @param path
      * @return
      */
-    public boolean compare(TagPath path) {
+    public boolean compare(XmlElementPath path) {
         if (isAbsolut()) {
             return this.path.equals(path.path);
         }
@@ -85,12 +85,12 @@ public class TagPath {
     }
 
     /**
-     * starts with this TagPath
+     * starts with this XmlElementPath
      * 
      * @param path
      * @return
      */
-    public boolean startsWith(TagPath path) {
+    public boolean startsWith(XmlElementPath path) {
         for (int okIndex = 0; okIndex < path.parts.length; okIndex++) {
             if (okIndex >= parts.length || (!path.parts[okIndex].equals(parts[okIndex]))) {
                 return false;
@@ -100,12 +100,12 @@ public class TagPath {
     }
 
     /**
-     * ends with this TagPath
+     * ends with this XmlElementPath
      * 
      * @param path
      * @return
      */
-    public boolean endsWith(TagPath path) {
+    public boolean endsWith(XmlElementPath path) {
         int index = parts.length-1;
         for (int okIndex = path.parts.length-1; okIndex>=0;okIndex--,index--) {
             if (index <0 || (!path.parts[okIndex].equals(parts[index]))) {
@@ -121,10 +121,10 @@ public class TagPath {
      * 
      * @return
      */
-    public TagPath parent() {
+    public XmlElementPath parent() {
         int lastIndex = this.path.lastIndexOf('/');
         if (lastIndex >= 0) {
-            return new TagPath(this.path.substring(0, lastIndex));
+            return new XmlElementPath(this.path.substring(0, lastIndex));
         }
         return null;
     }
@@ -139,8 +139,8 @@ public class TagPath {
      * @param p
      * @return
      */
-    public TagPath concat(TagPath p) {
-        return new TagPath(this.path + "/" + p.path);
+    public XmlElementPath concat(XmlElementPath p) {
+        return new XmlElementPath(this.path + "/" + p.path);
     }
 
     public String getPath() {

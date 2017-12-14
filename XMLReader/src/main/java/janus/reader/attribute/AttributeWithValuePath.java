@@ -1,20 +1,22 @@
-package janus.reader.actions;
+package janus.reader.attribute;
+
+import janus.reader.path.XmlElementPath;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The TagPath to a property of a class This is a path to the setter and a path
+ * The XmlElementPath to a property of a class This is a path to the setter and a path
  * to a value class
  * 
  * @author Thomas Nill
  *
  */
-public class SetFromValuePath extends TagPath {
+public class AttributeWithValuePath extends XmlElementPath {
     private static final Logger log = LoggerFactory
-            .getLogger(SetFromValuePath.class);
+            .getLogger(AttributeWithValuePath.class);
 
-    private TagPath valuePath;
+    private XmlElementPath valuePath;
 
     /**
      * Constructor
@@ -22,13 +24,13 @@ public class SetFromValuePath extends TagPath {
      * @param setterPath
      * @param valuePath
      */
-    public SetFromValuePath(TagPath setterPath, TagPath valuePath) {
+    public AttributeWithValuePath(XmlElementPath setterPath, XmlElementPath valuePath) {
         super(setterPath);
         this.valuePath = valuePath;
     }
 
     @Override
-    public boolean compare(TagPath path) {
+    public boolean compare(XmlElementPath path) {
         log.debug("compare {} and {}", this, path);
         String pathString = path.getPath();
         if (pathString.endsWith(valuePath.getPath())) {

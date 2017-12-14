@@ -1,26 +1,25 @@
 package test;
 
 import static org.junit.Assert.fail;
-import janus.reader.BasisReader;
 import janus.reader.Formater;
 import janus.reader.Reader;
 import janus.reader.TagReader;
-import janus.reader.actions.CurrentObject;
-import janus.reader.actions.ElementNameStack;
-import janus.reader.actions.Setter;
-import janus.reader.actions.SimpleCurrentObject;
-import janus.reader.actions.StackCurrentObject;
-import janus.reader.actions.TagPath;
-import janus.reader.actions.Value;
-import janus.reader.actions.ValueMap;
 import janus.reader.adapters.BooleanAdapter;
 import janus.reader.adapters.DoubleAdapter;
 import janus.reader.adapters.FloatAdapter;
 import janus.reader.adapters.IntegerAdapter;
 import janus.reader.adapters.LongAdapter;
+import janus.reader.attribute.Attribute;
+import janus.reader.core.ValuesAndAttributesContainer;
 import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
 import janus.reader.nls.Messages;
+import janus.reader.path.XmlElementPath;
+import janus.reader.value.CurrentObject;
+import janus.reader.value.SimpleCurrentObject;
+import janus.reader.value.StackCurrentObject;
+import janus.reader.value.Value;
+import janus.reader.value.ValueMap;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -71,10 +70,10 @@ public class SimpleTest {
 
     @Test
     public void testStartWithPaths() {
-        TagPath a = new TagPath("/aa/bb/cc");
-        TagPath b = new TagPath("/a");
-        TagPath c = new TagPath("/aa");
-        TagPath d = new TagPath("/aa/bb");
+        XmlElementPath a = new XmlElementPath("/aa/bb/cc");
+        XmlElementPath b = new XmlElementPath("/a");
+        XmlElementPath c = new XmlElementPath("/aa");
+        XmlElementPath d = new XmlElementPath("/aa/bb");
         Assert.assertTrue(a.startsWith(a));
         Assert.assertTrue(a.startsWith(c));
         Assert.assertTrue(a.startsWith(d));
@@ -83,14 +82,14 @@ public class SimpleTest {
 
     @Test
     public void testEndWithPaths() {
-        TagPath a = new TagPath("/aa/bb/cc");
-        TagPath b = new TagPath("/c");
-        TagPath c1 = new TagPath("/cc");
-        TagPath d1 = new TagPath("/bb/cc");
-        TagPath c2 = new TagPath("cc");
-        TagPath d2 = new TagPath("bb/cc");
-        TagPath d3 = new TagPath("/ee/aa/bb/cc");
-        TagPath d4 = new TagPath("/ee/ee/ee");
+        XmlElementPath a = new XmlElementPath("/aa/bb/cc");
+        XmlElementPath b = new XmlElementPath("/c");
+        XmlElementPath c1 = new XmlElementPath("/cc");
+        XmlElementPath d1 = new XmlElementPath("/bb/cc");
+        XmlElementPath c2 = new XmlElementPath("cc");
+        XmlElementPath d2 = new XmlElementPath("bb/cc");
+        XmlElementPath d3 = new XmlElementPath("/ee/aa/bb/cc");
+        XmlElementPath d4 = new XmlElementPath("/ee/ee/ee");
         Assert.assertTrue(a.endsWith(a));
         Assert.assertFalse(a.endsWith(c1));
         Assert.assertFalse(a.endsWith(d1));
@@ -113,23 +112,23 @@ public class SimpleTest {
 
     @Test
     public void compareTest() {
-        TagPath absolut = new TagPath("/a/b/c");
-        TagPath relativ = new TagPath("b/c");
+        XmlElementPath absolut = new XmlElementPath("/a/b/c");
+        XmlElementPath relativ = new XmlElementPath("b/c");
 
         Assert.assertTrue(absolut.isAbsolut());
         Assert.assertFalse(relativ.isAbsolut());
 
         Assert.assertTrue(relativ.compare(absolut));
-        Assert.assertFalse(new TagPath("a").compare(absolut));
+        Assert.assertFalse(new XmlElementPath("a").compare(absolut));
         Assert.assertTrue(absolut.compare(absolut));
-        Assert.assertFalse(new TagPath("/a").compare(absolut));
+        Assert.assertFalse(new XmlElementPath("/a").compare(absolut));
 
     }
 
     @Test
     public void parentPathTest() {
-        TagPath child = new TagPath("/a/b/cc");
-        TagPath parent = new TagPath("/a/b");
+        XmlElementPath child = new XmlElementPath("/a/b/cc");
+        XmlElementPath parent = new XmlElementPath("/a/b");
 
         Assert.assertEquals(parent, child.parent());
 
@@ -138,14 +137,14 @@ public class SimpleTest {
     @Test
     public void methodHandle() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/value"), TObject.class, current,
+        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
                 new SimpleCurrentObject());
         value.push();
 
-        ElementNameStack stack = new ElementNameStack(current);
+        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
 
-        Setter action = stack.createSetAction(value,
-                new TagPath("/value/first"), "Name");
+        Attribute action = stack.createSetAction(value,
+                new XmlElementPath("/value/first"), "Name");
         action.setValue("Test");
 
         value.pop();
@@ -158,13 +157,13 @@ public class SimpleTest {
     @Test
     public void methodHandleWithWrongValue() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/value"), TObject.class, current,
+        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
                 new SimpleCurrentObject());
         value.push();
-        ElementNameStack stack = new ElementNameStack(current);
+        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
 
-        Setter action = stack.createSetAction(value,
-                new TagPath("/value/first"), "fValue");
+        Attribute action = stack.createSetAction(value,
+                new XmlElementPath("/value/first"), "fValue");
 
         try {
             action.setValue("Test");
@@ -178,12 +177,12 @@ public class SimpleTest {
     @Test
     public void methodHandleWithEmptyValue() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/value"), TObject.class, current,
+        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
                 new SimpleCurrentObject());
-        ElementNameStack stack = new ElementNameStack(current);
+        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
 
-        Setter action = stack.createSetAction(value,
-                new TagPath("/value/first"), "Name");
+        Attribute action = stack.createSetAction(value,
+                new XmlElementPath("/value/first"), "Name");
 
         try {
             action.setValue("Test");
@@ -197,13 +196,13 @@ public class SimpleTest {
     @Test
     public void methodHandleWithStack() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/value"), TObject.class, current,
+        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
                 new StackCurrentObject());
         value.push();
 
-        ElementNameStack stack = new ElementNameStack(current);
+        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
 
-        Setter action = stack.createSetAction(value, new TagPath(
+        Attribute action = stack.createSetAction(value, new XmlElementPath(
                 "/value/first/is"), "Name");
         action.setValue("Test");
 
@@ -218,13 +217,13 @@ public class SimpleTest {
     public void stringStack() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/first/is"), TObject.class,
+        Value value = new Value(new XmlElementPath("/first/is"), TObject.class,
                 current, new SimpleCurrentObject());
         ValueMap map = new ValueMap();
 
-        ElementNameStack stack = new ElementNameStack(current, map);
+        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current, map);
         stack.addValue(value);
-        stack.addSetter(stack.createSetAction(value, new TagPath("name"),
+        stack.addSetter(stack.createSetAction(value, new XmlElementPath("name"),
                 "Name"));
 
         stack.push("first");
@@ -288,20 +287,20 @@ public class SimpleTest {
     public void adapter() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new TagPath("/first"), TObject.class, current,
+        Value value = new Value(new XmlElementPath("/first"), TObject.class, current,
                 new SimpleCurrentObject());
 
-        ElementNameStack stack = new ElementNameStack(current);
+        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
 
-        Setter iSetter = stack.createSetAction(value, new TagPath("/first/n"),
+        Attribute iSetter = stack.createSetAction(value, new XmlElementPath("/first/n"),
                 "Nummer");
-        Setter bSetter = stack.createSetAction(value, new TagPath("/first/b"),
+        Attribute bSetter = stack.createSetAction(value, new XmlElementPath("/first/b"),
                 "bValue");
-        Setter fSetter = stack.createSetAction(value, new TagPath("/first/f"),
+        Attribute fSetter = stack.createSetAction(value, new XmlElementPath("/first/f"),
                 "fValue");
-        Setter dSetter = stack.createSetAction(value, new TagPath("/first/d"),
+        Attribute dSetter = stack.createSetAction(value, new XmlElementPath("/first/d"),
                 "dValue");
-        Setter lSetter = stack.createSetAction(value, new TagPath("/first/l"),
+        Attribute lSetter = stack.createSetAction(value, new XmlElementPath("/first/l"),
                 "lValue");
 
         value.push();
@@ -348,7 +347,7 @@ public class SimpleTest {
     public void reader() {
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(
+        reader.addValue(new XmlElementPath(
                 Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
         reader.read(KONTOAUSZUG_XML);
@@ -361,12 +360,12 @@ public class SimpleTest {
     public void readerWithName() {
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(
+        reader.addValue(new XmlElementPath(
                 Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
         reader.addSetter(
-                new TagPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
-                new TagPath(
+                new XmlElementPath(Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
+                new XmlElementPath(
                         Const.TxId_Refs_TxDtls_NtryDtls_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Name");
 
@@ -382,11 +381,11 @@ public class SimpleTest {
     public void readerWithAttribute() {
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(
+        reader.addValue(new XmlElementPath(
                 Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(new TagPath(
-                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new TagPath(
+        reader.addSetter(new XmlElementPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new XmlElementPath(
                 Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Name");
 
@@ -402,11 +401,11 @@ public class SimpleTest {
 
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(
+        reader.addValue(new XmlElementPath(
                 Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(new TagPath(
-                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new TagPath(
+        reader.addSetter(new XmlElementPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new XmlElementPath(
                 Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
@@ -424,24 +423,24 @@ public class SimpleTest {
 
         Reader reader = new Reader();
 
-        reader.addValue(new TagPath(Const.BkToCstmrDbtCdtNtfctn_Document),
+        reader.addValue(new XmlElementPath(Const.BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(new TagPath(Const.BkToCstmrDbtCdtNtfctn_Document),
-                new TagPath(Const.MsgId_GrpHdr_BkToCstmrDbtCdtNtfctn_Document),
+        reader.addSetter(new XmlElementPath(Const.BkToCstmrDbtCdtNtfctn_Document),
+                new XmlElementPath(Const.MsgId_GrpHdr_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
-        reader.addValue(new TagPath(
+        reader.addValue(new XmlElementPath(
                 Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 TObject.class);
-        reader.addSetter(new TagPath(
-                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new TagPath(
+        reader.addSetter(new XmlElementPath(
+                Const.Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document), new XmlElementPath(
                 Const.AtCcy_Amt_Ntry_Ntfctn_BkToCstmrDbtCdtNtfctn_Document),
                 "Verwendungszweck");
 
         reader.read(KONTOAUSZUG_XML);
         reader.next();
 
-        Object ov = reader.getValueObject(new TagPath(
+        Object ov = reader.getValueObject(new XmlElementPath(
                 Const.BkToCstmrDbtCdtNtfctn_Document));
         Assert.assertNotNull(ov);
         Assert.assertTrue(ov instanceof TObject);

@@ -1,9 +1,10 @@
-package janus.reader.annotations;
+package janus.reader.core;
 
-import janus.reader.actions.ElementNameStack;
-import janus.reader.actions.TagPath;
+import janus.reader.annotations.XmlPath;
+import janus.reader.annotations.XmlPaths;
 import janus.reader.helper.ClassHelper;
 import janus.reader.nls.Messages;
+import janus.reader.path.XmlElementPath;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -29,7 +30,7 @@ public class AnnotationProcessor {
      * @param stack
      * @param clazzes
      */
-    public void processClasses(ElementNameStack stack, Class<?>... clazzes) {
+    public void processClasses(ValuesAndAttributesContainer stack, Class<?>... clazzes) {
         for (Class<?> clazz : clazzes) {
             processClass(stack, clazz);
         }
@@ -41,27 +42,27 @@ public class AnnotationProcessor {
      * @param stack
      * @param clazzes
      */
-    public void processClass(ElementNameStack stack, Class<?> clazz) {
+    public void processClass(ValuesAndAttributesContainer stack, Class<?> clazz) {
         checkClass(clazz);
         processAllXmlPathAnnotations(stack, clazz);
     }
 
-    protected void processAllXmlPathAnnotations(ElementNameStack stack,
+    protected void processAllXmlPathAnnotations(ValuesAndAttributesContainer stack,
             Class<?> clazz) {
         for (XmlPath cPath : clazz.getAnnotationsByType(XmlPath.class)) {
-            stack.addValue(new TagPath(cPath.path()), clazz);
+            stack.addValue(new XmlElementPath(cPath.path()), clazz);
             processNonStaticMethods(stack, clazz, cPath);
         }
         processStaticMethods(stack, clazz);
     }
 
-    private void processStaticMethods(ElementNameStack stack, Class<?> clazz) {
+    private void processStaticMethods(ValuesAndAttributesContainer stack, Class<?> clazz) {
         for (Method m : clazz.getMethods()) {
             processOneStaticMethod(stack, clazz, m);
         }
     }
 
-    private void processOneStaticMethod(ElementNameStack stack, Class<?> clazz,
+    private void processOneStaticMethod(ValuesAndAttributesContainer stack, Class<?> clazz,
             Method m) {
         if (Modifier.isStatic(m.getModifiers())
                 && (m.isAnnotationPresent(XmlPath.class)
@@ -69,7 +70,7 @@ public class AnnotationProcessor {
                         )) {
             for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
                 checkStaticMethod(clazz, m);
-                stack.addValue(new TagPath(mPath.path()), clazz, m.getName());
+                stack.addValue(new XmlElementPath(mPath.path()), clazz, m.getName());
                 processNonStaticMethods(stack, clazz, mPath);
             }
         }
@@ -86,14 +87,14 @@ public class AnnotationProcessor {
 
     }
 
-    private void processNonStaticMethods(ElementNameStack stack,
+    private void processNonStaticMethods(ValuesAndAttributesContainer stack,
             Class<?> clazz, XmlPath cPath) {
         for (Method m : clazz.getMethods()) {
             processOneNonStaticMethod(stack, cPath, m);
         }
     }
 
-    private void processOneNonStaticMethod(ElementNameStack stack,
+    private void processOneNonStaticMethod(ValuesAndAttributesContainer stack,
             XmlPath cPath, Method m) {
         if (!Modifier.isStatic(m.getModifiers())
                 && (m.isAnnotationPresent(XmlPath.class) || m
@@ -103,16 +104,16 @@ public class AnnotationProcessor {
         }
     }
 
-    protected void processAllXmlPathAnnotations(ElementNameStack stack,
+    protected void processAllXmlPathAnnotations(ValuesAndAttributesContainer stack,
             XmlPath cPath, Method m) {
         for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
             String path = mPath.path();
             String methodName = m.getName().substring(3);
             if (path.charAt(0) == '/') {
-                stack.addSetter(new TagPath(cPath.path()), new TagPath(path),
+                stack.addSetter(new XmlElementPath(cPath.path()), new XmlElementPath(path),
                         methodName);
             } else {
-                stack.addRelativSetter(new TagPath(cPath.path()), new TagPath(
+                stack.addRelativSetter(new XmlElementPath(cPath.path()), new XmlElementPath(
                         path), methodName);
             }
         }

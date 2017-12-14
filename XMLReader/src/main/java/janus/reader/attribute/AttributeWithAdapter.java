@@ -1,6 +1,8 @@
-package janus.reader.actions;
+package janus.reader.attribute;
 
 import janus.reader.nls.Messages;
+import janus.reader.path.XmlElementPath;
+import janus.reader.value.Value;
 
 import java.lang.reflect.Method;
 
@@ -10,16 +12,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Setter that sets a property where the vale is a string. The string value ist
+ * Attribute that sets a property where the vale is a string. The string value ist
  * first translatet to a class with an adapter
  * 
  * @author javaman
  *
  */
 // @FunctionalInterface
-public class SetWithAdapter extends Setter {
+public class AttributeWithAdapter extends Attribute {
     private static final Logger log = LoggerFactory
-            .getLogger(SetWithAdapter.class);
+            .getLogger(AttributeWithAdapter.class);
 
     private XmlAdapter<String, ?> a;
 
@@ -31,7 +33,7 @@ public class SetWithAdapter extends Setter {
      * @param v
      * @param a
      */
-    public SetWithAdapter(TagPath path, Method m, Value v,
+    public AttributeWithAdapter(XmlElementPath path, Method m, Value v,
             XmlAdapter<String, ?> a) {
         super(path, m, v);
         this.a = a;

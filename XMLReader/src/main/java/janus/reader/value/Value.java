@@ -1,10 +1,11 @@
-package janus.reader.actions;
+package janus.reader.value;
 
+import janus.reader.attribute.Attribute;
 import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.helper.ClassHelper;
-import janus.reader.nls.Messages;
+import janus.reader.path.PathEntry;
+import janus.reader.path.XmlElementPath;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -16,12 +17,12 @@ import org.slf4j.LoggerFactory;
  * instance ist generated in the pop action this object is transfered to the
  * current Object
  * 
- * there ar different methods to create {@link Setter}
+ * there ar different methods to create {@link Attribute}
  * 
  * @author Thomas Nill
  *
  */
-public class Value extends PathEntry implements Action {
+public class Value extends PathEntry {
     private static final Logger log = LoggerFactory.getLogger(Value.class);
 
     private Class<?> clazz;
@@ -37,7 +38,7 @@ public class Value extends PathEntry implements Action {
      * @param current
      * @param objectOfClass
      */
-    public Value(TagPath path, Class<?> clazz, CurrentObject current,
+    public Value(XmlElementPath path, Class<?> clazz, CurrentObject current,
             CurrentObject objectOfClass) {
         this(path, clazz, current, null, objectOfClass);
     }
@@ -51,7 +52,7 @@ public class Value extends PathEntry implements Action {
      * @param staticMethodName
      * @param objectOfClass
      */
-    public Value(TagPath path, Class<?> clazz, CurrentObject current,
+    public Value(XmlElementPath path, Class<?> clazz, CurrentObject current,
             String staticMethodName, CurrentObject objectOfClass) {
         super(path);
         log.debug("Create Value for path {} ", path);
@@ -88,7 +89,6 @@ public class Value extends PathEntry implements Action {
      * push action create a instance of class clazz
      * 
      */
-    @Override
     public void push() {
         try {
             if (staticCreationMethod == null) {
@@ -105,7 +105,6 @@ public class Value extends PathEntry implements Action {
      * pop action transfers object to current
      * 
      */
-    @Override
     public void pop() {
         current.setCurrent(objectOfClass.next());
     }

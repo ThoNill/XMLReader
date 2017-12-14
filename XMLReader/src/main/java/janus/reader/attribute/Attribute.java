@@ -1,24 +1,23 @@
-package janus.reader.actions;
+package janus.reader.attribute;
 
-import janus.reader.annotations.XmlPath;
-import janus.reader.annotations.XmlPaths;
 import janus.reader.nls.Messages;
+import janus.reader.path.PathEntry;
+import janus.reader.path.XmlElementPath;
+import janus.reader.value.Value;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * A Setter sets a property of a class to a value
+ * A Attribute sets a property of a class to a value
  * 
  * @author Thomas Nill
  *
  */
-public class Setter extends PathEntry {
-    private static final Logger log = LoggerFactory.getLogger(Setter.class);
+public class Attribute extends PathEntry {
+    private static final Logger log = LoggerFactory.getLogger(Attribute.class);
 
     Method m;
     Value v;
@@ -30,7 +29,7 @@ public class Setter extends PathEntry {
      * @param m
      * @param v
      */
-    public Setter(TagPath path, Method m, Value v) {
+    public Attribute(XmlElementPath path, Method m, Value v) {
         super(path);
         this.m = m;
         this.v = v;

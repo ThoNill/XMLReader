@@ -1,13 +1,13 @@
 package janus.reader;
 
-import janus.reader.actions.CurrentObject;
-import janus.reader.actions.ElementNameStack;
-import janus.reader.actions.SimpleCurrentObject;
-import janus.reader.actions.TagPath;
-import janus.reader.actions.ValueMap;
-import janus.reader.annotations.AnnotationProcessor;
+import janus.reader.core.AnnotationProcessor;
+import janus.reader.core.ValuesAndAttributesContainer;
 import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.nls.Messages;
+import janus.reader.path.XmlElementPath;
+import janus.reader.value.CurrentObject;
+import janus.reader.value.SimpleCurrentObject;
+import janus.reader.value.ValueMap;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,7 +29,7 @@ import javax.xml.stream.XMLStreamReader;
  */
 
 public class Reader extends BasisReader implements Iterator<Object> {
-    private ElementNameStack elementNameStack;
+    private ValuesAndAttributesContainer valuesAndAttributesContainer;
     private CurrentObject current;
     private XMLStreamReader xmlr;
     private ValueMap map;
@@ -42,7 +42,7 @@ public class Reader extends BasisReader implements Iterator<Object> {
         super();
         current = new SimpleCurrentObject();
         map = new ValueMap();
-        elementNameStack = new ElementNameStack(current, map);
+        valuesAndAttributesContainer = new ValuesAndAttributesContainer(current, map);
     }
 
     /**
@@ -113,8 +113,8 @@ public class Reader extends BasisReader implements Iterator<Object> {
      * @param clazz
      *            (class of the generated instance)
      */
-    public void addValue(TagPath name, Class<?> clazz) {
-        elementNameStack.addValue(name, clazz);
+    public void addValue(XmlElementPath name, Class<?> clazz) {
+        valuesAndAttributesContainer.addValue(name, clazz);
     }
 
     /**
@@ -129,8 +129,8 @@ public class Reader extends BasisReader implements Iterator<Object> {
      * @param field
      *            (the name of the setter Method)
      */
-    public void addSetter(TagPath valueName, TagPath absPath, String field) {
-        elementNameStack.addSetter(valueName, absPath, field);
+    public void addSetter(XmlElementPath valueName, XmlElementPath absPath, String field) {
+        valuesAndAttributesContainer.addSetter(valueName, absPath, field);
     }
 
     /**
@@ -145,30 +145,30 @@ public class Reader extends BasisReader implements Iterator<Object> {
      * @param field
      *            (the name of the setter Method)
      */
-    public void addRelativSetter(TagPath valueName, TagPath relPath,
+    public void addRelativSetter(XmlElementPath valueName, XmlElementPath relPath,
             String field) {
-        elementNameStack.addRelativSetter(valueName, relPath, field);
+        valuesAndAttributesContainer.addRelativSetter(valueName, relPath, field);
     }
 
     @Override
     protected void nextText(XMLStreamReader xmlr) {
         int start = xmlr.getTextStart();
         int length = xmlr.getTextLength();
-        elementNameStack.setText(new String(xmlr.getTextCharacters(), start,
+        valuesAndAttributesContainer.setText(new String(xmlr.getTextCharacters(), start,
                 length));
     }
 
     @Override
     protected void nextEndElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
-            elementNameStack.pop();
+            valuesAndAttributesContainer.pop();
         }
     }
 
     @Override
     protected void nextStartElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
-            elementNameStack.push(xmlr.getLocalName());
+            valuesAndAttributesContainer.push(xmlr.getLocalName());
         }
         processAttributes(xmlr);
     }
@@ -176,13 +176,13 @@ public class Reader extends BasisReader implements Iterator<Object> {
     protected void processAttribute(XMLStreamReader xmlr, int index) {
         String localName = xmlr.getAttributeLocalName(index);
         String value = xmlr.getAttributeValue(index);
-        elementNameStack.setAttribute(localName, value);
+        valuesAndAttributesContainer.setAttribute(localName, value);
 
     }
 
     private void readAnnotations(Class<?>[] classes) {
         AnnotationProcessor p = new AnnotationProcessor();
-        p.processClasses(elementNameStack, classes);
+        p.processClasses(valuesAndAttributesContainer, classes);
     }
 
     /**
@@ -191,8 +191,8 @@ public class Reader extends BasisReader implements Iterator<Object> {
      * @param name
      * @return
      */
-    public Object getValueObject(TagPath name) {
-        return elementNameStack.getValueObject(name);
+    public Object getValueObject(XmlElementPath name) {
+        return valuesAndAttributesContainer.getValueObject(name);
     }
 
     /**
@@ -202,8 +202,8 @@ public class Reader extends BasisReader implements Iterator<Object> {
      * @param name
      * @return
      */
-    public Object getValueObjectWithException(TagPath name) {
-        return elementNameStack.getValueObjectWithException(name);
+    public Object getValueObjectWithException(XmlElementPath name) {
+        return valuesAndAttributesContainer.getValueObjectWithException(name);
     }
 
 }

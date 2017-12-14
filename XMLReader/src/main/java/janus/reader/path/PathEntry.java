@@ -1,4 +1,4 @@
-package janus.reader.actions;
+package janus.reader.path;
 
 /**
  * A PathEntry is a Value in a {@link PathEntryMap}
@@ -7,7 +7,7 @@ package janus.reader.actions;
  *
  */
 public class PathEntry {
-    private TagPath path;
+    private XmlElementPath path;
 
     /**
      * Constructor with a String representation of a Path examples: /x, /x/y,
@@ -15,12 +15,12 @@ public class PathEntry {
      * 
      * @param path
      */
-    public PathEntry(TagPath path) {
+    public PathEntry(XmlElementPath path) {
         super();
         this.path = path;
     }
 
-    public TagPath getPath() {
+    public XmlElementPath getPath() {
         return path;
     }
 

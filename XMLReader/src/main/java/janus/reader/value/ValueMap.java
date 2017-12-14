@@ -1,9 +1,12 @@
-package janus.reader.actions;
+package janus.reader.value;
 
-import java.util.Map;
+import janus.reader.attribute.Attribute;
+import janus.reader.path.PathEntryMap;
+import janus.reader.path.XmlElementPath;
+
 
 /**
- * The NamedActionMap calls the {@link Action} and {@link Setter} actions, for a
+ * The NamedActionMap calls the {@link Action} and {@link Attribute} actions, for a
  * path. It connects the path, with the actions.
  * 
  * @author Thomas Nill
@@ -23,7 +26,7 @@ public class ValueMap extends PathEntryMap<Value> {
      * 
      * @param name
      */
-    public void push(TagPath name) {
+    public void push(XmlElementPath name) {
         Value action = get(name);
         if (action != null) {
             action.push();
@@ -35,7 +38,7 @@ public class ValueMap extends PathEntryMap<Value> {
      * 
      * @param name
      */
-    public void pop(TagPath name) {
+    public void pop(XmlElementPath name) {
         Value action = get(name);
         if (action != null) {
             action.pop();

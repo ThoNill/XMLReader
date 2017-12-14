@@ -1,6 +1,5 @@
 package janus.reader.helper;
 
-import org.omg.CORBA.Object;
 
 /**
  * Helper Method for subclassing

@@ -1,11 +1,10 @@
 package janus.reader;
 
-import janus.reader.actions.CurrentObject;
-import janus.reader.actions.ElementNameStack;
-import janus.reader.actions.SimpleCurrentObject;
-import janus.reader.actions.TagPath;
-import janus.reader.actions.ValueMap;
+import janus.reader.core.ValuesAndAttributesContainer;
 import janus.reader.nls.Messages;
+import janus.reader.path.XmlElementPath;
+import janus.reader.value.SimpleCurrentObject;
+import janus.reader.value.ValueMap;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -23,8 +22,8 @@ import javax.xml.stream.XMLStreamReader;
  *
  */
 public class TagReader extends BasisReader {
-    private HashMap<TagPath, TagPath> tags;
-    private ElementNameStack s;
+    private HashMap<XmlElementPath, XmlElementPath> tags;
+    private ValuesAndAttributesContainer s;
     private XMLStreamReader xmlr;
 
     /**
@@ -36,7 +35,7 @@ public class TagReader extends BasisReader {
         tags = new HashMap<>();
         SimpleCurrentObject current = new SimpleCurrentObject();
         ValueMap map = new ValueMap();
-        s = new ElementNameStack(current, map);
+        s = new ValuesAndAttributesContainer(current, map);
     }
 
     /**
@@ -85,7 +84,7 @@ public class TagReader extends BasisReader {
         StringBuilder builder = new StringBuilder();
         builder.append("package " + packageName + ";\n");
         builder.append("public interface " + className + " {\n");
-        for (TagPath name : tags.keySet()) {
+        for (XmlElementPath name : tags.keySet()) {
             String[] umgekehrt = name.toString().substring(1).split("\\/");
             builder.append(" String ");
             for (int i = umgekehrt.length - 1; i >= 0; i--) {
@@ -118,7 +117,7 @@ public class TagReader extends BasisReader {
     protected void nextStartElement(XMLStreamReader xmlr) {
         if (xmlr.hasName()) {
             s.push(xmlr.getLocalName());
-            TagPath pfad = s.getCurrentPath();
+            XmlElementPath pfad = s.getCurrentPath();
             tags.put(pfad, pfad);
         }
         processAttributes(xmlr);
@@ -127,7 +126,7 @@ public class TagReader extends BasisReader {
     protected void processAttribute(XMLStreamReader xmlr, int index) {
         String localName = xmlr.getAttributeLocalName(index);
         s.push("@" + localName);
-        TagPath pfad = s.getCurrentPath();
+        XmlElementPath pfad = s.getCurrentPath();
         tags.put(pfad, pfad);
         s.pop();
 

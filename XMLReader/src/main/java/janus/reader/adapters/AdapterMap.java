@@ -1,8 +1,5 @@
 package janus.reader.adapters;
 
-import janus.reader.nls.Messages;
-
-import java.text.MessageFormat;
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;

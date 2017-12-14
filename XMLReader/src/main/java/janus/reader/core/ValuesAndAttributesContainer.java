@@ -1,9 +1,22 @@
-package janus.reader.actions;
+package janus.reader.core;
 
 import janus.reader.adapters.AdapterMap;
 import janus.reader.annotations.XmlPath;
 import janus.reader.annotations.XmlPaths;
+import janus.reader.attribute.Attribute;
+import janus.reader.attribute.AttributeMap;
+import janus.reader.attribute.AttributeWithAdapter;
+import janus.reader.attribute.AttributeWithValue;
+import janus.reader.attribute.AttributeWithValueMap;
+//import janus.reader.annotations.XmlPath;
+//import janus.reader.annotations.XmlPaths;
 import janus.reader.nls.Messages;
+import janus.reader.path.XmlElementPath;
+import janus.reader.value.CurrentObject;
+import janus.reader.value.SimpleCurrentObject;
+import janus.reader.value.StackCurrentObject;
+import janus.reader.value.Value;
+import janus.reader.value.ValueMap;
 
 import java.lang.reflect.Method;
 import java.util.ArrayDeque;
@@ -36,22 +49,22 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Nill
  *
  */
-public class ElementNameStack extends ArrayDeque<String> {
+public class ValuesAndAttributesContainer extends ArrayDeque<String> {
     private static final Logger log = LoggerFactory
-            .getLogger(ElementNameStack.class);
+            .getLogger(ValuesAndAttributesContainer.class);
 
     private static final long serialVersionUID = 773837341597279034L;
     private CurrentObject current;
     private ValueMap valueMap = new ValueMap();
-    private SetterMap setterMap = new SetterMap();
-    private SetFromValueMap setFromValueMap = new SetFromValueMap();
+    private AttributeMap attributeMap = new AttributeMap();
+    private AttributeWithValueMap attributeWithValueMap = new AttributeWithValueMap();
 
     /**
      * constructor with a empty configuration
      * 
      * @param current
      */
-    public ElementNameStack(CurrentObject current) {
+    public ValuesAndAttributesContainer(CurrentObject current) {
         this(current, new ValueMap());
     }
 
@@ -61,7 +74,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param current
      * @param map
      */
-    public ElementNameStack(CurrentObject current, ValueMap map) {
+    public ValuesAndAttributesContainer(CurrentObject current, ValueMap map) {
         super();
         this.current = current;
         this.valueMap = map;
@@ -73,7 +86,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * 
      * @return
      */
-    public TagPath getCurrentPath() {
+    public XmlElementPath getCurrentPath() {
         StringBuilder builder = new StringBuilder();
         Object[] a = this.toArray();
         int pos = a.length - 1;
@@ -83,7 +96,7 @@ public class ElementNameStack extends ArrayDeque<String> {
             builder.append(s.toString());
             pos--;
         }
-        return new TagPath(builder.toString());
+        return new XmlElementPath(builder.toString());
     }
 
     /**
@@ -92,7 +105,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param name
      * @return
      */
-    public Object getValueObject(TagPath name) {
+    public Object getValueObject(XmlElementPath name) {
         Value value = valueMap.get(name);
         if (value != null) {
             return value.getValue();
@@ -107,7 +120,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param name
      * @return
      */
-    public Object getValueObjectWithException(TagPath name) {
+    public Object getValueObjectWithException(XmlElementPath name) {
         Object obj = getValueObject(name);
         if (obj == null) {
             throw new IllegalArgumentException("Aa value for " + name
@@ -125,7 +138,7 @@ public class ElementNameStack extends ArrayDeque<String> {
     public void push(String item) {
         log.debug("Push a Tag " + item);
         super.push(item);
-        TagPath path = getCurrentPath();
+        XmlElementPath path = getCurrentPath();
         valueMap.push(path);
     }
 
@@ -136,7 +149,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
     @Override
     public String pop() {
-        TagPath path = getCurrentPath();
+        XmlElementPath path = getCurrentPath();
 
         setFromValue(path);
 
@@ -145,9 +158,9 @@ public class ElementNameStack extends ArrayDeque<String> {
         return erg;
     }
 
-    public void setFromValue(TagPath path) {
+    public void setFromValue(XmlElementPath path) {
         log.debug("at pop  {} ", path);
-        setFromValueMap.setValue(path);
+        attributeWithValueMap.setValue(path);
     }
 
     /**
@@ -158,8 +171,8 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
     public void setAttribute(String item, String value) {
         super.push("@" + item);
-        TagPath path = getCurrentPath();
-        setterMap.setValue(path, value);
+        XmlElementPath path = getCurrentPath();
+        attributeMap.setValue(path, value);
         super.pop();
     }
 
@@ -169,8 +182,8 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param value
      */
     public void setText(String value) {
-        TagPath path = getCurrentPath();
-        setterMap.setValue(path, value);
+        XmlElementPath path = getCurrentPath();
+        attributeMap.setValue(path, value);
     }
 
     /**
@@ -182,12 +195,12 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (class of the generated instance)
      */
 
-    public void addValue(TagPath path, Class<?> clazz) {
+    public void addValue(XmlElementPath path, Class<?> clazz) {
         Value value = new Value(path, clazz, current, createCurrentObject(path));
         addValue(value);
     }
 
-    private CurrentObject createCurrentObject(TagPath name) {
+    private CurrentObject createCurrentObject(XmlElementPath name) {
         return name.isAbsolut() ? new SimpleCurrentObject()
                 : new StackCurrentObject();
     }
@@ -202,7 +215,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @param methodName
      */
 
-    public void addValue(TagPath path, Class<?> clazz, String methodName) {
+    public void addValue(XmlElementPath path, Class<?> clazz, String methodName) {
         Value value = new Value(path, clazz, current, methodName,
                 createCurrentObject(path));
         addValue(value);
@@ -221,11 +234,11 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (the name of the setter Method)
      */
 
-    public void addSetter(TagPath valuePath, TagPath absPath, String field) {
+    public void addSetter(XmlElementPath valuePath, XmlElementPath absPath, String field) {
         if (absPath.startsWith(valuePath)) {
             Value value = checkArguments(valuePath, absPath, field);
-            Setter setter = createSetAction(value, absPath, field);
-            addSetter(setter);
+            Attribute attribute = createSetAction(value, absPath, field);
+            addSetter(attribute);
         }
     }
 
@@ -242,7 +255,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      *            (the name of the setter Method)
      */
 
-    public void addRelativSetter(TagPath valuePath, TagPath relPath,
+    public void addRelativSetter(XmlElementPath valuePath, XmlElementPath relPath,
             String field) {
         addSetter(valuePath, valuePath.concat(relPath), field);
     }
@@ -260,14 +273,14 @@ public class ElementNameStack extends ArrayDeque<String> {
     /**
      * Add a @{SetAction} to a path of XML Elements
      * 
-     * @param setter
+     * @param attribute
      */
 
-    public void addSetter(Setter setter) {
-        setterMap.put(setter);
+    public void addSetter(Attribute attribute) {
+        attributeMap.put(attribute);
     }
 
-    private Value checkArguments(TagPath valueName, TagPath absPath,
+    private Value checkArguments(XmlElementPath valueName, XmlElementPath absPath,
             String field) {
         if (valueName == null || absPath == null || field == null) {
             throw new IllegalArgumentException(
@@ -277,7 +290,7 @@ public class ElementNameStack extends ArrayDeque<String> {
         return checkValue(valueName);
     }
 
-    private Object checkName(TagPath valueName) {
+    private Object checkName(XmlElementPath valueName) {
         Object o = valueMap.get(valueName);
         if (o == null) {
             throw new IllegalArgumentException("Value " + valueName
@@ -286,12 +299,12 @@ public class ElementNameStack extends ArrayDeque<String> {
         return o;
     }
 
-    private Value checkValue(TagPath valueName) {
+    private Value checkValue(XmlElementPath valueName) {
         return valueMap.get(valueName);
     }
 
     /**
-     * create a Setter form a method name
+     * create a Attribute form a method name
      * 
      * @param value
      * @param valuePath
@@ -299,7 +312,7 @@ public class ElementNameStack extends ArrayDeque<String> {
      * 
      * @return
      */
-    public Setter createSetAction(Value value, TagPath valuePath, String name) {
+    public Attribute createSetAction(Value value, XmlElementPath valuePath, String name) {
         try {
             if (name == null) {
                 throw new IllegalArgumentException(
@@ -312,7 +325,7 @@ public class ElementNameStack extends ArrayDeque<String> {
             if (targetClass.isAnnotationPresent(XmlPath.class)) {
                 XmlPath xpath = targetClass.getAnnotation(XmlPath.class);
                 return createSetFromValue(value, valuePath,
-                        new TagPath(xpath.path()), method);
+                        new XmlElementPath(xpath.path()), method);
             }
             if (targetClass.equals(String.class)) {
                 return createSetAction(value, valuePath, method);
@@ -335,19 +348,19 @@ public class ElementNameStack extends ArrayDeque<String> {
      * @return
      */
 
-    private Setter createSetAction(Value value, TagPath rValuePath,
+    private Attribute createSetAction(Value value, XmlElementPath rValuePath,
             Method handle) {
-        return new Setter(rValuePath, handle, value);
+        return new Attribute(rValuePath, handle, value);
     }
 
-    private Setter createSetFromValue(Value value, TagPath setterPath,
-            TagPath valuePath, Method handle) {
-        log.debug(" createSetFromValuAction Setter {} From {} ", setterPath,
+    private Attribute createSetFromValue(Value value, XmlElementPath setterPath,
+            XmlElementPath valuePath, Method handle) {
+        log.debug(" createSetFromValuAction Attribute {} From {} ", setterPath,
                 valuePath);
-        SetFromValue setFromValue = new SetFromValue(setterPath, valuePath,
-                valueMap, setterMap);
-        setFromValueMap.put(setFromValue);
-        return new Setter(setterPath, handle, value);
+        AttributeWithValue attributeWithValue = new AttributeWithValue(setterPath, valuePath,
+                valueMap, attributeMap);
+        attributeWithValueMap.put(attributeWithValue);
+        return new Attribute(setterPath, handle, value);
     }
 
     /**
@@ -359,9 +372,9 @@ public class ElementNameStack extends ArrayDeque<String> {
      */
     // NOSONAR because this method is USED
     @SuppressWarnings("squid:UnusedPrivateMethod")
-    private Setter createSetAction(Value value, TagPath rValuePath,
+    private Attribute createSetAction(Value value, XmlElementPath rValuePath,
             Method handle, XmlAdapter<String, ?> adapter) {
-        return new SetWithAdapter(rValuePath, handle, value, adapter);
+        return new AttributeWithAdapter(rValuePath, handle, value, adapter);
     }
 
     /**
