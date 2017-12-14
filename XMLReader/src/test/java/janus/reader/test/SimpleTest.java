@@ -44,14 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SimpleTest {
-    private static final Logger log = LoggerFactory.getLogger(Value.class);
-
-    private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
-    private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
-    private static final String CHILDS_XML = "src/test/resources/childs.xml";
-    private static final String WRONG_XML = "src/test/resources/wrongChilds.xml";
-
-    private static final String CHILDSANDCITY_XML = "src/test/resources/childsAndCity.xml";
+    private static final String EXCEPTION_NOT_EXPECTED = "this exception is a error";
+    private static final String EXCEPTION_EXPECTED = "Exception expected";
+    private static final Logger log = LoggerFactory.getLogger(SimpleTest.class);
 
     @Test
     public void testClassHelper() {
@@ -73,9 +68,9 @@ public class SimpleTest {
             IllegalArgumentException cause = new IllegalArgumentException();
             Messages.throwReaderRuntimeException(cause,
                     "Runtime.FILE_PROCESSING");
-            fail("Ausnahme erwartet");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
-            log.error("Ausnahme erwartet");
+            log.error(EXCEPTION_EXPECTED);
         }
     }
 
@@ -115,9 +110,9 @@ public class SimpleTest {
         try {
             IllegalArgumentException cause = new IllegalArgumentException();
             Messages.throwReaderRuntimeException(cause, "NotExists");
-            fail("Ausnahme erwartet");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
-            log.error("Ausnahme erwartet");
+            log.error(EXCEPTION_EXPECTED);
         }
     }
 
@@ -178,7 +173,7 @@ public class SimpleTest {
 
         try {
             action.setValue("Test");
-            fail("Ausnahme erwartet");
+            fail(EXCEPTION_EXPECTED);
         } catch (ReaderRuntimeException e) {
             log.error("Erwartete Ausnahem", e);
         }
@@ -197,7 +192,7 @@ public class SimpleTest {
 
         try {
             action.setValue("Test");
-            fail("Ausnahme erwartet");
+            fail(EXCEPTION_EXPECTED);
         } catch (ReaderRuntimeException e) {
             log.error("Erwartete Ausnahem", e);
         }
@@ -288,8 +283,8 @@ public class SimpleTest {
             Assert.assertEquals(Boolean.TRUE, bAdapter.unmarshal("true"));
             Assert.assertEquals(Boolean.FALSE, bAdapter.unmarshal("false"));
         } catch (ParseException e) {
-            log.error("Unerwartete Ausnahme {}", e);
-            fail("Unerwartete Ausnahme");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            fail(EXCEPTION_NOT_EXPECTED);
         }
 
     }

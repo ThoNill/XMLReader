@@ -46,7 +46,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class XmlTest {
-    private static final Logger log = LoggerFactory.getLogger(Value.class);
+    private static final Logger log = LoggerFactory.getLogger(XmlTest.class);
+    private static final String EXCEPTION_NOT_EXPECTED = "this exception is a error";
+    private static final String EXCEPTION_EXPECTED = "Exception expected";
+
 
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
@@ -73,8 +76,8 @@ public class XmlTest {
             reader.read();
             System.out.print(reader.source("reader", "Const"));
         } catch (XMLStreamException e) {
-            log.error("Unerwartete Ausnahme,", e);
-            fail("Unerwartete Ausnahme");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            fail(EXCEPTION_NOT_EXPECTED);
         }
 
     }
@@ -223,8 +226,8 @@ public class XmlTest {
             reader.write(KONTOAUSZUG_XML);
             reader.write(KONTOAUSZUG_XML, "test.erg", "UTF-8");
         } catch (IOException ex) {
-            log.info("unexpected Exception", ex);
-            fail("unexpected Exception");
+            log.info(EXCEPTION_NOT_EXPECTED, ex);
+            fail(EXCEPTION_NOT_EXPECTED);
         }
     }
 
@@ -236,12 +239,12 @@ public class XmlTest {
             while (reader.hasNext()) {
                 reader.next();
             }
-            Assert.fail("Exception erwartet");
+            Assert.fail(EXCEPTION_EXPECTED);
         } catch (ReaderRuntimeException e) {
-            log.error("Erwartete Ausnahme", e);
+            log.error(EXCEPTION_EXPECTED, e);
         } catch (Exception e) {
-            log.error("Unerwartete Ausnahme", e);
-            Assert.fail("Unerwartete Exception");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            Assert.fail(EXCEPTION_NOT_EXPECTED);
         }
     }
 
@@ -251,12 +254,12 @@ public class XmlTest {
         try {
             reader.read(WRONG_XML);
             reader.read();
-            Assert.fail("Exception erwartet");
+            Assert.fail(EXCEPTION_EXPECTED);
         } catch (ReaderRuntimeException e) {
-            log.error("Erwartete Ausnahme", e);
+            log.error(EXCEPTION_EXPECTED, e);
         } catch (Exception e) {
-            log.error("Unerwartete Ausnahme", e);
-            Assert.fail("Unerwartete Exception");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            Assert.fail(EXCEPTION_NOT_EXPECTED);
         }
     }
 
@@ -283,12 +286,12 @@ public class XmlTest {
 
         try {
             o = reader.next();
-            Assert.fail("Exception erwartet");
+            Assert.fail(EXCEPTION_EXPECTED);
         } catch (NoSuchElementException e) {
-            log.error("Erwartete Ausnahme", e);
+            log.error(EXCEPTION_EXPECTED, e);
         } catch (Exception e) {
-            log.error("Unerwartete Ausnahme", e);
-            Assert.fail("Unerwartete Exception");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            Assert.fail(EXCEPTION_NOT_EXPECTED);
         }
         Assert.assertFalse(reader.hasNext());
     }

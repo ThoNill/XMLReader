@@ -44,14 +44,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AnnotationTest {
-    private static final Logger log = LoggerFactory.getLogger(Value.class);
-
-    private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
-    private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
-    private static final String CHILDS_XML = "src/test/resources/childs.xml";
-    private static final String WRONG_XML = "src/test/resources/wrongChilds.xml";
-
-    private static final String CHILDSANDCITY_XML = "src/test/resources/childsAndCity.xml";
+    private static final Logger log = LoggerFactory.getLogger(AnnotationTest.class);
+    private static final String EXCEPTION_NOT_EXPECTED = "this exception is a error";
+    private static final String EXCEPTION_EXPECTED = "Exception expected";
+ 
 
     @Test
     public void wrongAnnotatedClass() {
@@ -59,7 +55,7 @@ public class AnnotationTest {
             new Reader(TObject.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            log.info("Expected exception", ex);
+            log.info(EXCEPTION_EXPECTED, ex);
         }
     }
 
@@ -69,7 +65,7 @@ public class AnnotationTest {
             new Reader(TWrongAnnotated.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            log.info("Expected exception", ex);
+            log.info(EXCEPTION_EXPECTED, ex);
         }
     }
 
@@ -79,7 +75,7 @@ public class AnnotationTest {
             new Reader(TWrongFunctionNameAnnotated.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            log.info("Expected exception", ex);
+            log.info(EXCEPTION_EXPECTED, ex);
         }
     }
 
@@ -89,7 +85,7 @@ public class AnnotationTest {
             new Reader(TWrongFunctionParameterCountAnnotated.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            log.info("Expected exception", ex);
+            log.info(EXCEPTION_EXPECTED, ex);
         }
     }
 
@@ -99,7 +95,7 @@ public class AnnotationTest {
             new Reader(TWrongStaticFunctionParameterCountAnnotated.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            log.info("Expected exception", ex);
+            log.info(EXCEPTION_EXPECTED, ex);
         }
     }
 
@@ -109,7 +105,7 @@ public class AnnotationTest {
             new Reader(TWrongStaticFunctionReturnWrongTypeAnnotated.class);
             fail("Keine Ausnahme");
         } catch (Exception ex) {
-            log.info("Expected exception", ex);
+            log.info(EXCEPTION_EXPECTED, ex);
         }
     }
 
@@ -119,8 +115,8 @@ public class AnnotationTest {
         try {
             Reader reader = new Reader(TAnnotated.class);
         } catch (Exception e) {
-            log.error("unerwartete Ausnahme", e);
-            fail("Nicht erwartete Ausnahme");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            fail(EXCEPTION_NOT_EXPECTED);
         }
     }
 
@@ -129,8 +125,8 @@ public class AnnotationTest {
         try {
             Reader reader = new Reader(TAnnotated.class);
         } catch (Exception e) {
-            log.error("unerwartete Ausnahme", e);
-            fail("Nicht erwartete Ausnahme");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            fail(EXCEPTION_NOT_EXPECTED);
         }
 
     }
@@ -140,8 +136,8 @@ public class AnnotationTest {
         try {
             Reader reader = new Reader(TStaticAnnotated.class);
         } catch (Exception e) {
-            log.error("unerwartete Ausnahme", e);
-            fail("Nicht erwartete Ausnahme");
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            fail(EXCEPTION_NOT_EXPECTED);
         }
 
     }
