@@ -1,23 +1,7 @@
 package janus.reader.test;
 
 import static org.junit.Assert.fail;
-import janus.reader.Formater;
 import janus.reader.Reader;
-import janus.reader.TagReader;
-import janus.reader.adapters.BooleanAdapter;
-import janus.reader.adapters.DoubleAdapter;
-import janus.reader.adapters.FloatAdapter;
-import janus.reader.adapters.IntegerAdapter;
-import janus.reader.adapters.LongAdapter;
-import janus.reader.attribute.Attribute;
-import janus.reader.core.ValuesAndAttributesContainer;
-import janus.reader.exceptions.ReaderRuntimeException;
-import janus.reader.helper.ClassHelper;
-import janus.reader.nls.Messages;
-import janus.reader.path.XmlElementPath;
-import janus.reader.test.entities.Child;
-import janus.reader.test.entities.City;
-import janus.reader.test.entities.LinkChild;
 import janus.reader.test.entities.TAnnotated;
 import janus.reader.test.entities.TObject;
 import janus.reader.test.entities.TStaticAnnotated;
@@ -26,19 +10,7 @@ import janus.reader.test.entities.TWrongFunctionNameAnnotated;
 import janus.reader.test.entities.TWrongFunctionParameterCountAnnotated;
 import janus.reader.test.entities.TWrongStaticFunctionParameterCountAnnotated;
 import janus.reader.test.entities.TWrongStaticFunctionReturnWrongTypeAnnotated;
-import janus.reader.value.CurrentObject;
-import janus.reader.value.SimpleCurrentObject;
-import janus.reader.value.StackCurrentObject;
-import janus.reader.value.Value;
-import janus.reader.value.ValueMap;
 
-import java.io.IOException;
-import java.text.ParseException;
-import java.util.NoSuchElementException;
-
-import javax.xml.stream.XMLStreamException;
-
-import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

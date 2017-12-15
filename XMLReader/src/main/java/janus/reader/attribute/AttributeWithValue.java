@@ -1,5 +1,6 @@
 package janus.reader.attribute;
 
+import janus.reader.annotations.XmlPath;
 import janus.reader.path.PathEntry;
 import janus.reader.path.XmlElementPath;
 import janus.reader.value.CurrentObject;
