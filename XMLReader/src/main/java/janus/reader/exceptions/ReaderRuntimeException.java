@@ -1,5 +1,7 @@
 package janus.reader.exceptions;
 
+import janus.reader.util.Assert;
+
 /**
  * class for runtime exception of the reader
  * 
@@ -15,6 +17,8 @@ public class ReaderRuntimeException extends RuntimeException {
      */
     public ReaderRuntimeException( Throwable cause) {
         super(cause);
+        Assert.notNull(cause, "The cause should not be null");
+
     }
 
     /**
@@ -25,6 +29,8 @@ public class ReaderRuntimeException extends RuntimeException {
      */
     public ReaderRuntimeException(String message, Throwable cause) {
         super(message, cause);
+        Assert.notNull(cause, "The cause should not be null");
+        Assert.hasText(message, "The message should not be empty");
     }
 
 

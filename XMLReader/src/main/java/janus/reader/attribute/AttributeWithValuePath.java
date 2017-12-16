@@ -1,6 +1,7 @@
 package janus.reader.attribute;
 
 import janus.reader.path.XmlElementPath;
+import janus.reader.util.Assert;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,11 +27,16 @@ public class AttributeWithValuePath extends XmlElementPath {
      */
     public AttributeWithValuePath(XmlElementPath setterPath, XmlElementPath valuePath) {
         super(setterPath);
+        Assert.notNull(setterPath, "setterPath should not be null");
+        Assert.notNull(valuePath, "valuePath should not be null");
+ 
         this.valuePath = valuePath;
     }
 
     @Override
     public boolean compare(XmlElementPath path) {
+        Assert.notNull(path, "path should not be null");
+        
         log.debug("compare {} and {}", this, path);
         String pathString = path.getPath();
         if (pathString.endsWith(valuePath.getPath())) {

@@ -4,66 +4,45 @@ import janus.reader.adapters.AdapterMap;
 import janus.reader.annotations.XmlPath;
 import janus.reader.annotations.XmlPaths;
 import janus.reader.attribute.Attribute;
-import janus.reader.attribute.AttributeMap;
 import janus.reader.attribute.AttributeWithAdapter;
 import janus.reader.attribute.AttributeWithValue;
-import janus.reader.attribute.AttributeWithValueMap;
+import janus.reader.attribute.MethodAttribute;
+import janus.reader.attribute.Setter;
+import janus.reader.attribute.SetterAttribute;
 import janus.reader.nls.Messages;
 import janus.reader.path.XmlElementPath;
+import janus.reader.util.Assert;
+import janus.reader.value.ClassValue;
+import janus.reader.value.Creator;
+import janus.reader.value.CreatorValue;
 import janus.reader.value.CurrentObject;
 import janus.reader.value.SimpleCurrentObject;
 import janus.reader.value.StackCurrentObject;
+import janus.reader.value.StaticMethodValue;
 import janus.reader.value.Value;
-import janus.reader.value.ValueMap;
+import janus.reader.value.ValueContainer;
 
 import java.lang.reflect.Method;
-import java.util.ArrayDeque;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
- * A stack of the Element Names in a XML document
+ * A Container of the Element Names in a XML document
  * 
- * if the cursor of a stax-Reader is at a position in the document the started
- * elements form a stack of element names that are current open.
- * 
- * At the starttag of a element, the element name is pushed at the top of the
- * stack At the endtag the element is closed and disappears with a pop from the
- * stack
- * 
- * Attributes nodes push and pop {@literal @}attributname to the stack.
- * 
- * The path of the stack is the concatenated list of element names, with a
- * {@literal /} as a delimiter
- * 
- * at the time of push or pop a action will bee called that is connected to the
- * current path. If no action exists, nothing happens.
- * 
- * The currentObject hold the top object that is completed after a endtag.
+ * There a creation methods for the different types of values und attributes
  * 
  * @author Thomas Nill
  *
  */
-public class ValuesAndAttributesContainer extends ArrayDeque<String> {
-    private static final Logger log = LoggerFactory
-            .getLogger(ValuesAndAttributesContainer.class);
 
-    private static final long serialVersionUID = 773837341597279034L;
-    private CurrentObject current;
-    private ValueMap valueMap = new ValueMap();
-    private AttributeMap attributeMap = new AttributeMap();
-    private AttributeWithValueMap attributeWithValueMap = new AttributeWithValueMap();
-
+public class ValuesAndAttributesContainer extends ValuesAndAttributesBag {
     /**
      * constructor with a empty configuration
      * 
      * @param current
      */
     public ValuesAndAttributesContainer(CurrentObject current) {
-        this(current, new ValueMap());
+        this(current, new ValueContainer());
     }
 
     /**
@@ -72,116 +51,26 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      * @param current
      * @param map
      */
-    public ValuesAndAttributesContainer(CurrentObject current, ValueMap map) {
-        super();
-        this.current = current;
-        this.valueMap = map;
+    public ValuesAndAttributesContainer(CurrentObject current, ValueContainer map) {
+        super(current, map);
     }
 
     /**
-     * create a path, that represent the current state of the stack, as a
-     * String, with delimiter {@literal /}
+     * Add the creation of a class instance to a path of XML Elements
      * 
-     * @return
+     * @param path
+     *            (path of XML Elements)
+     * @param clazz
+     *            (class of the generated instance)
+     * @param creator
      */
-    public XmlElementPath getCurrentPath() {
-        StringBuilder builder = new StringBuilder();
-        Object[] a = this.toArray();
-        int pos = a.length - 1;
-        while (pos >= 0) {
-            Object s = a[pos];
-            builder.append("/");
-            builder.append(s.toString());
-            pos--;
-        }
-        return new XmlElementPath(builder.toString());
-    }
+    public void addValue(XmlElementPath path, Class<?> clazz, Creator creator) {
+        Assert.notNull(path, THE_PATH_SHOULD_NOT_BE_NULL);
+        Assert.notNull(clazz, THE_CLASS_SHOULD_NOT_BE_NULL);
 
-    /**
-     * Created Object for a Class, perhaps it is not fully instantiated
-     *
-     * @param name
-     * @return
-     */
-    public Object getValueObject(XmlElementPath name) {
-        Value value = valueMap.get(name);
-        if (value != null) {
-            return value.getValue();
-        }
-        return null;
-    }
-
-    /**
-     * Created Object for a Class, perhaps it is not fully instantiated with a
-     * Exception if the value or Object does not exist
-     * 
-     * @param name
-     * @return
-     */
-    public Object getValueObjectWithException(XmlElementPath name) {
-        Object obj = getValueObject(name);
-        if (obj == null) {
-            throw new IllegalArgumentException("Aa value for " + name
-                    + " does not exist ");
-        }
-        return obj;
-    }
-
-    /**
-     * push a element name on the stack, calls a push method of a {@link Action}
-     * if it exists
-     * 
-     */
-    @Override
-    public void push(String item) {
-        log.debug("Push a Tag " + item);
-        super.push(item);
-        XmlElementPath path = getCurrentPath();
-        valueMap.push(path);
-    }
-
-    /**
-     * pop a element name on the stack, calls a pop method of a {@link Action}
-     * if it exists
-     * 
-     */
-    @Override
-    public String pop() {
-        XmlElementPath path = getCurrentPath();
-
-        setFromValue(path);
-
-        String erg = super.pop();
-        valueMap.pop(path);
-        return erg;
-    }
-
-    public void setFromValue(XmlElementPath path) {
-        log.debug("at pop  {} ", path);
-        attributeWithValueMap.setValue(path);
-    }
-
-    /**
-     * call a setter from a attribut in a XML document
-     * 
-     * @param item
-     * @param value
-     */
-    public void setAttribute(String item, String value) {
-        super.push("@" + item);
-        XmlElementPath path = getCurrentPath();
-        attributeMap.setValue(path, value);
-        super.pop();
-    }
-
-    /**
-     * call a setter from a text node
-     * 
-     * @param value
-     */
-    public void setText(String value) {
-        XmlElementPath path = getCurrentPath();
-        attributeMap.setValue(path, value);
+        Value value = new CreatorValue(path, clazz, getCurrent(),
+                createCurrentObject(path), creator);
+        addValue(value);
     }
 
     /**
@@ -194,7 +83,11 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      */
 
     public void addValue(XmlElementPath path, Class<?> clazz) {
-        Value value = new Value(path, clazz, current, createCurrentObject(path));
+        Assert.notNull(path, THE_PATH_SHOULD_NOT_BE_NULL);
+        Assert.notNull(clazz, THE_CLASS_SHOULD_NOT_BE_NULL);
+
+        Value value = new ClassValue(path, clazz, getCurrent(),
+                createCurrentObject(path));
         addValue(value);
     }
 
@@ -214,8 +107,12 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      */
 
     public void addValue(XmlElementPath path, Class<?> clazz, String methodName) {
-        Value value = new Value(path, clazz, current, methodName,
-                createCurrentObject(path));
+        Assert.notNull(path, THE_PATH_SHOULD_NOT_BE_NULL);
+        Assert.notNull(clazz, THE_CLASS_SHOULD_NOT_BE_NULL);
+        Assert.hasText(methodName, THE_METHOD_NAME_SHOULD_NOT_BE_EMPTY);
+
+        Value value = new StaticMethodValue(path, clazz, getCurrent(),
+                createCurrentObject(path), methodName);
         addValue(value);
     }
 
@@ -225,19 +122,19 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      * @param valuePath
      *            (the path of XML elements to the object instance, that will be
      *            set)
-     * @param absPath
-     *            (the absolute path of XML elements to a text-value, for the
+     * @param attributePath
+     *            (the relative path of XML elements to a text-value, for the
      *            value attribute of the setter)
      * @param field
      *            (the name of the setter Method)
      */
+    public void addRelativAttribute(XmlElementPath valuePath,
+            XmlElementPath attributePath, String field) {
+        Assert.notNull(valuePath, THE_PATH_SHOULD_NOT_BE_NULL);
+        Assert.notNull(attributePath, THE_CLASS_SHOULD_NOT_BE_NULL);
+        Assert.hasText(field, THE_FIELD_SHOULD_NOT_BE_EMPTY);
 
-    public void addSetter(XmlElementPath valuePath, XmlElementPath absPath, String field) {
-        if (absPath.startsWith(valuePath)) {
-            Value value = checkArguments(valuePath, absPath, field);
-            Attribute attribute = createSetAction(value, absPath, field);
-            addSetter(attribute);
-        }
+        addAttribute(valuePath, valuePath.concat(attributePath), field);
     }
 
     /**
@@ -246,59 +143,36 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      * @param valuePath
      *            (the path of XML elements to the object instance, that will be
      *            set)
-     * @param relPath
-     *            (the relative path of XML elements to a text-value, for the
+     * @param attributePath
+     *            (the absolute path of XML elements to a text-value, for the
      *            value attribute of the setter)
      * @param field
      *            (the name of the setter Method)
      */
+    public void addAttribute(XmlElementPath valuePath,
+            XmlElementPath attributePath, String field) {
+        Assert.notNull(valuePath, THE_PATH_SHOULD_NOT_BE_NULL);
+        Assert.notNull(attributePath, THE_CLASS_SHOULD_NOT_BE_NULL);
+        Assert.hasText(field, THE_FIELD_SHOULD_NOT_BE_EMPTY);
 
-    public void addRelativSetter(XmlElementPath valuePath, XmlElementPath relPath,
-            String field) {
-        addSetter(valuePath, valuePath.concat(relPath), field);
+        if (attributePath.startsWith(valuePath)) {
+            Value value = checkArguments(valuePath, attributePath, field);
+            Attribute attribute = createAttribute(value, attributePath, field);
+            addAttribute(attribute);
+        }
     }
 
     /**
-     * Add a @{Action} to a path of XML Elements
+     * create SetAction from a {@link Method}
      * 
      * @param value
+     * @param rValuePath
+     * @param handle
+     * @return
      */
-
-    public void addValue(Value value) {
-        valueMap.put(value);
-    }
-
-    /**
-     * Add a @{SetAction} to a path of XML Elements
-     * 
-     * @param attribute
-     */
-
-    public void addSetter(Attribute attribute) {
-        attributeMap.put(attribute);
-    }
-
-    private Value checkArguments(XmlElementPath valueName, XmlElementPath absPath,
-            String field) {
-        if (valueName == null || absPath == null || field == null) {
-            throw new IllegalArgumentException(
-                    "Pfade oder Feldnamen muessen != null sein");
-        }
-        checkName(valueName);
-        return checkValue(valueName);
-    }
-
-    private Object checkName(XmlElementPath valueName) {
-        Object o = valueMap.get(valueName);
-        if (o == null) {
-            throw new IllegalArgumentException("Value " + valueName
-                    + " ist nicht vorhanden");
-        }
-        return o;
-    }
-
-    private Value checkValue(XmlElementPath valueName) {
-        return valueMap.get(valueName);
+    public <T, V> Attribute addAttribute(Value value,
+            XmlElementPath rValuePath, Setter<T, V> handle) {
+        return new SetterAttribute(rValuePath, handle, value);
     }
 
     /**
@@ -306,35 +180,36 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      * 
      * @param value
      * @param valuePath
-     * @param name
+     * @param fieldName
      * 
      * @return
      */
-    public Attribute createSetAction(Value value, XmlElementPath valuePath, String name) {
+    public Attribute createAttribute(Value value, XmlElementPath valuePath,
+            String fieldName) {
         try {
-            if (name == null) {
-                throw new IllegalArgumentException(
-                        "seter Funktionsname muss != null sein");
-            }
-            String methodName = "set" + name;
+            Assert.notNull(value, THE_VALUE_SHOULD_NOT_BE_NULL);
+            Assert.notNull(valuePath, THE_PATH_SHOULD_NOT_BE_NULL);
+            Assert.hasText(fieldName, THE_FIELD_SHOULD_NOT_BE_EMPTY);
+
+            String methodName = "set" + fieldName;
             Method method = searchTheMethod(value.getClazz(), methodName,
                     String.class);
             Class<?> targetClass = method.getParameterTypes()[0];
             if (targetClass.isAnnotationPresent(XmlPath.class)) {
                 XmlPath xpath = targetClass.getAnnotation(XmlPath.class);
-                return createSetFromValue(value, valuePath,
-                        new XmlElementPath(xpath.path()), method);
+                return createSetFromValue(value, valuePath, new XmlElementPath(
+                        xpath.path()), method);
             }
             if (targetClass.equals(String.class)) {
-                return createSetAction(value, valuePath, method);
+                return createAttribute(value, valuePath, method);
             } else {
-                return createSetAction(value, valuePath, method,
+                return createAttribute(value, valuePath, method,
                         AdapterMap.getAdapter(targetClass));
             }
 
         } catch (Exception e) {
             Messages.throwReaderRuntimeException(e, "Runtime.NOT_METHOD", value
-                    .getClazz().getName(), name);
+                    .getClazz().getName(), fieldName);
             return null;
         }
     }
@@ -346,19 +221,19 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      * @return
      */
 
-    private Attribute createSetAction(Value value, XmlElementPath rValuePath,
+    private Attribute createAttribute(Value value, XmlElementPath rValuePath,
             Method handle) {
-        return new Attribute(rValuePath, handle, value);
+        return new MethodAttribute(rValuePath, handle, value);
     }
 
-    private Attribute createSetFromValue(Value value, XmlElementPath setterPath,
-            XmlElementPath valuePath, Method handle) {
+    private Attribute createSetFromValue(Value value,
+            XmlElementPath setterPath, XmlElementPath valuePath, Method handle) {
         log.debug(" createSetFromValuAction Attribute {} From {} ", setterPath,
                 valuePath);
-        AttributeWithValue attributeWithValue = new AttributeWithValue(setterPath, valuePath,
-                valueMap, attributeMap);
-        attributeWithValueMap.put(attributeWithValue);
-        return new Attribute(setterPath, handle, value);
+        AttributeWithValue attributeWithValue = new AttributeWithValue(
+                setterPath, valuePath, getValueMap(), getAttributeMap());
+        addAttributeWithValue(attributeWithValue);
+        return new MethodAttribute(setterPath, handle, value);
     }
 
     /**
@@ -370,9 +245,10 @@ public class ValuesAndAttributesContainer extends ArrayDeque<String> {
      */
     // NOSONAR because this method is USED
     @SuppressWarnings("squid:UnusedPrivateMethod")
-    private Attribute createSetAction(Value value, XmlElementPath rValuePath,
+    private Attribute createAttribute(Value value, XmlElementPath rValuePath,
             Method handle, XmlAdapter<String, ?> adapter) {
-        return new AttributeWithAdapter(rValuePath, handle, value, adapter);
+        Attribute delegate = new MethodAttribute(rValuePath, handle, value);
+        return new AttributeWithAdapter(delegate, adapter);
     }
 
     /**

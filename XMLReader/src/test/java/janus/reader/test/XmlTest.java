@@ -1,12 +1,12 @@
 package janus.reader.test;
 
 import static org.junit.Assert.fail;
-import janus.reader.Formater;
 import janus.reader.Reader;
 import janus.reader.TagReader;
 import janus.reader.exceptions.ReaderRuntimeException;
 import janus.reader.path.XmlElementPath;
 import janus.reader.test.entities.Child;
+import janus.reader.test.entities.ChildWithPrefix;
 import janus.reader.test.entities.City;
 import janus.reader.test.entities.DeepChild;
 import janus.reader.test.entities.DeepCity;
@@ -15,8 +15,6 @@ import janus.reader.test.entities.TAnnotated;
 import janus.reader.test.entities.TObject;
 import janus.reader.test.entities.TStaticAnnotated;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import javax.xml.stream.XMLStreamException;
@@ -34,6 +32,7 @@ public class XmlTest {
 
     private static final String KONTOAUSZUG_XML = "src/test/resources/kontoauszug.xml";
     private static final String KONTOAUSZUG_XML2 = "src/test/resources/kontoauszug2.xml";
+    private static final String CHILDS_WITH_PREFIX_XML = "src/test/resources/childsWithPrefix.xml";
     private static final String CHILDS_XML = "src/test/resources/childs.xml";
     private static final String WRONG_XML = "src/test/resources/wrongChilds.xml";
 
@@ -201,21 +200,6 @@ public class XmlTest {
 
    
     @Test
-    public void format() {
-        Formater reader = new Formater("   ");
-        try {
-            String fileName = "test.erg";
-            reader.write(KONTOAUSZUG_XML);
-            reader.write(KONTOAUSZUG_XML,fileName, "UTF-8");
-            File f = new File(fileName);
-            f.delete();
-        } catch (IOException ex) {
-            log.info(EXCEPTION_NOT_EXPECTED, ex);
-            fail(EXCEPTION_NOT_EXPECTED);
-        }
-    }
-
-    @Test
     public void readWrongXml() {
         Reader reader = new Reader(Child.class);
         try {
@@ -247,6 +231,34 @@ public class XmlTest {
         }
     }
 
+    @Test
+    public void readChildsWithPrefix() {
+        Reader reader = new Reader(ChildWithPrefix.class);
+        reader.read(CHILDS_WITH_PREFIX_XML);
+        Object o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof ChildWithPrefix);
+        Assert.assertEquals("Hans", ((ChildWithPrefix) o).getName());
+
+        Assert.assertTrue(reader.hasNext());
+        o = reader.next();
+        Assert.assertNotNull(o);
+        Assert.assertTrue(o instanceof ChildWithPrefix);
+        Assert.assertEquals("Frank", ((ChildWithPrefix) o).getName());
+
+        try {
+            o = reader.next();
+            Assert.fail(EXCEPTION_EXPECTED);
+        } catch (NoSuchElementException e) {
+            log.error(EXCEPTION_EXPECTED, e);
+        } catch (Exception e) {
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            Assert.fail(EXCEPTION_NOT_EXPECTED);
+        }
+        Assert.assertFalse(reader.hasNext());
+    }
+
+    
     @Test
     public void readChilds() {
         Reader reader = new Reader(Child.class);

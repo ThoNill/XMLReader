@@ -1,5 +1,7 @@
 package janus.reader.helper;
 
+import janus.reader.util.Assert;
+
 
 /**
  * Helper Method for subclassing
@@ -21,6 +23,9 @@ public class ClassHelper {
      * @return
      */
     public static boolean isThisClassOrASuperClass(Class<?> clazz, Class<?> c) {
+        Assert.notNull(clazz, "The class should not be null");
+        Assert.notNull(c, "The class should not be null");
+
         if (clazz.equals(Void.class)) {
             return false;
         }

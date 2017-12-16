@@ -1,5 +1,7 @@
 package janus.reader.adapters;
 
+import janus.reader.util.Assert;
+
 import java.text.ParseException;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -14,13 +16,15 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 public class IntegerAdapter extends XmlAdapter<String, Integer> {
 
     @Override
-    public Integer unmarshal(String v) throws ParseException {
-        return new Integer(v.trim());
+    public Integer unmarshal(String value) throws ParseException {
+        Assert.notNull(value, "Parameter should not be null");
+        return new Integer(value.trim());
     }
 
     @Override
-    public String marshal(Integer v) {
-        return v.toString();
+    public String marshal(Integer value) {
+        Assert.notNull(value, "Parameter should not be null");
+        return value.toString();
     }
 
 }

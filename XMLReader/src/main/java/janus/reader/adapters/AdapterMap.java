@@ -1,5 +1,8 @@
 package janus.reader.adapters;
 
+
+import janus.reader.util.Assert;
+
 import java.util.HashMap;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
@@ -11,6 +14,9 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  *
  */
 public class AdapterMap {
+    private static final String ADAPTER_SHOULD_NOT_BE_NULL = "The adapter should not be null";
+    private static final String CLASS_SHOULD_NOT_BE_NULL = "The class should not be null";
+    
     private static HashMap<Class<?>, XmlAdapter<String, ?>> adapters = null;
 
     static {
@@ -40,6 +46,8 @@ public class AdapterMap {
      */
     public static void addAdapter(Class<?> targetClass,
             XmlAdapter<String, ?> adapter) {
+        Assert.notNull(targetClass, CLASS_SHOULD_NOT_BE_NULL);
+        Assert.notNull(adapter, ADAPTER_SHOULD_NOT_BE_NULL);
         adapters.put(targetClass, adapter);
     }
 
@@ -51,6 +59,7 @@ public class AdapterMap {
      * @return
      */
     public static XmlAdapter<String, ?> getAdapter(Class<?> targetClass) {
+        Assert.notNull(targetClass, CLASS_SHOULD_NOT_BE_NULL);
         return adapters.get(targetClass);
     }
 
@@ -61,6 +70,7 @@ public class AdapterMap {
      * @return
      */
     public static boolean hasAdapterForClass(Class<?> targetClass) {
+        Assert.notNull(targetClass, CLASS_SHOULD_NOT_BE_NULL);
         return adapters.containsKey(targetClass);
     }
 

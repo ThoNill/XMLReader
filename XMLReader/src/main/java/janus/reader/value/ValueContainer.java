@@ -1,7 +1,7 @@
 package janus.reader.value;
 
 import janus.reader.attribute.Attribute;
-import janus.reader.path.PathEntryMap;
+import janus.reader.path.PathEntryContainer;
 import janus.reader.path.XmlElementPath;
 
 
@@ -12,12 +12,12 @@ import janus.reader.path.XmlElementPath;
  * @author Thomas Nill
  *
  */
-public class ValueMap extends PathEntryMap<Value> {
+public class ValueContainer extends PathEntryContainer<Value> {
 
     /**
      * constructor of parent class
      */
-    public ValueMap() {
+    public ValueContainer() {
         super();
     }
 
@@ -27,7 +27,7 @@ public class ValueMap extends PathEntryMap<Value> {
      * @param name
      */
     public void push(XmlElementPath name) {
-        Value action = get(name);
+        Value action = searchTheBestMatchingEntity(name);
         if (action != null) {
             action.push();
         }
@@ -39,7 +39,7 @@ public class ValueMap extends PathEntryMap<Value> {
      * @param name
      */
     public void pop(XmlElementPath name) {
-        Value action = get(name);
+        Value action = searchTheBestMatchingEntity(name);
         if (action != null) {
             action.pop();
         }

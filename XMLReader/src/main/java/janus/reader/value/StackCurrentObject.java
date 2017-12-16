@@ -35,7 +35,7 @@ public class StackCurrentObject implements CurrentObject {
 
     @Override
     public void setCurrent(Object obj) {
-        log.debug("-------------push " + obj);
+        log.debug("push " + obj);
         this.current.push(obj);
     }
 

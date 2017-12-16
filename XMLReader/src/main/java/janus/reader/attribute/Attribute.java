@@ -1,14 +1,6 @@
 package janus.reader.attribute;
 
-import janus.reader.nls.Messages;
 import janus.reader.path.PathEntry;
-import janus.reader.path.XmlElementPath;
-import janus.reader.value.Value;
-
-import java.lang.reflect.Method;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A Attribute sets a property of a class to a value
@@ -16,52 +8,17 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Nill
  *
  */
-public class Attribute extends PathEntry {
-    private static final Logger log = LoggerFactory.getLogger(Attribute.class);
-
-    Method m;
-    Value v;
+public interface Attribute extends PathEntry {
 
     /**
-     * Constructor
-     * 
-     * @param path
-     * @param m
-     * @param v
+     * set an attribute/property Value
+     * @param objValue
      */
-    public Attribute(XmlElementPath path, Method m, Value v) {
-        super(path);
-        this.m = m;
-        this.v = v;
-    }
-
-    public void setValue(Object value) {
-        try {
-            log.debug("setMethod {} of Value {} to {}", m,v.getPath(), value);
-            if (m.getParameters()[0].getType().isAssignableFrom(
-                    value.getClass())) {
-                m.invoke(v.getValue(), value);
-            } else {
-                log.debug("The Method {} is not asignable from {} ", m,
-                        value.getClass());
-            }
-        } catch (Exception e) {
-            if (v.getValue()== null) {
-                Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),"null","unknown");
-            } else {
-                Messages.throwReaderRuntimeException(e, "Runtime.NOT_APPLICABLE",m.getName(),m.getParameterTypes()[0].getTypeName(),v.getValue(),v.getValue().getClass().getName());
-            }       }
-    }
-
+    void setValue(Object objValue);
     /**
      * settable from a String
      * 
      * @return
      */
-    public boolean isSetableFromString() {
-        return m.getParameterTypes()[0].equals(String.class);
-    }
-
-      
-  
+    public boolean isSetableFromString();  
 }

@@ -1,28 +1,17 @@
 package janus.reader.path;
 
+
 /**
- * A PathEntry is a Value in a {@link PathEntryMap}
+ * A PathEntry is a Value in a {@link PathEntryContainer}
  * 
  * @author javaman
  *
  */
-public class PathEntry {
-    private XmlElementPath path;
-
+@FunctionalInterface
+public interface PathEntry {
     /**
-     * Constructor with a String representation of a Path examples: /x, /x/y,
-     * z/y
-     * 
-     * @param path
+     * get the Path to this entry
+     * @return
      */
-    public PathEntry(XmlElementPath path) {
-        super();
-        this.path = path;
-    }
-
-    public XmlElementPath getPath() {
-        return path;
-    }
-
- 
+    XmlElementPath getPath();
 }

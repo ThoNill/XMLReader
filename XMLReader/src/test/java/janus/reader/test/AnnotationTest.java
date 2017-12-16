@@ -25,7 +25,7 @@ public class AnnotationTest {
     public void wrongAnnotatedClass() {
         try {
             new Reader(TObject.class);
-            fail("Keine Ausnahme");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
             log.info(EXCEPTION_EXPECTED, ex);
         }
@@ -35,7 +35,7 @@ public class AnnotationTest {
     public void wrongAnnotatedMethod() {
         try {
             new Reader(TWrongAnnotated.class);
-            fail("Keine Ausnahme");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
             log.info(EXCEPTION_EXPECTED, ex);
         }
@@ -45,7 +45,7 @@ public class AnnotationTest {
     public void wrongFunctionName() {
         try {
             new Reader(TWrongFunctionNameAnnotated.class);
-            fail("Keine Ausnahme");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
             log.info(EXCEPTION_EXPECTED, ex);
         }
@@ -55,7 +55,7 @@ public class AnnotationTest {
     public void wrongFunctionParameterCountName() {
         try {
             new Reader(TWrongFunctionParameterCountAnnotated.class);
-            fail("Keine Ausnahme");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
             log.info(EXCEPTION_EXPECTED, ex);
         }
@@ -65,7 +65,7 @@ public class AnnotationTest {
     public void wrongStaticFunctionParameterCount() {
         try {
             new Reader(TWrongStaticFunctionParameterCountAnnotated.class);
-            fail("Keine Ausnahme");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
             log.info(EXCEPTION_EXPECTED, ex);
         }
@@ -75,7 +75,7 @@ public class AnnotationTest {
     public void wrongStaticFunctionReturnType() {
         try {
             new Reader(TWrongStaticFunctionReturnWrongTypeAnnotated.class);
-            fail("Keine Ausnahme");
+            fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
             log.info(EXCEPTION_EXPECTED, ex);
         }

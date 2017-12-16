@@ -1,6 +1,7 @@
 package janus.reader.nls;
 
 import janus.reader.exceptions.ReaderRuntimeException;
+import janus.reader.util.Assert;
 
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
@@ -35,6 +36,8 @@ public class Messages {
      * @return
      */
     public static String getString(String messageName) {
+        Assert.hasText(messageName, "The messageName should not be empty");
+
         try {
             return RESOURCE_BUNDLE.getString(messageName);
         } catch (MissingResourceException e) {
@@ -50,6 +53,8 @@ public class Messages {
      * @param arguments
      */
     public static void throwIllegalArgumentException(String patternName,Object ... arguments) {
+        Assert.hasText(patternName, "The patternName should not be empty");
+
         String pattern = Messages.getString(patternName);
         throw new IllegalArgumentException(MessageFormat.format(pattern, arguments));
     }
@@ -62,6 +67,8 @@ public class Messages {
      * @param arguments
      */
     public static void throwReaderRuntimeException(Throwable cause,String patternName,Object ... arguments)  {
+        Assert.hasText(patternName, "The patternName should not be empty");
+
         String pattern = Messages.getString(patternName);
         throw new ReaderRuntimeException(MessageFormat.format(pattern, arguments),cause);
     }

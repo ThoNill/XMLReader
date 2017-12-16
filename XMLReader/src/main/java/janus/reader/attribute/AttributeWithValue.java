@@ -1,11 +1,12 @@
 package janus.reader.attribute;
 
 import janus.reader.annotations.XmlPath;
-import janus.reader.path.PathEntry;
 import janus.reader.path.XmlElementPath;
+import janus.reader.path.XmlElementPathEntry;
+import janus.reader.util.Assert;
 import janus.reader.value.CurrentObject;
 import janus.reader.value.Value;
-import janus.reader.value.ValueMap;
+import janus.reader.value.ValueContainer;
 
 /**
  * set a property of a class with a {@link XmlPath} annotation where the
@@ -15,13 +16,13 @@ import janus.reader.value.ValueMap;
  *
  */
 
-public class AttributeWithValue extends PathEntry {
+public class AttributeWithValue extends XmlElementPathEntry {
 
     private XmlElementPath valuePath;
     private XmlElementPath setterPath;
 
-    private ValueMap valueMap;
-    private AttributeMap attributeMap;
+    private ValueContainer valueContainer;
+    private AttributeContainer attributeContainer;
     private Value value;
     private Attribute attribute;
 
@@ -30,14 +31,17 @@ public class AttributeWithValue extends PathEntry {
      * 
      * @param setterPath
      * @param valuePath
-     * @param valueMap
-     * @param attributeMap
+     * @param valueContainer
+     * @param attributeContainer
      */
     public AttributeWithValue(XmlElementPath setterPath, XmlElementPath valuePath,
-            ValueMap valueMap, AttributeMap attributeMap) {
+            ValueContainer valueContainer, AttributeContainer attributeContainer) {
         super(new AttributeWithValuePath(setterPath, valuePath));
-        this.valueMap = valueMap;
-        this.attributeMap = attributeMap;
+        Assert.notNull(valueContainer, "ValueContainer should not be null");
+        Assert.notNull(attributeContainer, "AttributeContainer should not be null");
+        
+        this.valueContainer = valueContainer;
+        this.attributeContainer = attributeContainer;
         this.valuePath = valuePath;
         this.setterPath = setterPath;
     }
@@ -47,8 +51,8 @@ public class AttributeWithValue extends PathEntry {
      */
     public void setValue() {
         if (value == null || attribute == null) {
-            value = valueMap.get(valuePath);
-            attribute = attributeMap.get(setterPath);
+            value = valueContainer.searchTheBestMatchingEntity(valuePath);
+            attribute = attributeContainer.searchTheBestMatchingEntity(setterPath);
         }
         if (value != null && attribute != null) {
             CurrentObject current = value.getCurrent();

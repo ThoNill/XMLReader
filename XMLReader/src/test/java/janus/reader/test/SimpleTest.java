@@ -13,13 +13,15 @@ import janus.reader.helper.ClassHelper;
 import janus.reader.nls.Messages;
 import janus.reader.path.XmlElementPath;
 import janus.reader.test.entities.TObject;
+import janus.reader.value.ClassValue;
+import janus.reader.value.CreatorValue;
 import janus.reader.value.CurrentObject;
 import janus.reader.value.SimpleCurrentObject;
 import janus.reader.value.StackCurrentObject;
 import janus.reader.value.Value;
-import janus.reader.value.ValueMap;
+import janus.reader.value.ValueContainer;
 
-import java.text.ParseException;
+import javax.xml.namespace.QName;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -53,7 +55,7 @@ public class SimpleTest {
                     "Runtime.FILE_PROCESSING");
             fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
-            log.error(EXCEPTION_EXPECTED);
+            log.error(EXCEPTION_EXPECTED,ex);
         }
     }
 
@@ -80,6 +82,7 @@ public class SimpleTest {
         XmlElementPath d3 = new XmlElementPath("/ee/aa/bb/cc");
         XmlElementPath d4 = new XmlElementPath("/ee/ee/ee");
         Assert.assertTrue(a.endsWith(a));
+        Assert.assertFalse(a.endsWith(b));
         Assert.assertFalse(a.endsWith(c1));
         Assert.assertFalse(a.endsWith(d1));
         Assert.assertTrue(a.endsWith(c2));
@@ -95,7 +98,7 @@ public class SimpleTest {
             Messages.throwReaderRuntimeException(cause, "NotExists");
             fail(EXCEPTION_EXPECTED);
         } catch (Exception ex) {
-            log.error(EXCEPTION_EXPECTED);
+            log.error(EXCEPTION_EXPECTED,ex);
         }
     }
 
@@ -107,10 +110,10 @@ public class SimpleTest {
         Assert.assertTrue(absolut.isAbsolut());
         Assert.assertFalse(relativ.isAbsolut());
 
-        Assert.assertTrue(relativ.compare(absolut));
-        Assert.assertFalse(new XmlElementPath("a").compare(absolut));
+        Assert.assertTrue(absolut.compare(relativ));
+        Assert.assertFalse(absolut.compare(new XmlElementPath("a")));
         Assert.assertTrue(absolut.compare(absolut));
-        Assert.assertFalse(new XmlElementPath("/a").compare(absolut));
+        Assert.assertFalse(absolut.compare(new XmlElementPath("/a")));
 
     }
 
@@ -124,15 +127,15 @@ public class SimpleTest {
     }
 
     @Test
-    public void methodHandle() {
+    public void methodAttribut() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
+        Value value = new ClassValue(new XmlElementPath("/value"), TObject.class, current,
                 new SimpleCurrentObject());
         value.push();
 
-        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
 
-        Attribute action = stack.createSetAction(value,
+        Attribute action = container.createAttribute(value,
                 new XmlElementPath("/value/first"), "Name");
         action.setValue("Test");
 
@@ -143,22 +146,66 @@ public class SimpleTest {
 
     }
 
+
+    @Test
+    public void methodHandle() {
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new ClassValue(new XmlElementPath("/value"), TObject.class, current,
+                new SimpleCurrentObject());
+        value.push();
+
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
+
+        Attribute action = container.addAttribute(value,
+                new XmlElementPath("/value/first"), 
+                TObject::setName);
+        action.setValue("Test");
+
+        value.pop();
+        TObject testObject = (TObject) current.next();
+
+        Assert.assertEquals("Test", testObject.getName());
+
+    }
+
+    @Test
+    public void creatorHandle() {
+        CurrentObject current = new SimpleCurrentObject();
+        Value value = new CreatorValue(new XmlElementPath("/value"), TObject.class, current,
+                new SimpleCurrentObject(),TObject::new);
+        value.push();
+
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
+
+        Attribute action = container.addAttribute(value,
+                new XmlElementPath("/value/first"), 
+                TObject::setName);
+        action.setValue("Test");
+
+        value.pop();
+        TObject testObject = (TObject) current.next();
+
+        Assert.assertEquals("Test", testObject.getName());
+
+    }
+
+    
     @Test
     public void methodHandleWithWrongValue() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
+        Value value = new ClassValue(new XmlElementPath("/value"), TObject.class, current,
                 new SimpleCurrentObject());
         value.push();
-        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
 
-        Attribute action = stack.createSetAction(value,
+        Attribute action = container.createAttribute(value,
                 new XmlElementPath("/value/first"), "fValue");
 
         try {
             action.setValue("Test");
             fail(EXCEPTION_EXPECTED);
         } catch (ReaderRuntimeException e) {
-            log.error("Erwartete Ausnahem", e);
+            log.error(EXCEPTION_EXPECTED, e);
         }
         value.pop();
     }
@@ -166,32 +213,32 @@ public class SimpleTest {
     @Test
     public void methodHandleWithEmptyValue() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
+        Value value = new ClassValue(new XmlElementPath("/value"), TObject.class, current,
                 new SimpleCurrentObject());
-        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
 
-        Attribute action = stack.createSetAction(value,
+        Attribute action = container.createAttribute(value,
                 new XmlElementPath("/value/first"), "Name");
 
         try {
             action.setValue("Test");
             fail(EXCEPTION_EXPECTED);
         } catch (ReaderRuntimeException e) {
-            log.error("Erwartete Ausnahem", e);
+            log.error(EXCEPTION_EXPECTED, e);
         }
     }
 
     
     @Test
-    public void methodHandleWithStack() {
+    public void methodHandleWithcontainer() {
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new XmlElementPath("/value"), TObject.class, current,
+        Value value = new ClassValue(new XmlElementPath("/value"), TObject.class, current,
                 new StackCurrentObject());
         value.push();
 
-        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
 
-        Attribute action = stack.createSetAction(value, new XmlElementPath(
+        Attribute action = container.createAttribute(value, new XmlElementPath(
                 "/value/first/is"), "Name");
         action.setValue("Test");
 
@@ -203,24 +250,24 @@ public class SimpleTest {
     }
 
     @Test
-    public void stringStack() {
+    public void stringcontainer() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new XmlElementPath("/first/is"), TObject.class,
+        Value value = new ClassValue(new XmlElementPath("/first/is"), TObject.class,
                 current, new SimpleCurrentObject());
-        ValueMap map = new ValueMap();
+        ValueContainer map = new ValueContainer();
 
-        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current, map);
-        stack.addValue(value);
-        stack.addSetter(stack.createSetAction(value, new XmlElementPath("name"),
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current, map);
+        container.addValue(value);
+        container.addAttribute(container.createAttribute(value, new XmlElementPath("name"),
                 "Name"));
 
-        stack.push("first");
-        stack.push("is");
-        stack.push("name");
-        stack.setText("Test");
-        stack.pop();
-        stack.pop();
+        container.push(new QName("first"));
+        container.push(new QName("is"));
+        container.push(new QName("name"));
+        container.setText("Test");
+        container.pop();
+        container.pop();
 
         TObject testObject = (TObject) current.next();
 
@@ -230,8 +277,9 @@ public class SimpleTest {
 
     @Test
     public void adapterMarshallTests() {
-        DoubleAdapter dAdapter = new DoubleAdapter();
-        Assert.assertEquals("2.0", dAdapter.marshal(new Double(2.0)));
+        try {
+            DoubleAdapter dAdapter = new DoubleAdapter();
+            Assert.assertEquals("2.0", dAdapter.marshal(new Double(2.0)));
 
         FloatAdapter fAdapter = new FloatAdapter();
         Assert.assertEquals("2.0", fAdapter.marshal(new Float(2.0)));
@@ -245,7 +293,11 @@ public class SimpleTest {
         BooleanAdapter bAdapter = new BooleanAdapter();
         Assert.assertEquals("true", bAdapter.marshal(Boolean.TRUE));
 
-    }
+        } catch (Exception e) {
+            log.error(EXCEPTION_NOT_EXPECTED, e);
+            fail(EXCEPTION_NOT_EXPECTED);
+        }
+  }
 
     @Test
     public void adapterUnmarshallTests() {
@@ -265,7 +317,7 @@ public class SimpleTest {
             BooleanAdapter bAdapter = new BooleanAdapter();
             Assert.assertEquals(Boolean.TRUE, bAdapter.unmarshal("true"));
             Assert.assertEquals(Boolean.FALSE, bAdapter.unmarshal("false"));
-        } catch (ParseException e) {
+        } catch (Exception e) {
             log.error(EXCEPTION_NOT_EXPECTED, e);
             fail(EXCEPTION_NOT_EXPECTED);
         }
@@ -276,20 +328,20 @@ public class SimpleTest {
     public void adapter() {
 
         CurrentObject current = new SimpleCurrentObject();
-        Value value = new Value(new XmlElementPath("/first"), TObject.class, current,
+        Value value = new ClassValue(new XmlElementPath("/first"), TObject.class, current,
                 new SimpleCurrentObject());
 
-        ValuesAndAttributesContainer stack = new ValuesAndAttributesContainer(current);
+        ValuesAndAttributesContainer container = new ValuesAndAttributesContainer(current);
 
-        Attribute iSetter = stack.createSetAction(value, new XmlElementPath("/first/n"),
+        Attribute iSetter = container.createAttribute(value, new XmlElementPath("/first/n"),
                 "Nummer");
-        Attribute bSetter = stack.createSetAction(value, new XmlElementPath("/first/b"),
+        Attribute bSetter = container.createAttribute(value, new XmlElementPath("/first/b"),
                 "bValue");
-        Attribute fSetter = stack.createSetAction(value, new XmlElementPath("/first/f"),
+        Attribute fSetter = container.createAttribute(value, new XmlElementPath("/first/f"),
                 "fValue");
-        Attribute dSetter = stack.createSetAction(value, new XmlElementPath("/first/d"),
+        Attribute dSetter = container.createAttribute(value, new XmlElementPath("/first/d"),
                 "dValue");
-        Attribute lSetter = stack.createSetAction(value, new XmlElementPath("/first/l"),
+        Attribute lSetter = container.createAttribute(value, new XmlElementPath("/first/l"),
                 "lValue");
 
         value.push();

@@ -5,6 +5,7 @@ import janus.reader.annotations.XmlPaths;
 import janus.reader.helper.ClassHelper;
 import janus.reader.nls.Messages;
 import janus.reader.path.XmlElementPath;
+import janus.reader.util.Assert;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -27,104 +28,117 @@ public class AnnotationProcessor {
     /**
      * Process a array of classes
      * 
-     * @param stack
+     * @param container
      * @param clazzes
      */
-    public void processClasses(ValuesAndAttributesContainer stack, Class<?>... clazzes) {
+    public void processClasses(ValuesAndAttributesContainer container,
+            Class<?>... clazzes) {
+        Assert.notNull(container, "The Container should not be null");
+        Assert.noNullElements(clazzes,
+                "The classes in the array should not be null");
+
         for (Class<?> clazz : clazzes) {
-            processClass(stack, clazz);
+            processClass(container, clazz);
         }
     }
 
     /**
      * Process a single class
      * 
-     * @param stack
+     * @param container
      * @param clazzes
      */
-    public void processClass(ValuesAndAttributesContainer stack, Class<?> clazz) {
+    public void processClass(ValuesAndAttributesContainer container, Class<?> clazz) {
+        Assert.notNull(container, "The container should not be null");
+        Assert.notNull(clazz, "The class should not be null");
+        
         checkClass(clazz);
-        processAllXmlPathAnnotations(stack, clazz);
+        processAllXmlPathAnnotations(container, clazz);
     }
 
-    protected void processAllXmlPathAnnotations(ValuesAndAttributesContainer stack,
-            Class<?> clazz) {
+    protected void processAllXmlPathAnnotations(
+            ValuesAndAttributesContainer container, Class<?> clazz) {
         for (XmlPath cPath : clazz.getAnnotationsByType(XmlPath.class)) {
-            stack.addValue(new XmlElementPath(cPath.path()), clazz);
-            processNonStaticMethods(stack, clazz, cPath);
+            container.addValue(new XmlElementPath(cPath.path()), clazz);
+            processNonStaticMethods(container, clazz, cPath);
         }
-        processStaticMethods(stack, clazz);
+        processStaticMethods(container, clazz);
     }
 
-    private void processStaticMethods(ValuesAndAttributesContainer stack, Class<?> clazz) {
+    private void processStaticMethods(ValuesAndAttributesContainer container,
+            Class<?> clazz) {
         for (Method m : clazz.getMethods()) {
-            processOneStaticMethod(stack, clazz, m);
+            processOneStaticMethod(container, clazz, m);
         }
     }
 
-    private void processOneStaticMethod(ValuesAndAttributesContainer stack, Class<?> clazz,
-            Method m) {
-        if (Modifier.isStatic(m.getModifiers())
-                && (m.isAnnotationPresent(XmlPath.class)
-                        || m.isAnnotationPresent(XmlPaths.class)
-                        )) {
-            for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
-                checkStaticMethod(clazz, m);
-                stack.addValue(new XmlElementPath(mPath.path()), clazz, m.getName());
-                processNonStaticMethods(stack, clazz, mPath);
+    private void processOneStaticMethod(ValuesAndAttributesContainer container,
+            Class<?> clazz, Method method) {
+        if (Modifier.isStatic(method.getModifiers())
+                && (method.isAnnotationPresent(XmlPath.class) || method
+                        .isAnnotationPresent(XmlPaths.class))) {
+            for (XmlPath mPath : method.getAnnotationsByType(XmlPath.class)) {
+                checkStaticMethod(clazz, method);
+                container.addValue(new XmlElementPath(mPath.path()), clazz,
+                        method.getName());
+                processNonStaticMethods(container, clazz, mPath);
             }
         }
     }
 
-    private void checkStaticMethod(Class<?> clazz, Method m) {
-        if (m.getParameterCount() != 0) {
-            Messages.throwIllegalArgumentException("AnnotationProcessor.NO_PARAMETER",m.getDeclaringClass().getName(),m.getName()); //$NON-NLS-1$
+    private void checkStaticMethod(Class<?> clazz, Method method) {
+        if (method.getParameterCount() != 0) {
+            Messages.throwIllegalArgumentException(
+                    "AnnotationProcessor.NO_PARAMETER", method.getDeclaringClass().getName(), method.getName()); //$NON-NLS-1$
         }
-        if (!ClassHelper.isThisClassOrASuperClass(m.getReturnType(), clazz)) {
-            Messages.throwIllegalArgumentException("AnnotationProcessor.WRONG_RETURN_TYPE",m.getDeclaringClass().getName(),m.getName(),clazz.getCanonicalName()); //$NON-NLS-1$
-            
+        if (!ClassHelper
+                .isThisClassOrASuperClass(method.getReturnType(), clazz)) {
+            Messages.throwIllegalArgumentException(
+                    "AnnotationProcessor.WRONG_RETURN_TYPE", method.getDeclaringClass().getName(), method.getName(), clazz.getCanonicalName()); //$NON-NLS-1$
+
         }
 
     }
 
-    private void processNonStaticMethods(ValuesAndAttributesContainer stack,
+    private void processNonStaticMethods(ValuesAndAttributesContainer container,
             Class<?> clazz, XmlPath cPath) {
         for (Method m : clazz.getMethods()) {
-            processOneNonStaticMethod(stack, cPath, m);
+            processOneNonStaticMethod(container, cPath, m);
         }
     }
 
-    private void processOneNonStaticMethod(ValuesAndAttributesContainer stack,
-            XmlPath cPath, Method m) {
-        if (!Modifier.isStatic(m.getModifiers())
-                && (m.isAnnotationPresent(XmlPath.class) || m
+    private void processOneNonStaticMethod(ValuesAndAttributesContainer container,
+            XmlPath cPath, Method method) {
+        if (!Modifier.isStatic(method.getModifiers())
+                && (method.isAnnotationPresent(XmlPath.class) || method
                         .isAnnotationPresent(XmlPaths.class))) {
-            checkMethod(m);
-            processAllXmlPathAnnotations(stack, cPath, m);
+            checkMethod(method);
+            processAllXmlPathAnnotations(container, cPath, method);
         }
     }
 
-    protected void processAllXmlPathAnnotations(ValuesAndAttributesContainer stack,
-            XmlPath cPath, Method m) {
-        for (XmlPath mPath : m.getAnnotationsByType(XmlPath.class)) {
+    protected void processAllXmlPathAnnotations(
+            ValuesAndAttributesContainer container, XmlPath cPath, Method method) {
+        for (XmlPath mPath : method.getAnnotationsByType(XmlPath.class)) {
             String path = mPath.path();
-            String methodName = m.getName().substring(3);
+            String methodName = method.getName().substring(3);
             if (path.charAt(0) == '/') {
-                stack.addSetter(new XmlElementPath(cPath.path()), new XmlElementPath(path),
-                        methodName);
+                container.addAttribute(new XmlElementPath(cPath.path()),
+                        new XmlElementPath(path), methodName);
             } else {
-                stack.addRelativSetter(new XmlElementPath(cPath.path()), new XmlElementPath(
-                        path), methodName);
+                container.addRelativAttribute(new XmlElementPath(cPath.path()),
+                        new XmlElementPath(path), methodName);
             }
         }
     }
 
     private void checkClass(Class<?> clazz) {
+        
         // Wenn es statische Methoden gibt, die nnotiert sind, ist die Kalsse
         // auch erlaubt
-        for (Method m : clazz.getMethods()) {
-            if (Modifier.isStatic(m.getModifiers())
-                    && (m.isAnnotationPresent(XmlPath.class) || m
+        for (Method method : clazz.getMethods()) {
+            if (Modifier.isStatic(method.getModifiers())
+                    && (method.isAnnotationPresent(XmlPath.class) || method
                             .isAnnotationPresent(XmlPaths.class))) {
                 return;
             }
@@ -132,18 +146,21 @@ public class AnnotationProcessor {
 
         if (!(clazz.isAnnotationPresent(XmlPath.class) || clazz
                 .isAnnotationPresent(XmlPaths.class))) {
-            Messages.throwIllegalArgumentException("AnnotationProcessor.WITH_ANNOTATION",clazz.getName()); //$NON-NLS-1$
+            Messages.throwIllegalArgumentException(
+                    "AnnotationProcessor.WITH_ANNOTATION", clazz.getName()); //$NON-NLS-1$
         }
     }
 
-    private void checkMethod(Method m) {
-        if (m.getParameterCount() != 1) {
-            Messages.throwIllegalArgumentException("AnnotationProcessor.WRONG_PARAMETER_COUNT",m.getDeclaringClass().getName(),m.getName()); //$NON-NLS-1$
+    private void checkMethod(Method method) {
+        
+        if (method.getParameterCount() != 1) {
+            Messages.throwIllegalArgumentException(
+                    "AnnotationProcessor.WRONG_PARAMETER_COUNT", method.getDeclaringClass().getName(), method.getName()); //$NON-NLS-1$
         }
-        if (!m.getName().startsWith("set")) { 
-            Messages.throwIllegalArgumentException("AnnotationProcessor.WRONG_FUNCTION_NAME",m.getDeclaringClass().getName(),m.getName()); //$NON-NLS-1$
+        if (!method.getName().startsWith("set")) {
+            Messages.throwIllegalArgumentException(
+                    "AnnotationProcessor.WRONG_FUNCTION_NAME", method.getDeclaringClass().getName(), method.getName()); //$NON-NLS-1$
         }
     }
-    
-   
+
 }
