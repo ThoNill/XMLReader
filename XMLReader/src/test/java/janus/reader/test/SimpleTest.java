@@ -1,5 +1,6 @@
 package janus.reader.test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 import janus.reader.adapters.BooleanAdapter;
 import janus.reader.adapters.DoubleAdapter;
@@ -91,6 +92,30 @@ public class SimpleTest {
         Assert.assertFalse(a.endsWith(d4));
     }
 
+
+    @Test
+    public void pathTestNPL() {
+        XmlElementPath e = new XmlElementPath("/{namespace}prefix:localName");
+        QName[] parts = { new QName("namespace","localName","prefix")};
+        assertEquals(e,new XmlElementPath(parts));
+    }
+
+    @Test
+    public void pathTestNP() {
+        XmlElementPath e = new XmlElementPath("/prefix:localName");
+        QName[] parts = { new QName(null,"localName","prefix")};
+        assertEquals(e,new XmlElementPath(parts));
+    }
+
+    @Test
+    public void pathTestN() {
+        XmlElementPath e = new XmlElementPath("/localName");
+        QName[] parts = { new QName("localName")};
+        assertEquals(e,new XmlElementPath(parts));
+    }
+
+
+    
     @Test
     public void testNonExistentMessages() {
         try {

@@ -199,7 +199,7 @@ public class XmlElementPath {
         String namespace = extractNamespace(text, posColon, posBraceEnd);
 
         String textWithoutNamespace = extractText(text, posBraceEnd);
-
+        posColon = textWithoutNamespace.indexOf(':');
         String prefix = extractPrefix(textWithoutNamespace, posColon);
         String localPart = extractText(textWithoutNamespace, posColon);
 
@@ -230,8 +230,12 @@ public class XmlElementPath {
 
     private String extractNamespace(String text, int posColon, int posBraceEnd) {
         String namespace = extractPrefix(text, posBraceEnd);
+        if (namespace != null) {
+            namespace = namespace.substring(1);
+        }
         return namespace == null && posColon >= 0 ? "" : namespace;
     }
+
 
     private String extractText(String text, int startPosition) {
         return text.substring(startPosition < 0 ? 0 : startPosition + 1);
@@ -245,6 +249,9 @@ public class XmlElementPath {
         StringBuilder builder = new StringBuilder();
         for (QName qn : parts) {
             builder.append("/");
+            String namespace = qn.getNamespaceURI();
+            builder.append(namespace == null || "".equals(namespace.trim()) ? ""
+                    : "{" + namespace + "}");
             String prefix = qn.getPrefix();
             builder.append(prefix == null || "".equals(prefix.trim()) ? ""
                     : prefix + ":");
@@ -253,6 +260,7 @@ public class XmlElementPath {
 
         return builder.toString();
     }
+
 
     /**
      * this comparation is a little asymmetric, because perhapsWithoutNamespace
