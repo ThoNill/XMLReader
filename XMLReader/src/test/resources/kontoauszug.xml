@@ -3,14 +3,14 @@
 	<BkToCstmrDbtCdtNtfctn>
 
 		<GrpHdr>
-			<MsgId>MSG1</MsgId>
+			<MsgId>Message-1</MsgId>
 			<CreDtTm>JJJJ-MM-TTThh:mm:ss+01:00</CreDtTm>
 			<MsgRcpt>
-				<Nm>Name BANK KUNDE</Nm>
+				<Nm>Testkunde</Nm>
 				<Id>
 					<OrgId>
 						<Othr>
-							<Id>AAAADE01</Id>
+							<Id>ID01</Id>
 							<Issr>EBICS</Issr>
 						</Othr>
 					</OrgId>
@@ -27,17 +27,17 @@
 			<CreDtTm>JJJJ-MM-TTThh:mm:ss+01:00</CreDtTm>
 			<Acct>
 				<Id>
-					<IBAN>DE86201207003100778899</IBAN>
+					<IBAN>DE11111111111111111111</IBAN>
 				</Id>
 				<Ccy>EUR</Ccy>
 				<Ownr>
-					<Nm>Name BANK KUNDE</Nm>
+					<Nm>Testkunde</Nm>
 				</Ownr>
 				<Svcr>
 					<FinInstnId>
-						<BIC>AAAADEZZXXX</BIC>
+						<BIC>AAAAYYYYXXX</BIC>
 						<Othr>
-							<Id>123456789</Id>
+							<Id>10001</Id>
 							<Issr>UmsStId</Issr>
 						</Othr>
 					</FinInstnId>
@@ -45,7 +45,7 @@
 			</Acct>
 			<Ntry> <!--  Beginn einer Sammelbuchung  -->
 			    
-				<Amt Ccy="EUR">666.66</Amt>
+				<Amt Ccy="EUR">600.00</Amt>
 				<CdtDbtInd>CRDT</CdtDbtInd>
 				<Sts>BOOK</Sts>
 				<BookgDt>
@@ -54,143 +54,143 @@
 				<ValDt>
 					<Dt>JJJJ-MM-TT</Dt>
 				</ValDt>
-				<AcctSvcrRef>6789</AcctSvcrRef>
+				<AcctSvcrRef>1111</AcctSvcrRef>
 				<NtryDtls> 
 					<Btch>
 						<NbOfTxs>2</NbOfTxs>
 					</Btch>
 					<TxDtls> <!--  Einzelne Transaktion innerhalb einer Sammelbuchung -->
 						<Refs>
-							<AcctSvcrRef>AABBBCC00001234</AcctSvcrRef>
-							<EndToEndId>NOTPROVIDED</EndToEndId>
-							<TxId>ICFSCTJJMMTT0000000DE000</TxId>
+							<AcctSvcrRef>A1001</AcctSvcrRef>
+							<EndToEndId>E1001</EndToEndId>
+							<TxId>TID1001</TxId>
 						</Refs>
 						<AmtDtls>
 							<TxAmt>
-								<Amt Ccy="EUR">500.21</Amt>
+								<Amt Ccy="EUR">300.00</Amt>
 							</TxAmt>
 						</AmtDtls>
 						<BkTxCd>
 							<Prtry>
-								<Cd>ABCD123</Cd>
-								<Issr>ZKA</Issr>
+								<Cd>ABC</Cd>
+								<Issr>ZZZ</Issr>
 							</Prtry>
 						</BkTxCd>
 						<RltdPties>
 							<Dbtr>
-								<Nm>Name SEPA Debtor</Nm>
+								<Nm>TestDebitor1</Nm>
 								<PstlAdr>
 									<Ctry>DE</Ctry>
-									<AdrLine>Postfach 0000 00000 Nirgendwo</AdrLine>
+									<AdrLine>Unbekannt</AdrLine>
 									<AdrLine>GERMANY</AdrLine>
 								</PstlAdr>
 							</Dbtr>
 							<DbtrAcct>
 								<Id>
-									<IBAN>DE99111111111111111111</IBAN>
+									<IBAN>DE22222222222222222222</IBAN>
 								</Id>
 							</DbtrAcct>
 							<Cdtr>
-								<Nm>Name SEPA Creditor 1</Nm>
+								<Nm>TestCeditor1</Nm>
 							</Cdtr>
 							<CdtrAcct>
 								<Id>
-									<IBAN>DE55444444443333333333</IBAN>
+									<IBAN>DE33333333333333333333</IBAN>
 								</Id>
 							</CdtrAcct>
 						</RltdPties>
 						<RltdAgts>
 							<DbtrAgt>
 								<FinInstnId>
-									<BIC>BBBBDEYYXXX</BIC>
+									<BIC>BBBBYYYYXXX</BIC>
 								</FinInstnId>
 							</DbtrAgt>
 							<CdtrAgt>
 								<FinInstnId>
-									<BIC>AAAADEZZXXX</BIC>
+									<BIC>AAAAYYYYXXX</BIC>
 								</FinInstnId>
 							</CdtrAgt>
 						</RltdAgts>
 						<RmtInf>
-							<Ustrd>SEPA CAMT.054 Nr. 1</Ustrd>
+							<Ustrd>1</Ustrd>
 						</RmtInf>
-						<AddtlTxInf>SEPA-Ueberweisung</AddtlTxInf>
+						<AddtlTxInf>Ueberweisung</AddtlTxInf>
 					</TxDtls>
 
 					<TxDtls>
 						<Refs>
-							<AcctSvcrRef>AABBBCC00001234</AcctSvcrRef>
-							<EndToEndId>NOTPROVIDED</EndToEndId>
-							<TxId>ICFSCTJJMMTT0000000DE00000000012345</TxId>
+							<AcctSvcrRef>A1002</AcctSvcrRef>
+							<EndToEndId>E1002</EndToEndId>
+							<TxId>TID1002</TxId>
 						</Refs>
 						<AmtDtls>
 							<TxAmt>
-								<Amt Ccy="EUR">543.21</Amt>
+								<Amt Ccy="EUR">200.00</Amt>
 							</TxAmt>
 						</AmtDtls>
 						<BkTxCd>
 							<Prtry>
-								<Cd>ABCD123</Cd>
-								<Issr>ZKA</Issr>
+								<Cd>BBBB</Cd>
+								<Issr>ZZZ</Issr>
 							</Prtry>
 						</BkTxCd>
 						<RltdPties>
 							<Dbtr>
-								<Nm>Name SEPA Debtor</Nm>
+								<Nm>TestDebito2</Nm>
 								<PstlAdr>
 									<Ctry>DE</Ctry>
-									<AdrLine>Postfach 0000 00000 Nirgendwo</AdrLine>
+									<AdrLine>Unbekannt</AdrLine>
 									<AdrLine>GERMANY</AdrLine>
 								</PstlAdr>
 							</Dbtr>
 							<DbtrAcct>
 								<Id>
-									<IBAN>DE99111111111111111111</IBAN>
+									<IBAN>DE66666666666666666666</IBAN>
 								</Id>
 							</DbtrAcct>
 							<Cdtr>
-								<Nm>Name SEPA Creditor 1</Nm>
+								<Nm>TestCreditor2</Nm>
 							</Cdtr>
 							<CdtrAcct>
 								<Id>
-									<IBAN>DE55444444443333333333</IBAN>
+									<IBAN>DE77777777777777777777</IBAN>
 								</Id>
 							</CdtrAcct>
 						</RltdPties>
 						<RltdAgts>
 							<DbtrAgt>
 								<FinInstnId>
-									<BIC>BBBBDEYYXXX</BIC>
+									<BIC>BBBBYYYYXXX</BIC>
 								</FinInstnId>
 							</DbtrAgt>
 							<CdtrAgt>
 								<FinInstnId>
-									<BIC>AAAADEZZXXX</BIC>
+									<BIC>AAAAYYYYXXX</BIC>
 								</FinInstnId>
 							</CdtrAgt>
 						</RltdAgts>
 						<RmtInf>
-							<Ustrd>SEPA CAMT.054 Nr. 1</Ustrd>
+							<Ustrd>2</Ustrd>
 						</RmtInf>
-						<AddtlTxInf>SEPA-Ueberweisung</AddtlTxInf>
+						<AddtlTxInf>Ueberweisung</AddtlTxInf>
 					</TxDtls>
 
 
 					<TxDtls>
 						<Refs>
-							<AcctSvcrRef>AABBBCC00001235</AcctSvcrRef>
-							<EndToEndId>NOTPROVIDED</EndToEndId>
-							<TxId>ICFSCTJJMMTT0000000DE00000000012346</TxId>
+		   					<AcctSvcrRef>A1003</AcctSvcrRef>
+							<EndToEndId>E1003</EndToEndId>
+							<TxId>TID1003</TxId>
 						</Refs>
 						<AmtDtls>
 							<TxAmt>
-								<Amt Ccy="EUR">123.45</Amt>
+								<Amt Ccy="EUR">100.00</Amt>
 							</TxAmt>
 						</AmtDtls>
 						<BkTxCd>
 							<Prtry>
-								<Cd>ABCD123</Cd>
-								<Issr>ZKA</Issr>
+								<Cd>CCCCC</Cd>
+								<Issr>ZZZ</Issr>
 							</Prtry>
 						</BkTxCd>
 						<RltdPties>
@@ -198,13 +198,13 @@
 								<Nm>Name SEPA Debtor</Nm>
 								<PstlAdr>
 									<Ctry>DE</Ctry>
-									<AdrLine>Postfach 0000 00000 Nirgendwo</AdrLine>
+									<AdrLine>Unbekannt</AdrLine>
 									<AdrLine>GERMANY</AdrLine>
 								</PstlAdr>
 							</Dbtr>
 							<DbtrAcct>
 								<Id>
-									<IBAN>DE88111111111111111111</IBAN>
+									<IBAN>DE88888888888888888888</IBAN>
 								</Id>
 							</DbtrAcct>
 							<Cdtr>
@@ -212,26 +212,26 @@
 							</Cdtr>
 							<CdtrAcct>
 								<Id>
-									<IBAN>DE88777777776666666666</IBAN>
+									<IBAN>DE99999999999999999999</IBAN>
 								</Id>
 							</CdtrAcct>
 						</RltdPties>
 						<RltdAgts>
 							<DbtrAgt>
 								<FinInstnId>
-									<BIC>BBBBDEYYXXX</BIC>
+									<BIC>BBBBYYYYXXX</BIC>
 								</FinInstnId>
 							</DbtrAgt>
 							<CdtrAgt>
 								<FinInstnId>
-									<BIC>AAAADEZZXXX</BIC>
+									<BIC>AAAAYYYYXXX</BIC>
 								</FinInstnId>
 							</CdtrAgt>
 						</RltdAgts>
 						<RmtInf>
-							<Ustrd>SEPA CAMT.054 Nr. 2</Ustrd>
+							<Ustrd>3</Ustrd>
 						</RmtInf>
-						<AddtlTxInf>SEPA-Ueberweisung</AddtlTxInf>
+						<AddtlTxInf>Ueberweisung</AddtlTxInf>
 					</TxDtls>
 				</NtryDtls>
 			</Ntry>

@@ -92,7 +92,7 @@ public class XmlTest {
         Object o = reader.next();
         Assert.assertNotNull(o);
         Assert.assertTrue(o instanceof TObject);
-        Assert.assertEquals("ICFSCTJJMMTT0000000DE00000000012346",
+        Assert.assertEquals("TID1003",
                 ((TObject) o).getName());
     }
 
@@ -163,7 +163,7 @@ public class XmlTest {
                 Const.BkToCstmrDbtCdtNtfctn_Document));
         Assert.assertNotNull(ov);
         Assert.assertTrue(ov instanceof TObject);
-        Assert.assertEquals("MSG1", ((TObject) ov).getVerwendungszweck());
+        Assert.assertEquals("Message-1", ((TObject) ov).getVerwendungszweck());
 
     }
 
