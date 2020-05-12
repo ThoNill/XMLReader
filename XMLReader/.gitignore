@@ -1,8 +1,4 @@
 /bin/
 /target/
-/.classpath
-/.project
 /.settings/
 /.sonar/
-./settings.xml
-/settings.xml
